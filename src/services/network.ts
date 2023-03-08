@@ -17,14 +17,14 @@ const mqtt=Mqtt();
 const network=new Network(socket,mqtt);
 
 network.setAuthenticate(auth);
-network.setAuthSubscribe((client,subscription,callback)=>{
-    console.log("### service/network.js TEST-001 ###\n",{subscription});
-    callback(null,subscription)
-})
+// network.setAuthSubscribe((client,subscription,callback)=>{
+//     console.log("### service/network.js TEST-001 ###\n",{subscription});
+//     callback(null,subscription)
+// })
 
-network.setAuthPublish((client,packet,callback)=>{
-    const topic=packet.topic;
-    if(topic=='test') return callback(new Error("test result"))
-    return callback(null);
-})
+// network.setAuthPublish((client,packet,callback)=>{
+//     const topic=packet.topic;
+//     if(topic=='test') return callback(new Error("test result"))
+//     return callback(null);
+// })
 export default network;

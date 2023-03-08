@@ -46,9 +46,10 @@ const _MAKE_LABEL_TEXTURE=" "
 
 
 /** start log */
-export function createLog(label:string,align:'center'|'right'|'left'='right'){
+export function createLog(label:string,align:'center'|'right'|'left'='right',debug:boolean=true){
     label=`${_COLORS['BgGreen']}${makeLabel(label,{align})}${_COLORS['Reset']}`
     return function log(msg:string|number|object,...args:any[]){
+        if(!debug) return;
         let _msg:string=`${timeStamp()} ${label} ${typeof msg=='object'?JSON.stringify(msg):msg}`;
         codes.forEach(code=>{
             const replace=code.replace?

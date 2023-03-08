@@ -11,23 +11,26 @@ import { toArray } from "../lib/utility";
 const _SOCKET_PORT=8888;
 const _SYSTEM_KEY="$SYS"
 const _PUBLISH_KEY=_SYSTEM_KEY+"/TOPICS/"
-const log=createLog("Websocket","center");
+const _DEBUG=false;
+const log=createLog("Websocket","center",_DEBUG);
 
 export default class Socket extends tEvent{
     setting:SocketOptions={port:_SOCKET_PORT}
     clients:WebSocket[]=[];
     wss:WebSocketServer;
+    db:SocketSavePacket={};
+
     constructor(options?:SocketOptions){
         super();
         this.setting=Object.assign(this.setting,options);
         this.wss=new WebSocketServer({port:this.setting.port},()=>{
+            const log=createLog("Websocket","center");
             log("start at PORT=%d",this.setting.port)
         });
 
         /** connect */
         this.wss.on("connection",(ws:WebSocketExt)=>{
             ws.id=uuidv4();
-            const token=
             log("%d connected",ws.id);
             /** handle login: done */
             const handleLogin=setHandleLogin(this);
@@ -51,6 +54,8 @@ export default class Socket extends tEvent{
                 const pos=this.clients.findIndex(c=>c===ws);
                 if(pos!==-1) this.clients.splice(pos,1);
             })
+
+        
             /** handle connect event */
             this.emit("client",ws,null)
         })
@@ -62,30 +67,48 @@ export default class Socket extends tEvent{
     publish(packet:PublishPacket){
         const topic=packet.topic||""
         if(!topic) return false;
-        this.emit(_PUBLISH_KEY+topic,{id:'server'},packet);
-        return true;
-    }
+        const db=this.db[topic]||{packet,subscribes:[]};
+        //save packet
+        if(packet.retain){
+            if(!this.db[topic]) this.db[topic]=db;//first
+            else db.packet=packet;
+        }
+        //send packet
+        db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(packet)))
+     }
 
-    /** subcribe from clients (not check sercurity) */
-    _subcribe(ws:WebSocketExt,topics:string|string[]){
-       let _topics:string[]=[];
-       _topics=_topics.concat(topics);
-       if(!_topics.length) return false;//not success
-       _topics.forEach(topic=>{
-            this.on(_PUBLISH_KEY+topic,(ws1:WebSocketExt,data:any)=>{
-                log("%s publish tp '%s' to '%s'",ws1.id,topic,ws.id)
-                ws.send(JSON.stringify(data))
-            })
-            log("_subscribe: test-01",{events:JSON.stringify(this._events)})
-       })
+    /** subcribe from client (after checking sercurity) 
+     * @returns true/false= success/fail
+    */
+    _subcribe(ws:WebSocketExt,subscription:Subscription):boolean{
+        const topic=subscription.topic
+        if(!topic) return false;
+        const db=this.db[topic];
+        if(!db) { // new topic => add first data
+            this.db[topic]={subscribes:[{ws,subscription}],packet:null}
+            console.log("\n*** _subscribe-001/db=\n",db)
+            return true;
+        }
+        //exist db
+        const packet=db.packet;
+        //send packet if available packet & subscribe with retain=true
+        if(packet && subscription.retain) ws.send(JSON.stringify(packet))
+        //update subscription
+        const _sub=db.subscribes.find(s=>s.ws==ws);
+        if(!_sub){ //first times client subscribe
+            db.subscribes.push({ws,subscription})
+            console.log("\n*** _subscribe-002/db=\n",db)
+            return true;
+        }
+        _sub.subscription=subscription;//update sub
+        console.log("\n*** _subscribe-003/db=\n",db)
+        return true;
     }
 
     /** subcribe direct from server bypass sercurity */
     subscribe(topic:string,callback:ServerSubscribeHandle){
         const that=this;
-        const _cb=(ws:WebSocketExt,packet:PublishPacket)=>{
-            callback(packet)
-        }
+        const _cb=(ws:WebSocketExt,packet:PublishPacket)=>callback(packet)
         return this.on(_PUBLISH_KEY+topic,_cb)
     }
 
@@ -95,6 +118,12 @@ export default class Socket extends tEvent{
 }
 
 //////////////// MINI FUNCTIONS ////////////////////
+
+/** convert subscription from toptic or subscription */
+function toSubscription(subscription:string|Subscription):Subscription{
+    if(typeof subscription=='string') return {topic:subscription,qos:0,retain:false}
+    return subscription
+}
  /** subscribe sercurity check */
  function setSubscribeHandle(server:Socket){
     return function subscribeHandle(ws:WebSocketExt,msg:SubscribePacket,next:Function){
@@ -105,17 +134,16 @@ export default class Socket extends tEvent{
             const suList:string[]=[];
             const erList:string[]=[];
             subs.forEach(sub=>{
-                const _df:Subscription={qos:0,retain:false,topic:''}
-                const _sub=Object.assign(_df,typeof sub=='string'?{topic:sub}:sub);
-                if(_sub.topic.startsWith(_SYSTEM_KEY)) return erList.push(_sub.topic)   // reject system
-                server.authorizeSubscribe(ws,_sub,(err,subscription:Subscription)=>{
+                sub=toSubscription(sub);
+                if(sub.topic.startsWith(_SYSTEM_KEY)) return erList.push(sub.topic)   // reject system
+                server.authorizeSubscribe(ws,sub,(err,subscription:Subscription)=>{
                     const _topic=subscription.topic;
                     if(err) {
                         erList.push(_topic)
                         return;
                     }
-                    suList.push(_topic)
-                    server._subcribe(ws,_topic);
+                    if(server._subcribe(ws,subscription)) suList.push(_topic)
+                    else erList.push(_topic)
                 })
                 ws.send(JSON.stringify({success:suList.length,msg:suList.length?"success topics:["+suList.join()+"]":""+erList.length?"failured topics:["+erList.join()+"]":""}))
             }) 
@@ -140,9 +168,11 @@ function setHandleLogin(server:Socket){
             const pass=payload.pass||"";
             if(!user||!pass) throw new Error("login: not get probaly username or password");
             server.authenticate(ws,user,pass,(err,success)=>{
+                // check sercurity
                 if(err) return ws.send(JSON.stringify({success:0,msg:err.message}));
                 if(!success) return ws.send(JSON.stringify({success:0,msg:"success logic is false"}));
-                return ws.send(JSON.stringify({success:1,msg:"login success",topic:"login"}))
+                //send publish message
+                ws.send(JSON.stringify({success:1,msg:"login success",topic:"login"}))
             })
 
         }
@@ -156,19 +186,26 @@ function setHandleLogin(server:Socket){
 
 /** handle topics */
 function setHandletopic(server:Socket){
-    return function handletopic(ws:WebSocketExt,msg:PublishPacket,next:Function){
-        const topic=msg.topic;
+    return function handletopic(ws:WebSocketExt,packet:PublishPacket,next:Function){
+        const topic=packet.topic;
         //check condition
         if(!topic||topic.startsWith(_SYSTEM_KEY)) return ws.send(JSON.stringify({success:0,msg:"wrong topic",topic}))
         // check sercurity
-        server.authorizePublish(ws,msg,(err)=>{
+        server.authorizePublish(ws,packet,(err)=>{
             if(err) {
                 log("handleTopic: ### reject publish ### ",{err:err.message,topic})
                 return ws.send(JSON.stringify({success:0,msg:err.message||"accept denied",topic}))
             }
-            const length=server.emit(_PUBLISH_KEY+topic,ws,msg);
-            if(!length) return next(ws,msg);
-            return ws.send(JSON.stringify({success:1,msg:"publish is success",topic}))
+
+            // /** sercurity success */
+            // const db=server.db[topic]||={packet,subscribes:[]};
+            // //save packet to server
+            // if(packet.retain){ 
+            //     if(!server.db[topic]) server.db[topic]=db;
+            // }
+            // db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(db.packet)))
+            server.publish(packet);
+            server.emit("publish",{...packet,cmd:'publish'},ws)
         })
     }
 }
@@ -206,3 +243,18 @@ interface WebSocketExt extends WebSocket{
     uid?:string;
     token?:string;
 }
+
+export interface SocketSavePacket{
+    [topic:string]:{
+        packet:PublishPacket|undefined|null
+        subscribes:SocketSubscribePacket[]
+    }
+}
+
+/** keep subscription on server */
+export interface SocketSubscribePacket{
+    ws:WebSocketExt;
+    subscription:Subscription
+}
+
+

@@ -1,6 +1,7 @@
 import { createLog } from "./log";
+const _DEBUG=false
 
-const log=createLog("Event","center");
+const log=createLog("Event","center",_DEBUG);
 export default class tEvent{
     _events:EventData={}
     constructor(){}

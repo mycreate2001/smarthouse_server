@@ -1,6 +1,8 @@
 export interface PublishPacket{
+    cmd:"publish"|"subscribe"
     topic:string;
     payload:Buffer|string;
+    retain?:boolean;
 }
 
 export interface AuthenticateHandle{
