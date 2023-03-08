@@ -8,6 +8,7 @@
     "build": "tsc -p .",
     "start": "npm run build && node dist/index.js",
     "dev": "nodemon --ext ts --watch ./src --exec npm start",
+    "up":"git add . && git commit && git push origin main",
     "test:mini":"npm run build && node dist/test/mini.js"
   },
   "keywords": [],
