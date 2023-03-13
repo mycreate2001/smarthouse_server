@@ -50,9 +50,15 @@ export default class Socket extends tEvent{
             })
             ws.on("close",(code,reason)=>{
                 log("%d disconnected",ws.id);
-                this.emit("clientDisconnect",{code,reason});
-                const pos=this.clients.findIndex(c=>c===ws);
-                if(pos!==-1) this.clients.splice(pos,1);
+                this.emit("clientDisconnect",ws,{code,reason});
+                //remove subscribe
+                Object.keys(this.db).forEach(topic=>{
+                    const db=this.db[topic];
+                    if(!db||!db.subscribes||!db.subscribes.length) return;
+                    for(let i=db.subscribes.length-1;i--;i>=0){
+                        if(db.subscribes[i].ws===ws) db.subscribes.splice(i,1)
+                    }
+                })
             })
 
         

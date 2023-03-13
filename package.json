@@ -8,18 +8,20 @@
     "build": "tsc -p .",
     "start": "npm run build && node dist/index.js",
     "dev": "nodemon --ext ts --watch ./src --exec npm start",
-    "up":"git config --global alias.add-commit '!git add -A && git commit'",
-    "test:mini":"npm run build && node dist/test/mini.js"
+    "up": "git config --global alias.add-commit '!git add -A && git commit'",
+    "test:mini": "npm run build && node dist/test/mini.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "aedes": "^0.48.1",
+    "crypto-js": "^4.1.1",
     "uuidv4": "^6.2.13",
     "ws": "^8.12.1"
   },
   "devDependencies": {
+    "@types/crypto-js": "^4.1.1",
     "@types/node": "^18.14.0",
     "@types/ws": "^8.5.4",
     "nodemon": "^2.0.20",
