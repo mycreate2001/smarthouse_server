@@ -1,6 +1,6 @@
-import { createLog } from "../lib/log";
-import { shortID, shortMsg } from "../lib/utility";
-import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle, PublishPacket, ServerSubscribeHandle } from "./interface.type";
+import { createLog } from "../../lib/log";
+import { shortID, shortMsg } from "../../lib/utility";
+import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle, PublishPacket, ServerSubscribeHandle } from "../interface.type";
 const log=createLog("Network","center");
 export default class Network{
     clients:any[]=[];

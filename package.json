@@ -17,6 +17,7 @@
   "dependencies": {
     "aedes": "^0.48.1",
     "crypto-js": "^4.1.1",
+    "local-database-lite": "github:mycreate2001/local-database-lite",
     "uuidv4": "^6.2.13",
     "ws": "^8.12.1"
   },

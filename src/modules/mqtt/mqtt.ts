@@ -11,7 +11,7 @@
 const Net=require('net');
 // import aedesServer from "aedes:server";
 import * as aedes from 'aedes'
-import { createLog } from '../lib/log';
+import { createLog } from '../../lib/log';
 // import Aedes from 'aedes:server';
 
 /** default */
