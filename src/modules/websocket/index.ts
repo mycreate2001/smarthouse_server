@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws'
 import { createLog } from "../../lib/log";
-import { ModuleInfor, ModulePackage } from "../../interface";
+import { ModuleInfor, ModulePackage } from "../../lib/module/module.interface";
 
 const _PORT=8888
 const log=createLog("websocket")

@@ -1,4 +1,4 @@
-import { ModuleInfor, ModulePackage } from '../../interface';
+import { ModuleInfor, ModulePackage } from '../../lib/module/module.interface';
 import Mqtt from './mqtt';
 const _PORT=1884
 export default function startup(infor:ModuleInfor,apps:ModulePackage[]){

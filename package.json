@@ -9,7 +9,8 @@
     "start": "npm run build && node dist/index.js",
     "dev": "nodemon --ext ts --watch ./src --exec npm start",
     "up": "git config --global alias.add-commit '!git add -A && git commit'",
-    "test:mini": "npm run build && node dist/test/mini.js"
+    "test:mini": "npm run build && node dist/test/mini.js",
+    "test:wildcard":"npm run build && node dist/lib/wildcard.js"
   },
   "keywords": [],
   "author": "",
