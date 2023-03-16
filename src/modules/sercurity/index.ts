@@ -19,5 +19,6 @@ export default function startup(infor:ModuleInfor,modules:InputModule){
         // network.authenticate=sercurity.authenticate();//authenticate
         network.setAuthenticate(sercurity.authenticate())
     })
+    log("load success!")
     return true;
 }

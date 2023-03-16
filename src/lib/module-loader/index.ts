@@ -1,11 +1,11 @@
 import { rmdirSync } from 'fs';
 import LocalDatabase,{DataConnect} from 'local-database-lite'
 import { ModulePackage } from './module.interface';
-import { createDebug, createLog } from '../log';
-import { toArray } from '../utility';
+import { createLog } from '../log';
 import { wildcard } from '../wildcard';
-const log=createLog("Module","center")
 const _ISCOMMIT=true
+const _DEBUG=false
+const log=createLog("Module","center",_DEBUG)
 export interface ModuleStorage{
     [key:string]:ModulePackage &{status:string}
 }
@@ -42,15 +42,21 @@ export class ModuleLoader {
 
     /** load each module */
     private loadModule(module:ModulePackage,modules:ModulePackage[],list:string[]){
-        const _DEBUG=false
         if(list.includes(module.id)) return module;
         log("start %s [%d]",module.id,module.level)
-        //filter by level
-        let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
+        // //filter by level
+        // let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
+        let preModules:ModulePackage[]
+            =Object.keys(module.imports).some(key=>wildcard(module.keys,module.imports[key]))?
+            modules.filter(m=>m.level<module.level)
+            :modules
+        // let preModules:ModulePackage[]=modules; //no filter by level
         const ips:any={};
+        // console.log("module-loeader/index.ts-51 ",module)
         Object.keys(module.imports).forEach(ipKey=>{
             // ips[key]= something
             const ref=module.imports[ipKey]
+            // console.log("module-loeader/index.ts-52 ",{ipKey,ref})
             // module is correct keys
             let _mds=preModules.filter(m=>wildcard(m.keys,ref))
             // get last level when same keys
@@ -78,47 +84,8 @@ export class ModuleLoader {
         return result;
     }
 
-    /** get loaded modules */
-    private _getList(){
-        return Object.keys(this.Modules);
-    }
-
     
 }
-
-function getList(arrs:any[],key:string):string[]{
-    const outs:string[]=[]
-    arrs.forEach(obj=>{
-        const val=obj[key]+""
-        if(outs.includes(val)) return
-        outs.push(val)
-    })
-    return outs;
-}
-
-
-// function loadModule(modules:ModulePackage[],module:ModulePackage,list:string[]){
-//     if(list.includes(module.id)) return module;
-//     const pre=modules.filter(m=>m.targets.includes(module.id));
-//     const preModules:ModulePackage[]=pre.map(m=>loadModule(modules,m,list))
-//         .filter(x=>!!x)
-//     const fn=require(module.path).default;
-    
-//     if(typeof fn=='function') {
-//         log("loaded %d",module.id)
-//         module.module=fn(module,preModules)
-//     }
-//     else {
-//         log("\n### ERROR ### load module '%d' is error",module.id);
-//         module.module=undefined;
-//     }
-//     //update list
-//     [...preModules,module].map(m=>m.id).forEach(id=>{
-//         if(list.includes(id)) return;
-//         list.push(id)
-//     })
-//     return module
-// }
 
 export interface LoadModuleOptions{
     modules:ModulePackage[],

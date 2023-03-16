@@ -4,12 +4,12 @@ import {join} from 'path'
 /** CONSTANT */
 const _DEBUG=true;
 const _CONFIG_FILE_NAME="config.ini"
-const _PATH_DEFAULT=join(__dirname,"..","..","..","..",_CONFIG_FILE_NAME)
+const _PATH_DEFAULT=join(__dirname,"..","..","..",_CONFIG_FILE_NAME);//require('../../../config.ts')
 const _ISCOMMIT=false;
 
 export default class Config{
     //variable
-    opts:ConfigOption={path:_PATH_DEFAULT,debug:_DEBUG}
+    private opts:ConfigOption={path:_PATH_DEFAULT,debug:_DEBUG}
     obj:any={}
     constructor(opts?:Partial<ConfigOption>){
         this.opts=Object.assign(this.opts,opts);
@@ -25,6 +25,7 @@ export default class Config{
                 obj[key]=val;
             })
             this.obj=obj;
+            console.log("\n\n###### configs/configs.ts-28 ",{path:this.opts.path,obj})
         }
         catch(err){
             if(this.opts.debug) {

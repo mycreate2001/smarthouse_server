@@ -1,0 +1,121 @@
+{
+    "modules": {
+        "socket_handle": {
+            "name": "socket handle",
+            "path": "../../modules/socket_handle",
+            "params": {},
+            "imports": {
+                "websocket": "network/websocket"
+            },
+            "keys": "network/websocket",
+            "level": 1
+        },
+        "mqtt": {
+            "name": "mqtt",
+            "path": "../../modules/mqtt",
+            "params": {
+                "port": 1883
+            },
+            "imports": {},
+            "keys": "network/mqtt",
+            "level": 0
+        },
+        "http": {
+            "name": "http",
+            "path": "../../modules/http",
+            "params": {
+                "port": 3000
+            },
+            "imports": {},
+            "keys": "http",
+            "level": 0
+        },
+        "network": {
+            "name": "network",
+            "path": "../../modules/network",
+            "params": {
+                "port": 1883
+            },
+            "imports": {
+                "network": "network/#"
+            },
+            "level": 10,
+            "keys": "network"
+        },
+        "websocket": {
+            "name": "websocket",
+            "path": "../../modules/websocket",
+            "params": {
+                "port": 8888
+            },
+            "imports": {},
+            "keys": "network/websocket",
+            "level": 0
+        },
+        "configure": {
+            "name": "configure file",
+            "path": "../../modules/configs",
+            "params": {},
+            "imports": {},
+            "keys": "configure",
+            "level": 0
+        },
+        "cryption": {
+            "name": "engypt/degypt password",
+            "path": "../../modules/cryption",
+            "params": {},
+            "imports": {
+                "config": "configure"
+            },
+            "keys": "hash/cryption",
+            "level": 1
+        },
+        "database": {
+            "name": "database",
+            "path": "../../modules/database",
+            "params": {},
+            "imports": {},
+            "keys": "database/general",
+            "level": 0
+        },
+        "user_database": {
+            "name": "User database",
+            "path": "../../modules/database/user.database.js",
+            "params": {},
+            "imports": {
+                "database": "database/general"
+            },
+            "keys": "database/user_database",
+            "level": 1
+        },
+        "user_service": {
+            "name": "User Service",
+            "path": "../../modules/user_service",
+            "params": {},
+            "imports": {
+                "database": "database/user_database",
+                "hash": "hash/#",
+                "network": "network"
+            },
+            "keys": "database/user_database",
+            "level": 11
+        },
+        "tasmota": {
+            "name": "tasmota",
+            "path": "../../modules/tasmota",
+            "params": {},
+            "imports": {},
+            "keys": "service/tasmota",
+            "level": 12
+        }
+    },
+    "users": {
+        "admin": {
+            "name": "",
+            "clientId": "",
+            "pass": "U2FsdGVkX1+qsog0GVHFr4Zu118if9+H47Fy4mB2WHY=",
+            "lastLogin": "2023-03-16T08:35:21.891Z",
+            "level": 10
+        }
+    }
+}
