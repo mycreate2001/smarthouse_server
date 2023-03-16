@@ -24,7 +24,6 @@ export default class Socket extends tEvent{
         super();
         this.setting=Object.assign(this.setting,options);
         this.wss=new WebSocketServer({port:this.setting.port},()=>{
-            const log=createLog("Websocket","center");
             log("start at PORT=%d",this.setting.port)
         });
 

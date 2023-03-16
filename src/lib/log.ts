@@ -60,6 +60,16 @@ export function createLog(label:string,align:'center'|'right'|'left'='right',deb
     }
 }
 
+export function createDebug(label:string,_debug:boolean){
+    return function debug(msg:any,...data:any[]){
+        if(!_debug) return;
+        if(typeof msg=='string') return console.log("["+label+"] "+msg,...data)
+        console.log("[%s] ",label,msg,...data)
+    }
+}
+
+/////////////// PRIVATE FUNCTIONS ////////////////////////////////
+
 /** make label string */
 function makeLabel(str:string|number,opts?:Partial<makeStringOptions>){
 
@@ -77,7 +87,7 @@ function makeLabel(str:string|number,opts?:Partial<makeStringOptions>){
     switch (_opts.align){
         case 'center':{
             str=_opts.texture+str+_opts.texture;
-            const pos=(str.length-_opts.length)/2-1;
+            const pos=Math.floor((str.length-_opts.length)/2);
             return str.substring(pos,pos+_opts.length);
 
         }break;
@@ -148,3 +158,4 @@ interface makeStringOptions{
     texture:string;
     align:'right'|'center'|'left'
 }
+

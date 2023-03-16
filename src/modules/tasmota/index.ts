@@ -1,4 +1,4 @@
-import { ModuleInfor, ModulePackage } from "../../lib/module/module.interface";
+import { ModuleInfor, ModulePackage } from "../../lib/module-loader/module.interface";
 import { createLog } from "../../lib/log";
 import { PublishPacket } from "../interface.type";
 import tEvent from "../../lib/event";
@@ -8,17 +8,8 @@ import aedesServer from "aedes:server";
 import { wildcard } from "../../lib/wildcard";
 const log=createLog("tasmota");
 export default function tamotas(infor:ModuleInfor,modules:ModulePackage[]){
-    const mqttModule=modules.find(m=>infor.targets.includes(m.id))
-    if(!mqttModule) return -1;
-    const mqtt=mqttModule.module
-    mqtt.on("publish",(packet:PublishPacket,client:any)=>{
-        if(!packet.cmd) return;
-        packet.payload=packet.payload.toString();
-        console.log("\npublish '%s' from %d\n-----------------------\n",packet.topic,client.id,{payload:packet.payload})
-        // handle
-        dispath(packet,client,mqtt)
-    })
-    return mqtt;
+    console.log("\n++++ %s +++\nmodules:",infor.name,modules);
+    return 1
 }
 
 const handles=[

@@ -3,8 +3,9 @@ export interface ModuleInfor{
     name:string;        // module name
     path:string;        // paht -- help load module
     params:any;         // parameters initals input when startup
-    targets:string[];   // modules use curent module
-    type:ModuleType;  
+    imports:ImportData;        // modules use curent module
+    keys:string;        // like topic 
+    level:number;
 }
 
 export interface ModulePackage extends ModuleInfor{
@@ -12,3 +13,10 @@ export interface ModulePackage extends ModuleInfor{
 }
 
 export type ModuleType ="network"|"database"|"service"
+export interface ImportData{
+    [key:string]:string
+}
+
+export interface InputModule{
+    [key:string]:ModulePackage[]
+}

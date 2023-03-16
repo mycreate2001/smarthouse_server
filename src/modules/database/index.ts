@@ -1,6 +1,6 @@
 import LocalDatabaseLite from "local-database-lite";
 import { join } from "path";
-import { ModuleInfor, ModulePackage } from "../../lib/module/module.interface";
+import { ModuleInfor, ModulePackage } from "../../lib/module-loader/module.interface";
 const _PATH=join(__dirname,"..",'..',"database.json")
 export default function startup(infor:ModuleInfor,modules:ModulePackage[]){
     console.log("******* HERE *******")
