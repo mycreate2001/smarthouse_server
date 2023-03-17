@@ -1,10 +1,9 @@
-import { join } from "path";
+import { resolve } from "path";
 import { ModuleLoader } from "./lib/module-loader";
+import { ModulePackage } from "./lib/module-loader/module.interface";
 console.clear();
 console.log("\n\n\n\n+++++++++++++++++++++++++++++++++++\ntime:%s\n------------------------------------------------------------------\n",Date.now())
 
 
-const path=join(__dirname,"..","storage","database.json");
-const lModule=new ModuleLoader(path);
-const control:any={}
-lModule.startup();
+const lModule=new ModuleLoader();
+lModule.startup()

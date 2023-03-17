@@ -3,6 +3,7 @@ import LocalDatabase,{DataConnect} from 'local-database-lite'
 import { ModulePackage } from './module.interface';
 import { createLog } from '../log';
 import { wildcard } from '../wildcard';
+import { resolve } from 'path';
 const _ISCOMMIT=true
 const _DEBUG=false
 const log=createLog("Module","center",_DEBUG)
@@ -12,9 +13,12 @@ export interface ModuleStorage{
 export class ModuleLoader {
     db:DataConnect<ModulePackage>;
     Modules:ModuleStorage={}    //result & status after loading module
-    constructor(path:string){
+    constructor(path?:string){
+        //handle path
+        path=path||resolve("storage","database.json")
         const db=new LocalDatabase(path);
         this.db=db.connect("modules");
+        // console.log("\n\n++++++++module-loader/index.js-21\nmodules:",this.db.search())
     }
     add(module:ModulePackage,isCommit:boolean=_ISCOMMIT){
         this.db.add(module,isCommit);

@@ -17,4 +17,8 @@
 - total level 1 ~ 10 (level10 is top), level1=lowest level, it's apply for communicate, database,...
 - module will load from level 0-->10
 - use type "network/websocket
-
+## 3.1 todo
+- add module from web [done]
+    [handle upload] --> [ zipfile ] --> [ add information]
+- edit package infor [notyet]
+- remove module from web [notyet]

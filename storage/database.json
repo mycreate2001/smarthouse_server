@@ -26,9 +26,11 @@
             "params": {
                 "port": 3000
             },
-            "imports": {},
+            "imports": {
+                "database": "database/#"
+            },
             "keys": "http",
-            "level": 0
+            "level": 2
         },
         "network": {
             "name": "network",
@@ -107,6 +109,15 @@
             "imports": {},
             "keys": "service/tasmota",
             "level": 12
+        },
+        "hellowould": {
+            "path": "E:\\WorkSpaces\\BACKEND\\smarthouse\\dist\\modules\\hellowould\\src\\index.js",
+            "name": "hellowould",
+            "params": {},
+            "imports": {},
+            "keys": "",
+            "level": 0,
+            "module": null
         }
     },
     "users": {

@@ -1,9 +1,7 @@
 import { ModuleInfor, ModulePackage } from "../../lib/module-loader/module.interface";
 import { createLog } from "../../lib/log";
 import { PublishPacket } from "../interface.type";
-import tEvent from "../../lib/event";
 import { Client } from "client";
-import Aedes from "aedes:server";
 import aedesServer from "aedes:server";
 import { wildcard } from "../../lib/wildcard";
 const log=createLog("tasmota");
