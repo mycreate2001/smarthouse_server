@@ -1,0 +1,783 @@
+---- start to pair --------------------
+2023.Mar.17 13:01:42.407     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":84,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:01:42.407      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 84,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":21,"Message":"Pairing mode enabled"}}'
+}
+2023.Mar.17 13:01:42.408     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":49,"topic":"stat/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:01:42.408      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 49,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbPermitJoin":"Done"}'
+}
+2023.Mar.17 13:01:45.632     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":157,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:01:45.632      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 157,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":34,"IEEEAddr":"0xA4C138E9B1287758","ShortAddr":"0xB2A2","ParentNetwork":"0x0000","JoinStatus":1,"Decision":0}}'
+}
+2023.Mar.17 13:02:11.304     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":157,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:02:11.305      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 157,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":34,"IEEEAddr":"0xA4C138E9B1287758","ShortAddr":"0xB2A2","ParentNetwork":"0x0000","JoinStatus":1,"Decision":0}}'
+}
+2023.Mar.17 13:02:12.366     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":165,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:02:12.367      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 165,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":30,"IEEEAddr":"0xA4C138E9B1287758","ShortAddr":"0xB2A2","PowerSource":false,"ReceiveWhenIdle":false,"Security":false}}'
+}
+2023.Mar.17 13:02:12.435     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":78,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:02:12.436      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 78,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":32,"ActiveEndpoints":["0x01"]}}'
+}
+2023.Mar.17 13:02:12.621     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":155,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:02:12.622      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 155,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","ModelId":"TS0201","Manufacturer":"_TZ3000_dowj6gyi","Endpoint":1,"LinkQuality":115}}}'
+}
+2023.Mar.17 13:02:14.678     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":249,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:02:14.679      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 249,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":33,"Device":"0xB2A2","Endpoint":"0x01","ProfileId":"0x0104","DeviceId":"0x0302","DeviceVersion":1,"InClusters":["0x0001","0x0003","0x0402","0x0405","0x0000"],"OutClusters":["0x0003","0x0019","0x000A"]}}'
+}
+2023.Mar.17 13:02:17.380     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:02:17.381      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbBind":{"Device":"0xB2A2","Status":0,"StatusMessage":"SUCCESS"}}'
+}
+2023.Mar.17 13:02:18.936     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:02:18.937      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbBind":{"Device":"0xB2A2","Status":0,"StatusMessage":"SUCCESS"}}'
+}
+2023.Mar.17 13:02:19.314     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.24
+Humindity: 68.77
+2023.Mar.17 13:02:19.315      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.24,"Humidity":68.77,"Endpoint":1,"LinkQuality":113}}}'
+}
+2023.Mar.17 13:02:19.362     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":157,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:02:19.363      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 157,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Cluster":10,"Read":[7],"ReadNames":{"LocalTime":true},"Endpoint":1,"LinkQuality":107}}}'
+}
+2023.Mar.17 13:02:21.428     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:02:21.429      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbBind":{"Device":"0xB2A2","Status":0,"StatusMessage":"SUCCESS"}}'
+}
+2023.Mar.17 13:02:23.242     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":170,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:02:23.242      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 170,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","ConfigResponse":{"Temperature":{"Status":0,"StatusMsg":"SUCCESS"}},"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:02:24.336     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.26
+Humindity: 68.62
+2023.Mar.17 13:02:24.337      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.26,"Humidity":68.62,"Endpoint":1,"LinkQuality":107}}}'
+}
+2023.Mar.17 13:02:24.944     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":167,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:02:24.946      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 167,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","ConfigResponse":{"Humidity":{"Status":0,"StatusMsg":"SUCCESS"}},"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:02:29.327     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.28
+Humindity: 68.48
+2023.Mar.17 13:02:29.328      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.28,"Humidity":68.48,"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:02:34.336     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.24
+Humindity: 68.35
+2023.Mar.17 13:02:34.338      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.24,"Humidity":68.35,"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:02:39.320     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.24
+Humindity: 68.31
+2023.Mar.17 13:02:39.321      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.24,"Humidity":68.31,"Endpoint":1,"LinkQuality":113}}}'
+}
+2023.Mar.17 13:02:42.423     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":85,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:02:42.424      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 85,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":20,"Message":"Pairing mode disabled"}}'
+}
+2023.Mar.17 13:02:44.335     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.23
+Humindity: 68.35
+2023.Mar.17 13:02:44.336      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.23,"Humidity":68.35,"Endpoint":1,"LinkQuality":113}}}'
+}
+2023.Mar.17 13:02:49.335     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.24
+Humindity: 68.81
+2023.Mar.17 13:02:49.336      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.24,"Humidity":68.81,"Endpoint":1,"LinkQuality":113}}}'
+}
+2023.Mar.17 13:02:54.319     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.24
+Humindity: 68.72
+2023.Mar.17 13:02:54.321      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.24,"Humidity":68.72,"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:02:59.336     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.23
+Humindity: 68.53
+2023.Mar.17 13:02:59.337      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.23,"Humidity":68.53,"Endpoint":1,"LinkQuality":118}}}'
+}
+2023.Mar.17 13:03:04.323     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.21
+Humindity: 68.51
+2023.Mar.17 13:03:04.324      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.21,"Humidity":68.51,"Endpoint":1,"LinkQuality":115}}}'
+}
+2023.Mar.17 13:03:09.324     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.21
+Humindity: 68.49
+2023.Mar.17 13:03:09.325      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.21,"Humidity":68.49,"Endpoint":1,"LinkQuality":118}}}'
+}
+2023.Mar.17 13:03:14.335     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":138,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.24
+Humindity: 68.7
+2023.Mar.17 13:03:14.337      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 138,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.24,"Humidity":68.7,"Endpoint":1,"LinkQuality":105}}}'
+}
+2023.Mar.17 13:03:19.926     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.36
+Humindity: 69.34
+2023.Mar.17 13:03:19.927      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.36,"Humidity":69.34,"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:04:32.794     Network     E8D...BFAE publish tele/E8DB849DBFAE/STATE msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":328,"topic":"tele/E8DB849DBFAE/STATE...
+2023.Mar.17 13:04:32.795      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 328,
+  topic: 'tele/E8DB849DBFAE/STATE',
+  payload: '{"Time":"2023-03-17T07:04:32","Uptime":"0T00:20:10","UptimeSec":1210,"Vcc":3.505,"Heap":24,"SleepMode":"Dynamic","Sleep":50,"LoadAvg":19,"MqttCount":1,"Wifi":{"AP":1,"SSId":"Full House","BSSId":"0A:6A:C5:7B:F1:38","Channel":11,"Mode":"11n","RSSI":100,"Signal":-25,"LinkCount":1,"Downtime":"0T00:00:04"}}'
+}
+
+
+---- pair PIR 2023.Mar.17 13:09:32.804     Network     E8D...BFAE publish tele/E8DB849DBFAE/STATE msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":328,"topic":"tele/E8DB849DBFAE/STATE...
+2023.Mar.17 13:09:32.805      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 328,
+  topic: 'tele/E8DB849DBFAE/STATE',
+  payload: '{"Time":"2023-03-17T07:09:32","Uptime":"0T00:25:10","UptimeSec":1510,"Vcc":3.504,"Heap":24,"SleepMode":"Dynamic","Sleep":50,"LoadAvg":19,"MqttCount":1,"Wifi":{"AP":1,"SSId":"Full House","BSSId":"0A:6A:C5:7B:F1:38","Channel":11,"Mode":"11n","RSSI":100,"Signal":-24,"LinkCount":1,"Downtime":"0T00:00:04"}}'
+}
+
+
+----- 2023.Mar.17 13:09:57.054     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 28.36
+Humindity: 69.34
+2023.Mar.17 13:09:57.055      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":28.36,"Humidity":69.34,"Endpoint":1,"LinkQuality":113}}}'
+}
+
+
+
+
+
+
+
+---------------------------- pair PIR -------------
+2023.Mar.17 13:10:50.380     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":84,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:10:50.381      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 84,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":21,"Message":"Pairing mode enabled"}}'
+}
+2023.Mar.17 13:10:50.382     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":49,"topic":"stat/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:10:50.382      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 49,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbPermitJoin":"Done"}'
+}
+------------------
+2023.Mar.17 13:11:08.506     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":157,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:11:08.507      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 157,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":34,"IEEEAddr":"0x00124B002396E6B4","ShortAddr":"0xAA75","ParentNetwork":"0x0000","JoinStatus":1,"Decision":0}}'
+}
+2023.Mar.17 13:11:09.005     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":165,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:11:09.006      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 165,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":30,"IEEEAddr":"0x00124B002396E6B4","ShortAddr":"0xAA75","PowerSource":false,"ReceiveWhenIdle":false,"Security":false}}'
+}
+2023.Mar.17 13:11:09.007     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":123,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:11:09.008      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 123,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?01":"15000000","Endpoint":1,"LinkQuality":118}}}'
+}
+2023.Mar.17 13:11:09.009     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":160,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:11:09.009      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 160,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000000000","ZoneStatusChange":1,"Contact":1,"Endpoint":1,"LinkQuality":118}}}'
+}
+2023.Mar.17 13:11:09.582     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":78,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:11:09.582      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 78,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":32,"ActiveEndpoints":["0x01"]}}'
+}
+2023.Mar.17 13:11:10.221     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":144,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:11:10.222      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 144,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","ModelId":"DS01","Manufacturer":"eWeLink","Endpoint":1,"LinkQuality":113}}}'
+}
+2023.Mar.17 13:11:11.802     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":222,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:11:11.803      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 222,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":33,"Device":"0xAA75","Endpoint":"0x01","ProfileId":"0x0104","DeviceId":"0x0402","DeviceVersion":0,"InClusters":["0x0000","0x0003","0x0500","0x0001"],"OutClusters":["0x0003"]}}'
+}
+2023.Mar.17 13:11:14.706     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":116,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:11:14.707      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 116,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","ZoneType":21,"Endpoint":1,"LinkQuality":131}}}'
+}
+2023.Mar.17 13:11:16.864     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":148,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:11:16.864      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 148,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbResponse":{"Device":"0xAA75","Command":"0500_04","Status":0,"StatusMessage":"SUCCESS","Endpoint":1,"LinkQuality":123}}'
+}
+2023.Mar.17 13:11:18.409     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":148,"topic":"tele/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:11:18.409      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 148,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbResponse":{"Device":"0xAA75","Command":"0500!00","Status":0,"StatusMessage":"SUCCESS","Endpoint":1,"LinkQuality":126}}'
+}
+2023.Mar.17 13:11:24.323     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:11:24.324      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbBind":{"Device":"0xAA75","Status":0,"StatusMessage":"SUCCESS"}}'
+}
+2023.Mar.17 13:11:24.325     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:11:24.325      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbBind":{"Device":"0xAA75","Status":0,"StatusMessage":"SUCCESS"}}'
+}
+2023.Mar.17 13:11:24.326     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:11:24.327      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","ConfigResponse":{"ZoneStatus":{"Status":134,"StatusMsg":"UNSUPPORTED_ATTRIBUTE"}},"Endpoint":1,"LinkQuality":126}}}'
+}
+2023.Mar.17 13:11:50.425     Network     E8D...BFAE publish tele/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":85,"topic":"tele/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:11:50.425      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 85,
+  topic: 'tele/E8DB849DBFAE/RESULT',
+  payload: '{"ZbState":{"Status":20,"Message":"Pairing mode disabled"}}'
+}
+2023.Mar.17 13:13:19.410     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":121,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 27.9
+2023.Mar.17 13:13:19.411      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 121,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":27.9,"Endpoint":1,"LinkQuality":110}}}'
+}
+2023.Mar.17 13:13:31.130     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":105,"topic":"stat/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:13:31.131      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 105,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbData":"ZbData 0xB2A2,0AFF0414646E3A9B0114640E05010F00E60A0080161BFF390080"}'
+}
+2023.Mar.17 13:13:31.132     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":105,"topic":"stat/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:13:31.132      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 105,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbData":"ZbData 0x329F,0A743C10646E078F3310640E05010F0098080080401FFF000080"}'
+}
+2023.Mar.17 13:13:31.134     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":111,"topic":"stat/E8DB849DBFAE/RESUL...
+2023.Mar.17 13:13:31.134      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 111,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbData":"ZbData 0xCCF7,0ABEE12963A740BEE12963080401010000000D000803010F000006FFFF"}'
+}
+2023.Mar.17 13:13:31.135     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"stat/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:13:31.136      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbData":"ZbData 0xAA75,0A0B0514647E5F0B051464080401020001311500"}'
+}
+2023.Mar.17 13:13:31.137     Network     E8D...BFAE publish stat/E8DB849DBFAE/RESULT msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":93,"topic":"stat/E8DB849DBFAE/RESULT...
+2023.Mar.17 13:13:31.137      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 93,
+  topic: 'stat/E8DB849DBFAE/RESULT',
+  payload: '{"ZbData":"ZbData 0xC43B,0A13FD8E63690713FD8E63080401020000001500"}'
+}
+2023.Mar.17 13:13:31.436     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":125,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:13:31.436      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 125,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","BatteryPercentage":95,"Endpoint":1,"LinkQuality":126}}}'
+}
+2023.Mar.17 13:14:32.816     Network     E8D...BFAE publish tele/E8DB849DBFAE/STATE msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":328,"topic":"tele/E8DB849DBFAE/STATE...
+2023.Mar.17 13:14:32.817      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 328,
+  topic: 'tele/E8DB849DBFAE/STATE',
+  payload: '{"Time":"2023-03-17T07:14:32","Uptime":"0T00:30:10","UptimeSec":1810,"Vcc":3.495,"Heap":24,"SleepMode":"Dynamic","Sleep":50,"LoadAvg":19,"MqttCount":1,"Wifi":{"AP":1,"SSId":"Full House","BSSId":"0A:6A:C5:7B:F1:38","Channel":11,"Mode":"11n","RSSI":100,"Signal":-29,"LinkCount":1,"Downtime":"0T00:00:04"}}'
+}
+2023.Mar.17 13:19:32.786     Network     E8D...BFAE publish tele/E8DB849DBFAE/STATE msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":328,"topic":"tele/E8DB849DBFAE/STATE...
+2023.Mar.17 13:19:32.786      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 328,
+  topic: 'tele/E8DB849DBFAE/STATE',
+  payload: '{"Time":"2023-03-17T07:19:32","Uptime":"0T00:35:10","UptimeSec":2110,"Vcc":3.504,"Heap":24,"SleepMode":"Dynamic","Sleep":50,"LoadAvg":19,"MqttCount":1,"Wifi":{"AP":1,"SSId":"Full House","BSSId":"0A:6A:C5:7B:F1:38","Channel":11,"Mode":"11n","RSSI":100,"Signal":-24,"LinkCount":1,"Downtime":"0T00:00:04"}}'
+}
+2023.Mar.17 13:21:50.042     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:21:50.043      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"000000010000","ZoneStatusChange":0,"ZoneStatusChangeZone":1,"Contact":0,"Endpoint":1,"LinkQuality":131}}}'
+}
+2023.Mar.17 13:21:52.148     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:21:52.149      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000010000","ZoneStatusChange":1,"ZoneStatusChangeZone":1,"Contact":1,"Endpoint":1,"LinkQuality":131}}}'
+}
+2023.Mar.17 13:21:53.381     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:21:53.382      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"000000010000","ZoneStatusChange":0,"ZoneStatusChangeZone":1,"Contact":0,"Endpoint":1,"LinkQuality":131}}}'
+}
+2023.Mar.17 13:21:55.453     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:21:55.454      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000010000","ZoneStatusChange":1,"ZoneStatusChangeZone":1,"Contact":1,"Endpoint":1,"LinkQuality":131}}}'
+}
+2023.Mar.17 13:21:56.804     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:21:56.805      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"000000010000","ZoneStatusChange":0,"ZoneStatusChangeZone":1,"Contact":0,"Endpoint":1,"LinkQuality":128}}}'
+}
+2023.Mar.17 13:21:58.770     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:21:58.772      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000010000","ZoneStatusChange":1,"ZoneStatusChangeZone":1,"Contact":1,"Endpoint":1,"LinkQuality":128}}}'
+}
+2023.Mar.17 13:22:03.816     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:22:03.816      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"000000010000","ZoneStatusChange":0,"ZoneStatusChangeZone":1,"Contact":0,"Endpoint":1,"LinkQuality":147}}}'
+}
+2023.Mar.17 13:22:06.851     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:22:06.852      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000010000","ZoneStatusChange":1,"ZoneStatusChangeZone":1,"Contact":1,"Endpoint":1,"LinkQuality":102}}}'
+}
+2023.Mar.17 13:22:08.679     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:22:08.680      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"000000010000","ZoneStatusChange":0,"ZoneStatusChangeZone":1,"Contact":0,"Endpoint":1,"LinkQuality":100}}}'
+}
+2023.Mar.17 13:22:10.476     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":185,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:22:10.477      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 185,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000010000","ZoneStatusChange":1,"ZoneStatusChangeZone":1,"Contact":1,"Endpoint":1,"LinkQuality":123}}}'
+}
+2023.Mar.17 13:22:11.913     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":184,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:22:11.914      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 184,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"000000010000","ZoneStatusChange":0,"ZoneStatusChangeZone":1,"Contact":0,"Endpoint":1,"LinkQuality":79}}}'
+}
+2023.Mar.17 13:22:13.646     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":184,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+2023.Mar.17 13:22:13.647      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 184,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xAA75":{"Device":"0xAA75","0500?00":"010000010000","ZoneStatusChange":1,"ZoneStatusChangeZone":1,"Contact":1,"Endpoint":1,"LinkQuality":92}}}'
+}
+2023.Mar.17 13:23:19.148     Network     E8D...BFAE publish tele/E8DB849DBFAE/SENSOR msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":139,"topic":"tele/E8DB849DBFAE/SENSO...
+[handle/sensors] ####
+Temperature: 29.22
+Humindity: 66.22
+2023.Mar.17 13:23:19.149      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 139,
+  topic: 'tele/E8DB849DBFAE/SENSOR',
+  payload: '{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":29.22,"Humidity":66.22,"Endpoint":1,"LinkQuality":107}}}'
+}
+2023.Mar.17 13:24:32.759     Network     E8D...BFAE publish tele/E8DB849DBFAE/STATE msg:{"cmd":"publish","retain":false,"qos":0,"dup":false,"length":328,"topic":"tele/E8DB849DBFAE/STATE...
+2023.Mar.17 13:24:32.760      handle     display infor msg from client Packet {
+  cmd: 'publish',
+  retain: false,
+  qos: 0,
+  dup: false,
+  length: 328,
+  topic: 'tele/E8DB849DBFAE/STATE',
+  payload: '{"Time":"2023-03-17T07:24:32","Uptime":"0T00:40:10","UptimeSec":2410,"Vcc":3.495,"Heap":24,"SleepMode":"Dynamic","Sleep":50,"LoadAvg":19,"MqttCount":1,"Wifi":{"AP":1,"SSId":"Full House","BSSId":"0A:6A:C5:7B:F1:38","Channel":11,"Mode":"11n","RSSI":100,"Signal":-28,"LinkCount":1,"Downtime":"0T00:00:04"}}'
+}

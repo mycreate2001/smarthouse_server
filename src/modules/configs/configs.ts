@@ -25,7 +25,6 @@ export default class Config{
                 obj[key]=val;
             })
             this.obj=obj;
-            console.log("\n\n###### configs/configs.ts-28 ",{path:this.opts.path,obj})
         }
         catch(err){
             if(this.opts.debug) {

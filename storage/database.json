@@ -36,7 +36,7 @@
             "name": "network",
             "path": "../../modules/network",
             "params": {
-                "port": 1883
+                "port": 1884
             },
             "imports": {
                 "network": "network/#"
@@ -48,7 +48,7 @@
             "name": "websocket",
             "path": "../../modules/websocket",
             "params": {
-                "port": 8888
+                "port": 8889
             },
             "imports": {},
             "keys": "network/websocket",
@@ -106,18 +106,9 @@
             "name": "tasmota",
             "path": "../../modules/tasmota",
             "params": {},
-            "imports": {},
+            "imports": {"network":"network/mqtt"},
             "keys": "service/tasmota",
             "level": 12
-        },
-        "hellowould": {
-            "path": "E:\\WorkSpaces\\BACKEND\\smarthouse\\dist\\modules\\hellowould\\src\\index.js",
-            "name": "hellowould",
-            "params": {},
-            "imports": {},
-            "keys": "",
-            "level": 0,
-            "module": null
         }
     },
     "users": {
