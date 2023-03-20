@@ -1,6 +1,6 @@
 import { rmdirSync } from 'fs';
 import LocalDatabase,{DataConnect} from 'local-database-lite'
-import { ModulePackage } from './module.interface';
+import { InputModule, ModulePackage, toImportConfig } from './module.interface';
 import { createLog } from '../log';
 import { wildcard } from '../wildcard';
 import { resolve } from 'path';
@@ -50,33 +50,32 @@ export class ModuleLoader {
         log("start %s [%d]",module.id,module.level)
         // //filter by level
         let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
-        // let preModules:ModulePackage[]
-        //     =Object.keys(module.imports).some(key=>wildcard(module.keys,module.imports[key]))?
-        //     modules.filter(m=>m.level<module.level)
-        //     :modules
-        // let preModules:ModulePackage[]=modules; //no filter by level
-        const ips:any={};
-        // console.log("module-loeader/index.ts-51 ",module)
-        Object.keys(module.imports).forEach(ipKey=>{
+        /** ips={database:xxxx,services:[xxxx]} */
+        const ips:any={}; // inputsmodule
+        /** for each key */ 
+        Object.keys(module.imports).forEach(imports_keys=>{
             // ips[key]= something
-            const ref=module.imports[ipKey]
-            // console.log("module-loeader/index.ts-52 ",{ipKey,ref})
+            const _import=toImportConfig(module.imports[imports_keys])
             // module is correct keys
-            let _mds=preModules.filter(m=>wildcard(m.keys,ref))
-            // get last level when same keys
+            let _mds=preModules.filter(m=>wildcard(m.keys,_import.ref))
+            // get top level when same keys
             const objs:ModulePackage[]=[];//result
             _mds.forEach(_md=>{
-                const key=_md.keys
-                const pos=objs.findIndex(o=>o.keys==key);
+                const keys=_md.keys
+                const pos=objs.findIndex(o=>o.keys==keys);
                 if(pos==-1) objs.push(_md);
                 else if(objs[pos].level<_md.level) objs[pos]=_md
-                // debug("step2.3.2 get objs/checkpoint",{objs})
             })
-            ips[ipKey]=objs.map(m=>this.loadModule(m,modules,list));//modules
+            //new revise
+            if(_import.type=='array')
+                ips[imports_keys]=objs.map(m=>this.loadModule(m,modules,list).module);//modules
+            else if(_import.type=='single')
+                ips[imports_keys]=this.loadModule(objs[0],modules,list).module
+            else ips[imports_keys]=null;
         })
+        //calculate imports modules
         const fn=require(module.path).default;
-        // console.log("+++ test function +++ \n",{type:typeof fn,fn,fnstr:fn.toString()})
-        if(typeof fn=='function') module.module=fn(module,ips);
+        if(typeof fn=='function') module.module=fn(module,...Object.keys(ips).map(key=>ips[key]));
         list.push(module.id);
         log("finish %s [%d]",module.id,module.level)
         return module;

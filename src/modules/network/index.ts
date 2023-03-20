@@ -1,23 +1,22 @@
 import { createLog } from '../../lib/log';
-import { InputModule, ModuleInfor, ModulePackage } from '../../lib/module-loader/module.interface';
+import { InputModule, ModulePackage } from '../../lib/module-loader/module.interface';
 import Network from './network'
 
-export default function startupNetwork(infor:ModulePackage,modules:InputModule){
+export default function startupNetwork(infor:ModulePackage,networks:any[]){
     const log=createLog(infor.id,"center")
     try{
-        const networkModules=modules.network;
-        if(!networkModules||!networkModules.length||!networkModules.filter(m=>m.module).length)
+        /** verify */
+        if(!networks||!networks.length)
             throw new Error("Load network was failred!");
 
-        //handle clients
-        const clients=networkModules.map(m=>m.module);
-        const network=new Network(...clients);
+        /** execute */
+        const network=new Network(...networks);
         log("load success!");
         return network;
     }
     catch(err){
         const msg:string=err instanceof Error?err.message:"other message"
-        log("### ERROR:%s\n",msg,modules)
+        log("### ERROR:%s\n",msg)
         return null;
     }
 }

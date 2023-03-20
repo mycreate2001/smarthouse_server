@@ -1,7 +1,6 @@
 import { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
 import Cryption from "../cryption/cryption";
-import {AuthenticateHandle} from '../interface.type'
 
 const _DEBUG=true;
 const log=createLog("UserService","center",_DEBUG)

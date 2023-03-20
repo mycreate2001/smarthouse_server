@@ -1,19 +1,16 @@
 import { createLog } from "../../lib/log";
 import { InputModule, ModuleInfor } from "../../lib/module-loader/module.interface";
-import { AuthenticateHandle } from "../interface.type";
-import UserService from "../user_service/user.service";
-export default function startup(infor:ModuleInfor,modules:InputModule){
+import { AuthenticateHandle } from "../websocket/websocket.interface";
+import UserService from "../user/user.service";
+import Network from "../network/network";
+export default function startup(infor:ModuleInfor,networks:any[],userService:UserService){
     const log=createLog(infor.id,"center")
     try{
         //input & verify
-        const networkModules=modules.network
-        const serviceModules=modules.user_service;
-        if(!networkModules||!networkModules.length) throw new Error("load network failred!")
-        if(!serviceModules||!serviceModules.length||!serviceModules[0].module) throw new Error("load userService failred")
+        if(!networks||!networks.length) throw new Error("load network failred!")
+        if(!userService) throw new Error("load userService failred")
 
         //execute
-        const networks=networkModules.map(m=>m.module);
-        const userService=serviceModules[0].module as UserService;
         const authenticate:AuthenticateHandle=(client,uid,pass,callback)=>{
            userService.login(uid,pass.toString())
            .then(user=>callback(null,true))
@@ -28,7 +25,7 @@ export default function startup(infor:ModuleInfor,modules:InputModule){
     }
     catch(err){
         const msg:string=err instanceof Error?err.message:"other error"
-        log("#ERROR:%s\n",msg,modules);
+        log("#ERROR:%s\n",msg);
         return null;
     }
 }

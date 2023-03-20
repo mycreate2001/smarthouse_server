@@ -24,7 +24,7 @@ export default class Network{
             this.getInfor(id);
         },2000)
         let status=devices[0].status
-        setInterval(()=>{
+        setTimeout(()=>{
             status=1-status;
             this.remote({id,status})
         },5000)

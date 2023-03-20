@@ -2,7 +2,7 @@
 
 import { createLog } from "../../lib/log";
 import { toArray } from "../../lib/utility";
-import { PublishPacket, SubscribePacket, SubscribePayload, Subscription } from "../interface.type";
+import { PublishPacket, SubscribePacket, SubscribePayload, Subscription } from "../websocket/websocket.interface";
 import { WebSocketExt } from "./interface";
 import SocketService from "./socket_handle";
 const _SYSTEM_KEY="$"

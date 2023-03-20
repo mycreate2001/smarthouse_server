@@ -37,7 +37,7 @@
             "path": "../../modules/network",
             "params": {},
             "imports": {
-                "network": "network/#"
+                "network": {"ref":"network/#","type":"array"}
             },
             "keys": "network",
             "level": 5
@@ -83,7 +83,7 @@
             "path": "../../modules/sercurity",
             "params": {},
             "imports": {
-                "network":"network/#",
+                "network":{"ref":"network/#","type":"array"},
                 "user_service":"service/user"
             },
             "keys": "sercurity",
@@ -91,7 +91,7 @@
         },
         "user_database": {
             "name": "User database",
-            "path": "../../modules/database/user.database.js",
+            "path": "../../modules/user/user.database.js",
             "params": {},
             "imports": {
                 "database": "database/basic"
@@ -104,14 +104,14 @@
             "path": "../../modules/device/device.database.js",
             "params": {},
             "imports": {
-                "database": "database/basic"
+                "database":"database/basic"
             },
             "keys": "database/device",
             "level": 2
         },
         "user_service": {
             "name": "User Service",
-            "path": "../../modules/user_service",
+            "path": "../../modules/user",
             "params": {},
             "imports": {
                 "database": "database/user_database",

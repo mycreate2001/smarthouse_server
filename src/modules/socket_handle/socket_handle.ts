@@ -4,7 +4,7 @@ import { WebSocketServer,WebSocket } from 'ws'
 import { createLog } from "../../lib/log";
 import {v4 as uuidv4 } from 'uuid'
 import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle,
-         PublishPacket, ServerSubscribeHandle, SubscribePacket, SubscribePayload, Subscription}  from "../interface.type";
+         PublishPacket, ServerSubscribeHandle, SubscribePacket, SubscribePayload, Subscription}  from "../websocket/websocket.interface";
 import {SocketSavePacket, WebSocketExt} from './interface'
 import { NotFound, parserJSON, setHandleLogin, setHandletopic, setSubscribeHandle } from "./utility";
 import { NetworkConfig, NetworkConnect, NetworkUpdate } from "../network/network";

@@ -1,22 +1,21 @@
+import { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
-import { InputModule, ModulePackage } from "../../lib/module-loader/module.interface";
+import { ModulePackage } from "../../lib/module-loader/module.interface";
+import { Device } from "./device.interface";
 import DeviceService from "./device.service";
 
-export default function startDeviceService(infor:ModulePackage,modules:InputModule){
+export default function startDeviceService(infor:ModulePackage,db:DataConnect<Device>){
     const log=createLog(infor.id,"center");
     try{
-        const mDatabases=modules.database
-        if(!mDatabases||!mDatabases.length||!mDatabases[0].module){
-            throw new Error("load database error");
-        }
-        const db=mDatabases[0].module;
+        /** input & verify */
+        if(!db)throw new Error("load database error");
         const service=new DeviceService(db);
         log("load success!");
         return service;
     }
     catch(err){
         const msg:string=err instanceof Error?err.message:"other error"
-        log("### ERROR:%s\nmodules",modules);
+        log("### ERROR:%s\n");
         return null;
     }
 }

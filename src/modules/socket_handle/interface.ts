@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { PublishPacket, Subscription } from "../interface.type";
+import { PublishPacket, Subscription } from "../websocket/websocket.interface";
 
 
 
