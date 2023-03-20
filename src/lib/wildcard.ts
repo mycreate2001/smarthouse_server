@@ -22,7 +22,7 @@ export function wildcard(topic:string,ref:string):boolean{
     })
 }
 
-export function getParams<T>(topic:string,ref:string):T{
+export function getParams(topic:string,ref:string){
     const out:any={};
     const aTopic=topic.split("/");
     const aRef=ref.split("/");
@@ -31,7 +31,7 @@ export function getParams<T>(topic:string,ref:string):T{
         const key=ref.substring(1);
         out[key]=aTopic[i]
     })
-    return out as T
+    return out
 }
 
 // const refs=[

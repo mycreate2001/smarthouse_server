@@ -49,11 +49,11 @@ export class ModuleLoader {
         if(list.includes(module.id)) return module;
         log("start %s [%d]",module.id,module.level)
         // //filter by level
-        // let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
-        let preModules:ModulePackage[]
-            =Object.keys(module.imports).some(key=>wildcard(module.keys,module.imports[key]))?
-            modules.filter(m=>m.level<module.level)
-            :modules
+        let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
+        // let preModules:ModulePackage[]
+        //     =Object.keys(module.imports).some(key=>wildcard(module.keys,module.imports[key]))?
+        //     modules.filter(m=>m.level<module.level)
+        //     :modules
         // let preModules:ModulePackage[]=modules; //no filter by level
         const ips:any={};
         // console.log("module-loeader/index.ts-51 ",module)

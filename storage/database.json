@@ -8,7 +8,7 @@
                 "websocket": "network/websocket"
             },
             "keys": "network/websocket",
-            "level": 1
+            "level": 3
         },
         "mqtt": {
             "name": "mqtt",
@@ -18,7 +18,7 @@
             },
             "imports": {},
             "keys": "network/mqtt",
-            "level": 0
+            "level": 2
         },
         "http": {
             "name": "http",
@@ -35,60 +35,79 @@
         "network": {
             "name": "network",
             "path": "../../modules/network",
-            "params": {
-                "port": 1884
-            },
+            "params": {},
             "imports": {
                 "network": "network/#"
             },
-            "level": 10,
-            "keys": "network"
+            "keys": "network",
+            "level": 5
         },
         "websocket": {
             "name": "websocket",
             "path": "../../modules/websocket",
             "params": {
-                "port": 8889
+                "port": 8888
             },
             "imports": {},
             "keys": "network/websocket",
-            "level": 0
+            "level": 2
         },
         "configure": {
             "name": "configure file",
             "path": "../../modules/configs",
             "params": {},
             "imports": {},
-            "keys": "configure",
-            "level": 0
+            "keys": "setting/configure",
+            "level": 1
         },
         "cryption": {
             "name": "engypt/degypt password",
             "path": "../../modules/cryption",
             "params": {},
             "imports": {
-                "config": "configure"
+                "setting": "setting/#"
             },
             "keys": "hash/cryption",
-            "level": 1
+            "level": 2
         },
         "database": {
             "name": "database",
             "path": "../../modules/database",
             "params": {},
             "imports": {},
-            "keys": "database/general",
-            "level": 0
+            "keys": "database/basic",
+            "level": 1
+        },
+         "sercurity": {
+            "name": "sercurity",
+            "path": "../../modules/sercurity",
+            "params": {},
+            "imports": {
+                "network":"network/#",
+                "user_service":"service/user"
+            },
+            "keys": "sercurity",
+            "level": 4
         },
         "user_database": {
             "name": "User database",
             "path": "../../modules/database/user.database.js",
             "params": {},
             "imports": {
-                "database": "database/general"
+                "database": "database/basic"
             },
             "keys": "database/user_database",
-            "level": 1
+            "level": 2
+        },
+        "device_database": {
+            "name": "device database",
+            "path": "../../modules/device/device.database.js",
+            "params": {},
+            "imports": {
+                "database": "database/basic"
+            },
+            "keys": "database/device",
+            "level": 2
         },
         "user_service": {
             "name": "User Service",
@@ -96,19 +115,28 @@
             "params": {},
             "imports": {
                 "database": "database/user_database",
-                "hash": "hash/#",
-                "network": "network"
+                "hash": "hash/#"
             },
-            "keys": "database/user_database",
-            "level": 11
+            "keys": "service/user",
+            "level": 3
+        },
+        "device_service": {
+            "name": "Device Service",
+            "path": "../../modules/device",
+            "params": {},
+            "imports": {
+                "database": "database/device"
+            },
+            "keys": "service/device",
+            "level": 3
         },
         "tasmota": {
             "name": "tasmota",
             "path": "../../modules/tasmota",
             "params": {},
             "imports": {"network":"network/mqtt"},
-            "keys": "service/tasmota",
-            "level": 12
+            "keys": "network/mqtt",
+            "level": 4
         }
     },
     "users": {

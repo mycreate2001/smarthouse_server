@@ -5,9 +5,9 @@ import { createLog } from "../../lib/log";
 import {v4 as uuidv4 } from 'uuid'
 import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle,
          PublishPacket, ServerSubscribeHandle, SubscribePacket, SubscribePayload, Subscription}  from "../interface.type";
-import { toArray } from "../../lib/utility";
 import {SocketSavePacket, WebSocketExt} from './interface'
 import { NotFound, parserJSON, setHandleLogin, setHandletopic, setSubscribeHandle } from "./utility";
+import { NetworkConfig, NetworkConnect, NetworkUpdate } from "../network/network";
 
 /** default */
 const _SOCKET_PORT=8888;
@@ -77,6 +77,12 @@ export default class SocketService extends tEvent{
         //send packet
         db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(packet)))
      }
+
+    onConnect:NetworkConnect=(packet,client,server)=>null;
+    onUpdate:NetworkUpdate=(packet,client,server)=>null;
+    onConfigure:NetworkConfig=(packet,client,server)=>null;
+    remote(deviceId:string,data:any){}
+    getInfor(deviceId:string){ }
 
     /** subcribe from client (after checking sercurity) 
      * @returns true/false= success/fail

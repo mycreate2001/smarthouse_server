@@ -36,10 +36,7 @@ export default class UserService{
         const user=await this.db.get(uid);
         if(!user) throw new Error("username is not exist");
         const _pass=this.cryption?this.cryption.decrypt(user.pass):user.pass;
-        if(pass!==_pass){
-            throw new Error("username/password invalid");
-        } 
-            
+        if(pass!==_pass)throw new Error("username/password invalid"); 
         return user;
     }
 
@@ -53,21 +50,6 @@ export default class UserService{
         return nUser;
     }
 
-    authenticate(){
-        const authenticate:AuthenticateHandle=async (client,uid,pass,callback)=>{
-            try{
-                const user=await this.login(uid,pass.toString());
-                log("%d login %s => success!",client.id,uid)
-                callback(null,true)
-            }
-            catch(err){
-                const _err:Error=err instanceof Error?err:new Error("other error")
-                log("%d login %s =>failred! #%s",client.id,uid,_err.message)
-                callback(_err,false)
-            }
-        }
-        return authenticate;
-    }
 }
 
 /////////////// SMALL FUNCTIONS //////////////////

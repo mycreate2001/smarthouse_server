@@ -1,48 +1,44 @@
 import { createLog } from "../../lib/log";
-import { shortID, shortMsg } from "../../lib/utility";
-import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle, PublishPacket, ServerSubscribeHandle } from "../interface.type";
+import { Device, DeviceStatus, Equipment } from "../device/device.interface";
 const log=createLog("Network","center");
 export default class Network{
-    clients:any[]=[];
-    constructor(...clients:any[]){
-        // this.clients=this.clients.concat(clients);
-        this.clients=clients;
-        this.on("client",(client:any)=>{
-            log("%d connect",shortID(client.id));
-        });
-        this.on("clientDisconnect",(client:any)=>{
-            log("%d disconnect",shortID(client.id))
-        })
-        this.on("publish",(packet:PublishPacket,client:any)=>{
-            if(packet.cmd!=='publish') return;
-            const topic=packet.topic;
-            log(`%d publish %s msg:%s`,shortID(client.id),topic,shortMsg(packet))
+    networks:any[]=[];
+    constructor(...networks:any[]){
+        // this.networks=this.networks.concat(networks);
+        this.networks=networks;
+        this.networks.forEach(network=>{
+            network.onConnect=this.onConnect;
+            network.onUpdate=this.onUpdate;
+            network.onConfigure=this.onConfigure;
         })
     }
-    on(title: string, callback: Function) {
-        return this.clients.map(client=>client.on(title,callback))
-    }
-    /** publish from server  */
-    publish(packet:PublishPacket){
-        return this.clients.map(client=>client.publish(packet))
-    }
-
-    setAuthenticate(handle:AuthenticateHandle){
-        return this.clients.map(client=>client.authenticate=handle)
-    }
-
-    setAuthSubscribe(handle:AuthorizeSubscribeHandle){
-        return this.clients.map(client=>client.authorizeSubscribe=handle)
-    }
-
-    setAuthPublish(handle:AuthorizePublishHandle){
-        return this.clients.map(client=>client.authorizePublish=handle)
-    }
-
-    subscribe(topic:string,callback:ServerSubscribeHandle){
-        return this.clients.map(client=>client.subscribe(topic,callback))
+    
+    onConnect:NetworkConnect=(online,client,server)=>{console.log("\n[network.ts-17] online:",online)}
+    onUpdate:NetworkUpdate=(sttInfor,client,server)=>{
+        log(" onUpdate/Status:",sttInfor)
+    };
+    onConfigure:NetworkConfig=(equipment,devices,client,server)=>{
+        log("onConfig/devices:",devices)
+        const id=devices[0].id;
+        setTimeout(()=>{
+            this.getInfor(id);
+        },2000)
+        let status=devices[0].status
+        setInterval(()=>{
+            status=1-status;
+            this.remote({id,status})
+        },5000)
+    };
+    remote(stt:DeviceStatus){
+        return this.networks.map(network=>network.remote(stt))
     }
 
+    getInfor(deviceId:string){
+        return this.networks.map(network=>network.getInfor(deviceId))
+    }
 }
 
+export type NetworkConnect=(online:boolean,client:any,server:any)=>void;
+export type NetworkUpdate=(status:DeviceStatus[],client:any,server:any)=>void;
+export type NetworkConfig=(equipment:Equipment,devices:Device[],client:any,server:any)=>void;
 
