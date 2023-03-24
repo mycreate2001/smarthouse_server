@@ -1,4 +1,4 @@
-import { DataConnect } from "local-database-lite";
+import LocalDatabaseLite, { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
 import { wildcard } from "../../lib/wildcard";
 import { UserData } from "../user/user.interfac";
@@ -6,14 +6,14 @@ import UserService from "../user/user.service";
 import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
 import { SercurityHandle } from "./sercurity.interface";
 const log=createLog("sercurity","center");
+const _SERCURITY_DB_="sercurities"
 export default class Sercurity{
     service:UserService
     sercurities:SercurityHandle[]=[];
-    constructor(service:UserService,db:DataConnect<SercurityHandle>){
+    constructor(service:UserService,db:LocalDatabaseLite){
         this.service=service
-        db.search().then(sercus=>{
-            this.sercurities=sercus;
-        })
+        const sDb:DataConnect<SercurityHandle>= db.connect(_SERCURITY_DB_)
+        sDb.search().then(sercs=>this.sercurities=sercs)
     }
     authenticate:AuthenticateHandle=(client,uid,pass,callback)=>{
         this.service.login(uid,pass.toString())

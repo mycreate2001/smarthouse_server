@@ -1,12 +1,12 @@
 import { ModulePackage } from "../../lib/module-loader/module.interface";
 import UserService from "./user.service";
 
-export default function startupUserService(infor:ModulePackage,userDatabase:any,hash:any){
+export default function startupUserService(infor:ModulePackage,db:any,hash:any){
     //1. check & verify
-    if(!userDatabase) throw new Error("load database error")
+    if(!db) throw new Error("load database error")
     if(!hash) throw new Error("load hash is failred!")
     
     //2. execute
-    const service=new UserService(userDatabase,hash);
+    const service=new UserService(db,hash);
     return service;
 }

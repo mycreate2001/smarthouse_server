@@ -1,14 +1,14 @@
-import { DataConnect } from "local-database-lite";
+import LocalDatabaseLite, { DataConnect } from "local-database-lite";
 import Cryption from "../cryption/cryption";
 import { UserData } from "./user.interfac";
 
 const _DEBUG=true;
-
+const _USER_DB_="users"
 export default class UserService{
     db:DataConnect<UserData>;
     cryption:Cryption
-    constructor(db:DataConnect<UserData>,cryption:Cryption){
-        this.db=db;
+    constructor(db:LocalDatabaseLite,cryption:Cryption){
+        this.db=db.connect(_USER_DB_)
         this.cryption=cryption
         this.makeDefaultUser();
 

@@ -39,6 +39,18 @@ export default class Network{
     }
 }
 
+export const publishPacketDefault:PublishPacket={
+    cmd:'publish',
+    qos:0,
+    retain:false,
+    payload:'',
+    topic:'unknown',
+    dup:false
+}
+export function createPublishPacket(packet:Partial<PublishPacket>&{topic:string,payload:string}):PublishPacket{
+    return Object.assign({},publishPacketDefault,packet)
+}
+
 export type NetworkConnect=(online:boolean,client:any,server:any)=>void;
 export type NetworkUpdate=(status:DeviceStatus[],client:any,server:any)=>void;
 export type NetworkConfig=(equipment:Equipment,devices:Device[],client:any,server:any)=>void;

@@ -7,7 +7,6 @@ export default function startup(infor:ModulePackage,networks:any[],userService:U
     if(!userService) throw new Error("load userService failred")
     if(!db) throw new Error("sercurity_database error")
     // 2. execute
-    console.log("\n\n+++ sercurity/index.ts-10 ",{db})
     const sercurity=new Sercurity(userService,db);
     networks.forEach(network=>{
         network.authenticate=sercurity.authenticate;

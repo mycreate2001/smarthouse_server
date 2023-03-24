@@ -41,11 +41,12 @@ export class ModuleLoader {
                 /** check error */
                 try{
                     this.loadModule(module,modules,list);
-                    log("load module %s => success!",module.id)
                 }
                 catch(err){
                     const msg=err instanceof Error?err.message:"other error"
-                    log("load module %s => failed!, err:",module.id,msg)
+                    log("%s load failed!, #### ERROR:",module.id,msg);
+                    console.log(err,"------------\n");
+                    list.push(module.id)
                 }
             }
         }
@@ -55,6 +56,7 @@ export class ModuleLoader {
     /** load each module */
     private loadModule(module:ModulePackage,modules:ModulePackage[],list:string[]){
         if(list.includes(module.id)) return module;
+        log("%s load",module.id)
         // //filter by level
         let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
         /** ips={database:xxxx,services:[xxxx]} */
@@ -81,7 +83,7 @@ export class ModuleLoader {
             else ips[imports_keys]=null;
         })
         //calculate imports modules
-        const fn=require(module.path).default;
+        const fn=require(resolve("dist","modules",module.path)).default;
         if(typeof fn=='function') module.module=fn(module,...Object.keys(ips).map(key=>ips[key]));
         list.push(module.id);
         return module;
