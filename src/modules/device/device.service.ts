@@ -49,10 +49,6 @@ export default class DeviceService extends tEvent{
         }
 
     }
-    
-    allDevices(){
-       return  this.db.search
-    }
 
     onConnect:NetworkConnect=async (online,client)=>{
         const eid=client.id||"";

@@ -1,11 +1,20 @@
+import { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
+import { getParams, wildcard } from "../../lib/wildcard";
+import { UserData } from "../user/user.interfac";
 import UserService from "../user/user.service";
 import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
+import { SercurityHandle } from "./sercurity.interface";
 const log=createLog("sercurity","center");
 export default class Sercurity{
     service:UserService
-    constructor(service:UserService){
+    sercurities:SercurityHandle[]=[];
+    constructor(service:UserService,db:DataConnect<SercurityHandle>){
         this.service=service
+        db.search().then(sercus=>{
+            this.sercurities=sercus;
+            console.log("\n++++ sercurity.service.ts-16 ",sercus);
+        })
     }
     authenticate:AuthenticateHandle=(client,uid,pass,callback)=>{
         this.service.login(uid,pass.toString())
@@ -22,31 +31,70 @@ export default class Sercurity{
     }
 
     authorizeSubscribe:AuthorizeSubscribeHandle=(client,sub,callback)=>{
+        const user=client.user||{id:"unknown"}
         try{
-            const user=client.user
-            if(!user) throw new Error("Not yet login");
+            const sercus=this.sercurities.filter(s=>s.ref===sub.topic)
+            const result=sercus.every(hd=>handleVerify(hd.subHandles,client))
+            if(!result) throw new Error("access deny!")
             log("%d (%s) subscribe %s",client.id,user.id,sub.topic);
             callback(null,sub);
         }
         catch(err){
             const _err:Error=err instanceof Error?err:new Error("other error");
-            log("%d subscribe %s=>error %s",client.id,sub.topic,_err.message);
+            log("%d (%s) subscribe %s=>error %s",client.id,user.id,sub.topic,_err.message);
             callback(_err,sub)
         }
     }
 
     authorizePublish:AuthorizePublishHandle=(client,packet,callback)=>{
+        const user=client.user||{id:"unknown"}
         try{
-            const user=client.user
-            if(!user) throw new Error("not yet login")
+            const sers=this.sercurities.filter(s=>wildcard(packet.topic,s.ref))
+            const result=sers.every(ser=>handleVerify(ser.pubHandles,client))
+            if(!result) throw new Error("access deny!")
             log("%d (%s) publish %s\npayload:%s",client.id,user.id,packet.topic,packet.payload.toString());
             callback(null);
         }
         catch(err){
             const _err:Error=err instanceof Error?err:new Error("other error");
-            log("%d subscribe %s=>error %s",client.id,packet.topic,_err.message);
+            log("%d (%s) publish %s=>error %s",client.id,user.id,packet.topic,_err.message);
             callback(_err)
         }
     }
+}
+
+function verify(client:any){
+    const user:UserData=client.user;
+    return {
+        login():boolean{
+            if(!user) return false;
+            return true
+        },
+        level(setLevel:number|string):boolean{
+            const _slevel=typeof setLevel=='string'?parseInt(setLevel)||0:setLevel;
+            const level=user.level||0;
+            if(level<_slevel) return false;
+            return true;
+        },
+        private(){
+            if(!this.login()) return false;
+        }
+    }
+}
+
+function handleVerify(fns:string[],client:any):boolean{
+    return fns.every(fn=>{
+        if(fn.toUpperCase().startsWith("LEVEL")){
+            let arrs=fn.split(":");
+            const sLevel=arrs[1]||0
+            return verify(client).level(sLevel)
+        }
+
+        if(fn.toUpperCase().startsWith("LOGIN")){
+            return verify(client).login()
+        }
+        console.log("\n+++ sercurity.service.ts-87 #### ERROR: Out of case");
+        return false;
+    })
 }
 
