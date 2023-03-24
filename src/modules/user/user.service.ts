@@ -1,12 +1,8 @@
 import { DataConnect } from "local-database-lite";
-import { createLog } from "../../lib/log";
 import Cryption from "../cryption/cryption";
 import { UserData } from "./user.interfac";
 
 const _DEBUG=true;
-const log=createLog("UserService","center",_DEBUG)
-
-
 
 export default class UserService{
     db:DataConnect<UserData>;

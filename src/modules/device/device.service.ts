@@ -17,7 +17,7 @@ export default class DeviceService extends tEvent{
        Promise.all(all).then(_=>this.db.commit())
     }
     onUpdate:NetworkUpdate=async (stts:DeviceStatus[],client,network)=>{
-        console.log("\n\n-------------- device.service.ts-20 debug -----------\n client %s network:",client.id,network,"\n------------------\n\n")
+        // console.log("\n\n-------------- device.service.ts-20 debug -----------\n client %s network:",client.id,network,"\n------------------\n\n")
         const devices=await this.db.gets(stts.map(d=>d.id));
         const list:Device[]=[];
         stts.forEach(stt=>{

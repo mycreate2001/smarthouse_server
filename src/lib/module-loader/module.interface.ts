@@ -1,4 +1,4 @@
-export interface ModuleInfor{
+export interface ModulePackage{
     id:string;          // id of module
     name:string;        // module name
     path:string;        // paht -- help load module
@@ -6,9 +6,6 @@ export interface ModuleInfor{
     imports:ImportData;        // modules use curent module
     keys:string;        // like topic 
     level:number;
-}
-
-export interface ModulePackage extends ModuleInfor{
     module:any;
 }
 

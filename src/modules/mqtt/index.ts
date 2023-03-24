@@ -1,12 +1,10 @@
-import { createLog } from '../../lib/log';
-import { ModuleInfor, ModulePackage } from '../../lib/module-loader/module.interface';
+import { ModulePackage } from '../../lib/module-loader/module.interface';
 import Mqtt from './mqtt';
 const _PORT=1884
-export default function startup(infor:ModuleInfor){
-    const log=createLog(infor.id,"center")
-    //handle params
+export default function startup(infor:ModulePackage){
+    //1. input & verify
     const port=infor.params.port?infor.params.port:_PORT
+    //2. execute
     const mqtt=Mqtt({port})
-    log("load success!");
     return mqtt;
 }

@@ -1,11 +1,11 @@
 import { rmdirSync } from 'fs';
 import LocalDatabase,{DataConnect} from 'local-database-lite'
-import { InputModule, ModulePackage, toImportConfig } from './module.interface';
+import { ModulePackage, toImportConfig } from './module.interface';
 import { createLog } from '../log';
 import { wildcard } from '../wildcard';
 import { resolve } from 'path';
 const _ISCOMMIT=true
-const _DEBUG=false
+const _DEBUG=true
 const log=createLog("Module","center",_DEBUG)
 export interface ModuleStorage{
     [key:string]:ModulePackage &{status:string}
@@ -38,7 +38,15 @@ export class ModuleLoader {
             let module=this._getNext(modules,list);
             if(!module) {isDone=true}
             else{
-                this.loadModule(module,modules,list)
+                /** check error */
+                try{
+                    this.loadModule(module,modules,list);
+                    log("load module %s => success!",module.id)
+                }
+                catch(err){
+                    const msg=err instanceof Error?err.message:"other error"
+                    log("load module %s => failed!, err:",module.id,msg)
+                }
             }
         }
         return modules;
@@ -47,7 +55,6 @@ export class ModuleLoader {
     /** load each module */
     private loadModule(module:ModulePackage,modules:ModulePackage[],list:string[]){
         if(list.includes(module.id)) return module;
-        log("start %s [%d]",module.id,module.level)
         // //filter by level
         let preModules:ModulePackage[]=modules.filter(m=>m.level<module.level);
         /** ips={database:xxxx,services:[xxxx]} */
@@ -77,7 +84,6 @@ export class ModuleLoader {
         const fn=require(module.path).default;
         if(typeof fn=='function') module.module=fn(module,...Object.keys(ips).map(key=>ips[key]));
         list.push(module.id);
-        log("finish %s [%d]",module.id,module.level)
         return module;
     }
 
