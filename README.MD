@@ -8,7 +8,7 @@
 ## Network
 - combine websocket & mqtt
 - protocol look same mqtt (aedes)
-
+- can publish throw server (mqtt,websocket)
 # 2. Need to do
 [local-database]
 
@@ -22,3 +22,4 @@
     [handle upload] --> [ zipfile ] --> [ add information]
 - edit package infor [notyet]
 - remove module from web [notyet]
+- publish betwen networks (tasmota & socketservice)- [done]

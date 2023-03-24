@@ -1,10 +1,8 @@
-import { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
 import { ModulePackage } from "../../lib/module-loader/module.interface";
-import Cryption from "../cryption/cryption";
-import UserService, { UserData } from "./user.service";
+import UserService from "./user.service";
 
-export default function startupUserService(infor:ModulePackage,userDatabase:DataConnect<UserData>,hash:Cryption){
+export default function startupUserService(infor:ModulePackage,userDatabase:any,hash:any){
     const log=createLog(infor.id,"center");
     try{
         //check & verify

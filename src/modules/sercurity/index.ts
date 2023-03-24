@@ -1,23 +1,19 @@
 import { createLog } from "../../lib/log";
-import { InputModule, ModuleInfor } from "../../lib/module-loader/module.interface";
-import { AuthenticateHandle } from "../websocket/websocket.interface";
+import { ModulePackage } from "../../lib/module-loader/module.interface";
+import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
 import UserService from "../user/user.service";
-import Network from "../network/network";
-export default function startup(infor:ModuleInfor,networks:any[],userService:UserService){
+import Sercurity from "./sercurity.service";
+export default function startup(infor:ModulePackage,networks:any[],userService:UserService){
     const log=createLog(infor.id,"center")
     try{
         //input & verify
         if(!networks||!networks.length) throw new Error("load network failred!")
         if(!userService) throw new Error("load userService failred")
-
-        //execute
-        const authenticate:AuthenticateHandle=(client,uid,pass,callback)=>{
-           userService.login(uid,pass.toString())
-           .then(user=>callback(null,true))
-           .catch(err=>callback(err,false))
-        }
+        const sercurity=new Sercurity(userService);
         networks.forEach(network=>{
-            network.authenticate=authenticate;
+            network.authenticate=sercurity.authenticate;
+            network.authorizePublish=sercurity.authorizePublish;
+            network.authorizeSubscribe=sercurity.authorizeSubscribe
         })
         log("load success!");
         return 1;//

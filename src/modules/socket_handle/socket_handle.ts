@@ -65,7 +65,8 @@ export default class SocketService extends tEvent{
     /** publish from server 
      * @returns publish result true/false = success/fail
     */
-    publish(packet:PublishPacket){
+    _publish(packet:PublishPacket){
+        log("publish %s",packet.topic)
         const topic=packet.topic||""
         if(!topic) return false;
         const db=this.db[topic]||{packet,subscribes:[]};
@@ -77,6 +78,7 @@ export default class SocketService extends tEvent{
         //send packet
         db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(packet)))
      }
+    publish=this._publish
 
     onConnect:NetworkConnect=(packet,client,server)=>null;
     onUpdate:NetworkUpdate=(packet,client,server)=>null;
@@ -93,7 +95,6 @@ export default class SocketService extends tEvent{
         const db=this.db[topic];
         if(!db) { // new topic => add first data
             this.db[topic]={subscribes:[{ws,subscription}],packet:null}
-            console.log("\n*** _subscribe-001/db=\n",db)
             return true;
         }
         //exist db
@@ -104,11 +105,9 @@ export default class SocketService extends tEvent{
         const _sub=db.subscribes.find(s=>s.ws==ws);
         if(!_sub){ //first times client subscribe
             db.subscribes.push({ws,subscription})
-            console.log("\n*** _subscribe-002/db=\n",db)
             return true;
         }
         _sub.subscription=subscription;//update sub
-        console.log("\n*** _subscribe-003/db=\n",db)
         return true;
     }
 

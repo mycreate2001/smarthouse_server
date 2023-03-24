@@ -1,7 +1,7 @@
 /** import */
-import { WebSocket, WebSocketServer } from "ws";
+import { WebSocketServer } from "ws";
 import { createLog } from "../../lib/log";
-import { InputModule, ModulePackage } from "../../lib/module-loader/module.interface";
+import { ModulePackage } from "../../lib/module-loader/module.interface";
 import SocketService from "./socket_handle";
 
 

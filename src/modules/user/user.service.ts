@@ -1,17 +1,11 @@
 import { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
 import Cryption from "../cryption/cryption";
+import { UserData } from "./user.interfac";
 
 const _DEBUG=true;
 const log=createLog("UserService","center",_DEBUG)
-export interface UserData{
-    id:string;
-    name:string;
-    clientId:string;
-    pass:string;
-    lastLogin:string;
-    level:number
-}
+
 
 
 export default class UserService{
