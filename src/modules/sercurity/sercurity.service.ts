@@ -1,6 +1,6 @@
 import { DataConnect } from "local-database-lite";
 import { createLog } from "../../lib/log";
-import { getParams, wildcard } from "../../lib/wildcard";
+import { wildcard } from "../../lib/wildcard";
 import { UserData } from "../user/user.interfac";
 import UserService from "../user/user.service";
 import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
@@ -13,7 +13,6 @@ export default class Sercurity{
         this.service=service
         db.search().then(sercus=>{
             this.sercurities=sercus;
-            console.log("\n++++ sercurity.service.ts-16 ",sercus);
         })
     }
     authenticate:AuthenticateHandle=(client,uid,pass,callback)=>{
@@ -52,7 +51,7 @@ export default class Sercurity{
             const sers=this.sercurities.filter(s=>wildcard(packet.topic,s.ref))
             const result=sers.every(ser=>handleVerify(ser.pubHandles,client))
             if(!result) throw new Error("access deny!")
-            log("%d (%s) publish %s\npayload:%s",client.id,user.id,packet.topic,packet.payload.toString());
+            // log("%d (%s) publish %s\npayload:%s",client.id,user.id,packet.topic,packet.payload.toString());
             callback(null);
         }
         catch(err){
@@ -71,8 +70,9 @@ function verify(client:any){
             return true
         },
         level(setLevel:number|string):boolean{
-            const _slevel=typeof setLevel=='string'?parseInt(setLevel)||0:setLevel;
+            const _slevel=typeof setLevel=='string'?parseInt(setLevel)||9:setLevel;
             const level=user.level||0;
+            console.log("\n+++ sercurity.service.ts-75",{level,_slevel})
             if(level<_slevel) return false;
             return true;
         },
