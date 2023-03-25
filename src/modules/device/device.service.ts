@@ -1,73 +1,110 @@
-import { DataConnect, toArray } from "local-database-lite";
+import LocalDatabaseLite, { DataConnect, toArray } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "../../lib/log";
-import { NetworkConfig, NetworkConnect, NetworkUpdate } from "../network/network";
-import { Device, DeviceStatus } from "./device.interface";
+import Config from "../configs/configs";
+import Network, { NetworkConfig, NetworkConnect, NetworkUpdate } from "../network/network";
+import { Device, DeviceDb, DeviceStatus, Equipment } from "./device.interface";
+
+const _DEVICE_DB_="devices"
+const _UPDATE_TOPIC_="api/update"
 const log=createLog("DeviceService","center")
+
 export default class DeviceService extends tEvent{
     db:DataConnect<Device>;
-    constructor(db:DataConnect<Device>){
+    network:Network;
+    ndevices:DeviceDb={};
+    constructor(network:Network,db:LocalDatabaseLite,config:Config){
         super();
-        this.db=db;
-    }
-    add(devices:Device|Device[]){
-        const _devices=toArray(devices);
-       const all= _devices.map(device=>this.db.add(device,false))
-       Promise.all(all).then(_=>this.db.commit())
-    }
-    onUpdate:NetworkUpdate=async (stts:DeviceStatus[],client,network)=>{
-        // console.log("\n\n-------------- device.service.ts-20 debug -----------\n client %s network:",client.id,network,"\n------------------\n\n")
-        const devices=await this.db.gets(stts.map(d=>d.id));
-        const list:Device[]=[];
-        stts.forEach(stt=>{
-            const dv=devices.find(d=>d.id==stt.id);
-            if(!dv) return log("[Warn] not exist device %d",stt.id);
-            if(dv.status!==stt.status){
-                /** change status */
-                this.emit(stt.id+":"+stt.status,{before:dv.states,after:stt.status});
-                dv.status=stt.status;
-                list.push(dv);
-                this.db.add(dv,false);
-            }
-
-        })
-
-        if(list.length){
-            log("update success ",list.map(d=>d.id+":"+d.status));
-            // console.log("\n++++ device.service.ts-37 network:",network)
-            const packet:PublishPacket={
-                cmd:'publish',
-                payload:JSON.stringify(list),
-                qos:0,
-                dup:false,
-                retain:true,
-                topic:'api/update'
-            }
-            network.publish(packet)
-            this.db.commit();//save to database
+        this.db=db.connect(_DEVICE_DB_);
+        this.network=network
+        network.onConnect=(online,client,server)=>{
+            this.onConnect(online,client)
+        }
+        network.onUpdate=(status,client,server)=>{
+            this.onUpdate(status,client)
         }
 
-    }
-
-    onConnect:NetworkConnect=async (online,client)=>{
-        const eid=client.id||"";
-        console.log("\n+++ device.service.ts-54 '%s' onConnect",client.id);
-        if(!eid) return log("wrong client");
-        const devices=await this.db.search({key:'id',type:'==',value:eid})
-        devices.forEach(device=>{
-            device.online=online;
-            this.db.add(device,false);
-        })
-        if(devices.length){
-            log("update connect status of eid:",eid);
-            this.db.commit();//save value
+        network.onConfigure=(equipment,devices,client,server)=>{
+            this.onConfigure(equipment,devices,client)
         }
+        network.update();//
     }
 
-    onConfigure:NetworkConfig=(equipment,devices,client,server)=>{
-        log("new devices:",devices.map(d=>`${d.id}-${d.name}`));
-        // temporarily add 
-        this.add(devices)
+    onConnect(online:boolean,client:any){
+        const list:string[]=[]
+        return this.db.search({key:'eid',type:'==',value:client.id})
+        .then(idvs=>{
+            const allTask=idvs.map(idv=>{
+                if(idv.online!==online) list.push(idv.id)
+                idv.online=online;
+                return this.db.add(idv,false)
+            })
+            return Promise.all(allTask).then(idvs=>{
+                if(list.length){
+                    log("update ",list);
+                    this.db.commit();
+                    this._sendUpdate("update",idvs)
+                    return true
+                }
+                return false;
+            })
+        })
+    }
+
+    /**
+     * send update to app
+     * @param type type of update is "full device or just update"
+     * @param devices devices information
+     */
+    private _sendUpdate(type:'full'|'update',devices:Device[]){
+        const packet:PublishPacket={
+            topic:_UPDATE_TOPIC_,
+            payload:JSON.stringify({type,devices}),
+            retain:true,
+            qos:0,
+            cmd:'publish',
+            dup:false
+        }
+        this.network.publish(packet)
+    }
+
+    onUpdate(idvs:DeviceStatus[],client:any){
+        const ids=idvs.map(s=>s.id);
+        return this.db.gets(ids)
+        .then(devices=>{
+            const list:Device[]=[]
+            idvs.forEach(idv=>{
+                const dv=devices.find(d=>d.id==idv.id);
+                if(!dv) return log("%s not exist on database",idv.id);
+                console.log("\n+++ device.service.ts-80 +++",{dv:dv.status,idv:idv.status})
+                if(dv.status!=idv.status){
+                    dv.status=idv.status;
+                    this.db.add(dv,false);
+                    list.push(dv);
+                    this.emit(dv.id+":"+dv.status,dv)
+                }
+            })
+            log("update status:",list.map(l=>l.id));
+            console.log("\n++++ device.service.ts-87\n",{idvs,list,ndevices:this.ndevices,devices})
+            if(!list.length) return false;//update status
+            this.db.commit();
+            this._sendUpdate("update",list)
+            return true;
+        })
+    }
+
+    /** add unregister devices */
+    private _addNewDevice(idvs:Device[]){
+        const ids=idvs.map(i=>i.id)
+        this.db.gets(ids).then(ndevices=>{
+            idvs=idvs.filter(idv=>!ndevices.find(ndv=>ndv.id==idv.id));//not database
+            console.log("\n+++ device.service.ts-99 idvs:",idvs);
+            idvs.forEach(idv=>this.ndevices[idv.id]=idv)
+        })
+    }
+
+    onConfigure(equipment:Equipment,devices:Device[],client:any){
+        this._addNewDevice(devices)       
     }
 }

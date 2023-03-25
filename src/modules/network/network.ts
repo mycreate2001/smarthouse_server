@@ -34,8 +34,12 @@ export default class Network{
         return this.networks.map(network=>network.getInfor(deviceId))
     }
     publish(packet:PublishPacket){
-        log("publish %s\n",packet.topic)
+        log("publish %s :%s",packet.topic,packet.payload)
         this.networks.map(network=>network._publish(packet))
+    }
+
+    onRemote(data:any){
+        
     }
 }
 

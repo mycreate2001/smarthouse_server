@@ -23,3 +23,12 @@
 - edit package infor [notyet]
 - remove module from web [notyet]
 - publish betwen networks (tasmota & socketservice)- [done]
+- revise config => more depth with object 
++ example
+[
+    [hash]
+    test1=100
+    [network]
+    test2=name
+]
+=> result={hash:{test1:'100'},network:{test2:'name'}}

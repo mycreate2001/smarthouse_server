@@ -66,7 +66,7 @@ export default class SocketService extends tEvent{
      * @returns publish result true/false = success/fail
     */
     _publish(packet:PublishPacket){
-        log("publish %s",packet.topic)
+        log("_publish %s",packet.topic)
         const topic=packet.topic||""
         if(!topic) return false;
         const db=this.db[topic]||{packet,subscribes:[]};

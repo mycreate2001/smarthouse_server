@@ -58,7 +58,7 @@ export class Tasmota{
     _publish(packet:PublishPacket){
         this.mqtt.publish(packet,(err)=>{
             if(err) return log("publish %s=>error %s",packet.topic,err.message);
-            log("publish %s =>success",packet.topic)
+            log("_publish %s =>success",packet.topic)
         })
     }
 

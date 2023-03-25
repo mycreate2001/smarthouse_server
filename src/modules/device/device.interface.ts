@@ -23,3 +23,7 @@ export interface Device{
     status:number;
 }
 
+export interface DeviceDb{
+    [id:string]:Device
+}
+
