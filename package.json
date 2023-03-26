@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "aedes": "^0.48.1",
+    "configure": "github:mycreate2001/config",
     "crypto-js": "^4.1.1",
     "express": "^4.18.2",
     "local-database-lite": "github:mycreate2001/local-database-lite",

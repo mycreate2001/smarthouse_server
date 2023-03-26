@@ -1,9 +1,9 @@
+import Config from "configure";
 import LocalDatabaseLite, { DataConnect, toArray } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "../../lib/log";
-import Config from "../configs/configs";
-import Network, { NetworkConfig, NetworkConnect, NetworkUpdate } from "../network/network";
+import Network from "../network/network";
 import { Device, DeviceDb, DeviceStatus, Equipment } from "./device.interface";
 
 const _DEVICE_DB_="devices"

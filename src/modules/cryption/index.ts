@@ -8,7 +8,7 @@ export default function CryptionStatup(infor:ModulePackage,setting:any){
         throw new Error("load setting error");
 
     //2. execute
-    const key=setting.obj._MAIN_KEY||_paramsKey
+    const key=setting.obj.hash._MAIN_KEY||_paramsKey
     const cryption=new Cryption(key);
     return cryption;
 }
