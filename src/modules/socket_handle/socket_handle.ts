@@ -7,7 +7,7 @@ import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle,
          PublishPacket, ServerSubscribeHandle, SubscribePacket, SubscribePayload, Subscription}  from "../websocket/websocket.interface";
 import {SocketSavePacket, WebSocketExt} from './interface'
 import { NotFound, parserJSON, setHandleLogin, setHandletopic, setSubscribeHandle } from "./utility";
-import { NetworkConfig, NetworkConnect, NetworkUpdate } from "../network/network";
+import { NetworkConfig, NetworkConnect, NetworkUpdate, NetworkUpdateDevice } from "../network/network";
 
 /** default */
 const _SOCKET_PORT=8888;
@@ -79,7 +79,7 @@ export default class SocketService extends tEvent{
         db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(packet)))
      }
     publish=this._publish
-
+    onUpdateDevice:NetworkUpdateDevice=(devices,client,server)=>null;
     onConnect:NetworkConnect=(packet,client,server)=>null;
     onUpdate:NetworkUpdate=(packet,client,server)=>null;
     onConfigure:NetworkConfig=(packet,client,server)=>null;

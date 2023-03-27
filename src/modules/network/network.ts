@@ -19,6 +19,9 @@ export default class Network{
             network.onConnect=this.onConnect;
             network.onUpdate=this.onUpdate;
             network.onConfigure=this.onConfigure;
+            network.onUpdateDevice=(devices:Device[],client:any,server:any)=>{
+                this.onUpdateDevice(devices,client,this)
+            }
             network.publish=(packet:PublishPacket)=>{this.publish(packet)}
             // network.publish=this.publish;
         })
@@ -38,8 +41,8 @@ export default class Network{
         this.networks.map(network=>network._publish(packet))
     }
 
-    onRemote(data:any){
-        
+    onUpdateDevice(devices:Device[],client:any,server:any){
+        log("onUpdateDevice ### Warning! not be handle")
     }
 }
 
@@ -58,4 +61,5 @@ export function createPublishPacket(packet:Partial<PublishPacket>&{topic:string,
 export type NetworkConnect=(online:boolean,client:any,server:any)=>void;
 export type NetworkUpdate=(status:DeviceStatus[],client:any,server:any)=>void;
 export type NetworkConfig=(equipment:Equipment,devices:Device[],client:any,server:any)=>void;
+export type NetworkUpdateDevice=(devices:Device[],client:any,server:any)=>void;
 

@@ -3,7 +3,7 @@ import LocalDatabaseLite, { DataConnect, toArray } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "../../lib/log";
-import Network from "../network/network";
+import Network, { NetworkUpdateDevice } from "../network/network";
 import { Device, DeviceDb, DeviceStatus, Equipment } from "./device.interface";
 
 const _DEVICE_DB_="devices"
@@ -67,6 +67,12 @@ export default class DeviceService extends tEvent{
             dup:false
         }
         this.network.publish(packet)
+    }
+
+    onUpdateDevice:NetworkUpdateDevice=(devices,client,server)=>{
+        //{id:'ssss',shortAddr:'xxx',type:'sensor'}
+        log("\n++++ devices:",devices);
+
     }
 
     onUpdate(idvs:DeviceStatus[],client:any){

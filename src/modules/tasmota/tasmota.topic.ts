@@ -1,6 +1,12 @@
 import { PublishPacket } from "packet";
 import { Device, DeviceStatus, Equipment } from "../device/device.interface";
 
+interface SensorDb{
+    [shortAddr:string]:string;//
+}
+
+const sensorDb:SensorDb={}
+
 const topics=[
     {
         name:'online',
@@ -56,6 +62,54 @@ const topics=[
             })
             console.log("\n++++ tasmota.handle.ts-109 ++++",{stts})
             if(stts.length) network.onUpdate(stts,client,network);
+        }
+    },
+    /** sensor */
+    {
+        //{"ZbParent":{"Device":"0x0000","Children":3,"ChildInfo":["0x00124B002396E6B4","0xA4C138E9B1287758","0x00124B0023B46876"]}}
+        name:'address of sensor',
+        topic:'tele/:id/RESULT',
+        handle(packet:PublishPacket,client:any,network:any){
+            const obj=JSON.parse(packet.payload.toString());
+            const ZbParent=obj["ZbParent"]
+            if(!ZbParent) return;
+            const ChildInfo=ZbParent.ChildInfo;
+            console.log("\n++++ tasmota.topic.ts-71 +++ \nchildInfor:",ChildInfo,"--------------------\n")
+        }
+    },
+    {
+        //payload:{"ZbState":{"Status":34,"IEEEAddr":"0xA4C138E9B1287758","ShortAddr":"0xB2A2","ParentNetwork":"0x0000","JoinStatus":1,"Decision":0}}
+        name:'paring address',
+        topic:'tele/:id/RESULT',
+        handle(packet:PublishPacket,client:any,network:any){
+            //1. input
+            const obj=JSON.parse(packet.payload.toString());
+            //2. verify
+            const ZbState=obj.ZbState;
+            if(!ZbState) return;
+            const Status=ZbState.Status;
+            if(Status!==34) return;//not
+            const fullAddr=ZbState.IEEEAddr;
+            const shortAddr=ZbState.ShortAddr;
+            console.log("\n+++ tasmota.topic.ts-88 ++++ %s\n",this.name,{fullAddr,shortAddr},"\n-------------------------\n")
+            sensorDb[shortAddr]=fullAddr;
+        }
+    },
+    {   
+        //{"ZbReceived":{"0xB2A2":{"Device":"0xB2A2","Temperature":24.91,"Humidity":71.83,"Endpoint":1,"LinkQuality":74}}}
+        //tele/E8DB849DBFAE/SENSOR
+        name:'sensor status',
+        topic:'tele/:id/SENSOR',
+        handle(packet:PublishPacket,client:any,network:any){
+            const obj=JSON.parse(packet.payload.toString())
+            const ZbReceived=obj.ZbReceived;
+            if(!ZbReceived) return;
+            let sensors:any[]=Object.keys(ZbReceived).map(key=>ZbReceived[key]);
+            sensors=sensors.map(sensor=>{
+                const id=sensorDb[sensor.Device]||sensor.Device;
+                return {...sensor,id}
+            })
+            console.log("\n+++ tasmota.topic.ts-101 %s sensors:",this.name,sensors,"\n-------------------------------\n")
         }
     }
 ];
