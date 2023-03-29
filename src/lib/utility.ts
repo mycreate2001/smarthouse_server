@@ -45,3 +45,7 @@ export function getParams(topic:string,ref:string){
         return {}
     }
 }
+
+export function createOption<T extends {id:string}>(df:T,opts:Partial<T>):T{
+    return Object.assign({},df,opts);
+}

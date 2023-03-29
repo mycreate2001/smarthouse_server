@@ -1,7 +1,7 @@
 /** import */
 import { WebSocketServer } from "ws";
 import { ModulePackage } from "../../lib/module-loader/module.interface";
-import SocketService from "./socket_handle";
+import SocketService from "./socket.service";
 
 
 export default function startup(infor:ModulePackage,websocket:WebSocketServer){

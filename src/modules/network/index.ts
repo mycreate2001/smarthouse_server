@@ -1,5 +1,5 @@
 import { ModulePackage } from '../../lib/module-loader/module.interface';
-import Network from './network'
+import Network from './network.service'
 
 export default function startupNetwork(infor:ModulePackage,networks:any[]){
     /** verify */

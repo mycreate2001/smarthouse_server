@@ -1,13 +1,14 @@
 /** import */
 import tEvent, { runCallback } from "../../lib/event";
-import { WebSocketServer,WebSocket } from 'ws'
+import { WebSocketServer } from 'ws'
 import { createLog } from "../../lib/log";
 import {v4 as uuidv4 } from 'uuid'
-import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle,
-         PublishPacket, ServerSubscribeHandle, SubscribePacket, SubscribePayload, Subscription}  from "../websocket/websocket.interface";
+import { AuthorizePublishHandle, Subscription}  from "../websocket/websocket.interface";
 import {SocketSavePacket, WebSocketExt} from './interface'
 import { NotFound, parserJSON, setHandleLogin, setHandletopic, setSubscribeHandle } from "./utility";
-import { NetworkConfig, NetworkConnect, NetworkUpdate, NetworkUpdateDevice } from "../network/network";
+import { NetworkAuthenticate, NetworkAuthorizeSubscribe, 
+         NetworkCommon, NetworkHandlePublish, NetworkOnConnect, NetworkSubscribe } from "../network/network.interface";
+import { PublishPacket } from "packet";
 
 /** default */
 const _SOCKET_PORT=8888;
@@ -16,7 +17,7 @@ const _PUBLISH_KEY=_SYSTEM_KEY+"/TOPICS/"
 const _DEBUG=false;
 const log=createLog("Websocket","center",_DEBUG);
 
-export default class SocketService extends tEvent{
+export default class SocketService extends tEvent implements NetworkCommon{
     wss:WebSocketServer;
     db:SocketSavePacket={};
     constructor(socket:WebSocketServer){
@@ -45,6 +46,7 @@ export default class SocketService extends tEvent{
             })
             ws.on("close",(code,reason)=>{
                 log("%d disconnected",ws.id);
+                this.onConnect(false,ws,this);  // execute onconnect = offline
                 this.emit("clientDisconnect",ws,{code,reason});
                 //remove subscribe
                 Object.keys(this.db).forEach(topic=>{
@@ -56,12 +58,15 @@ export default class SocketService extends tEvent{
                 })
             })
 
-        
+            
             /** handle connect event */
+            this.onConnect(true,ws,this);   // execute onconnect =online
             this.emit("client",ws,null)
         })
     }
-
+    onConnect: NetworkOnConnect=(stt,client,server)=>{
+        log("[onConnect] ### not be handle")
+    }
     /** publish from server 
      * @returns publish result true/false = success/fail
     */
@@ -79,10 +84,6 @@ export default class SocketService extends tEvent{
         db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(packet)))
      }
     publish=this._publish
-    onUpdateDevice:NetworkUpdateDevice=(devices,client,server)=>null;
-    onConnect:NetworkConnect=(packet,client,server)=>null;
-    onUpdate:NetworkUpdate=(packet,client,server)=>null;
-    onConfigure:NetworkConfig=(packet,client,server)=>null;
     remote(deviceId:string,data:any){}
     getInfor(deviceId:string){ }
 
@@ -111,15 +112,24 @@ export default class SocketService extends tEvent{
         return true;
     }
 
+    onPublish: NetworkHandlePublish=(packet,client,server)=>{
+
+    }
+
     /** subcribe direct from server bypass sercurity */
-    subscribe(topic:string,callback:ServerSubscribeHandle){
+    // subscribe(topic:string,callback:NetworkCallback){
+    //     const that=this;
+    //     const _cb=(ws:WebSocketExt,packet:PublishPacket)=>callback(packet)
+    //     return this.on(_PUBLISH_KEY+topic,_cb)
+    // }
+    subscribe: NetworkSubscribe=(topic,callback)=>{
         const that=this;
         const _cb=(ws:WebSocketExt,packet:PublishPacket)=>callback(packet)
         return this.on(_PUBLISH_KEY+topic,_cb)
     }
 
-    authenticate:AuthenticateHandle=(client,user,pass,callback)=>callback(null,true);
-    authorizeSubscribe:AuthorizeSubscribeHandle=(client,subscription,callback)=>callback(null,subscription);
+    authenticate:NetworkAuthenticate=(client,user,pass,callback)=>callback(null,true);
+    authorizeSubscribe:NetworkAuthorizeSubscribe=(client,subscription,callback)=>callback(null,subscription);
     authorizePublish:AuthorizePublishHandle=(client,packet,callback)=>callback(null)
 }
 

@@ -1,27 +1,35 @@
+import { AuthenticateError } from "aedes";
 import { PublishPacket } from "packet"
+import { UserData } from "../user/user.interfac";
 
 export interface NetworkCommon{
-    on:NetworkOn;
-    onPublish:NetworkOnPublish;
+    // on:NetworkOn;
+    onPublish:NetworkHandlePublish;
+    onConnect:NetworkOnConnect;
     publish:NetworkPublish;
     subscribe:NetworkSubscribe;
-    onConnect:NetworkOnConnect;
     authenticate:NetworkAuthenticate;
     authorizeSubscribe:NetworkAuthorizeSubscribe;
     authorizePublish:NetworkAuthorizePublish;
+    _publish:NetworkPublish;
 }
 
-export type NetworkOn=(topic:"publish"|"subscribe",callback:NetworkCallback)=>void;
-export type NetworkOnPublish=(packet:PublishPacket,client:Networkclient,server:NetworkCommon)=>void;
+export type NetworkOn=(topic:"publish"|"subscribe"|"clientDisconnect"|"client",callback:NetworkCallback)=>void;
+export type NetworkHandlePublish=(packet:PublishPacket,client:Networkclient|null,server:NetworkCommon)=>void;
 export type NetworkCallback=(packet:PublishPacket)=>void;
 export type NetworkPublish=(packet:PublishPacket,callback?:NetworkCallbackError)=>void;
-export type NetworkSubscribe=(topic:string,callback:NetworkCallback)=>void
+export type NetworkSubscribe=(topic:string,callback:NetworkCallback)=>any
 export type NetworkOnConnect=(stt:boolean,client:Networkclient,server:NetworkCommon)=>void;
-export type NetworkAuthenticate=(client:any,user:string,pass:Buffer|string,callback:NetworkAuthError)=>void
+export type NetworkAuthenticate=(
+    client:any,
+    user:string,
+    pass:Buffer|string,
+    done:(err:AuthenticateError|null,success:boolean|null)=>void
+)=>void
 
-export type Networkclient=object&{id:string}
-export type NetworkCallbackError=(err:Error|undefined)=>void;
-export type NetworkAuthError=(err:Error|null,success:boolean)=>void;
+export type Networkclient=object&{id:string,user?:UserData}
+export type NetworkCallbackError=(err?:Error)=>void;
+export type NetworkAuthError=(error:Error|null,success:boolean|null)=>void;
 export type NetworkAuthorizeSubscribe= (client:any,subscription:Subscription,callback:NetworkAuthSubscribeError)=>void;
 export type NetworkAuthorizePublish=(client:any,packet:PublishPacket,callback:NetworkHandleError)=>void;
 
