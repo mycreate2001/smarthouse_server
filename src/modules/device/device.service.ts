@@ -1,7 +1,7 @@
 import LocalDatabaseLite, { DataConnect, toArray } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
 import { Networkclient, NetworkCommon } from "../network/network.interface";
 import { Device, DeviceAdd, DeviceConfig, DeviceConnect, 
@@ -28,6 +28,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
 
         network.onPublish=(packet,client,server)=>{
             const _client:Networkclient=client?client:{id:"server"}
+            log("%d publish %s \npayload:%s",_client.id,packet.topic,packet.payload.toString())
             if(!this._dispatch(packet,_client)){
                 const user=_client.user||{id:"root"}
                 log("%d (%s) publish %s \npayload:%s",_client.id,user.id,packet.topic,packet.payload.toString())
@@ -51,6 +52,12 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         this.network.publish(packet)
     }
 
+    publish= (packet: PublishPacket) => {
+        this.network.publish(packet,(err)=>{
+            console.log("\n[publish] %s %s",packet.topic,packet.payload.toString())
+        })
+    }
+
     /** remote device from server */
     remote: DeviceRemote=(stts)=>{
 
@@ -65,6 +72,16 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
                 dv.online=online;
                 return this.db.add(dv,false);
             })
+            const packet:PublishPacket={
+                topic:`cmnd/${eid}/zbinfo'`,
+                cmd:'publish',
+                retain:false,
+                dup:false,
+                qos:0,
+                payload:''
+            }
+            console.log("\n+++ device.service.ts-86");
+            this.publish(packet);
             if(!devices.length) return log("[onconnect] NOT CHANGE")
             Promise.all(all).then(_=>{
                 this.db.commit();

@@ -1,5 +1,5 @@
 import aedesServer from "aedes:server";
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, 
         NetworkCommon, NetworkHandleError, NetworkHandlePublish, NetworkOnConnect, 
         NetworkPublish, NetworkSubscribe } 

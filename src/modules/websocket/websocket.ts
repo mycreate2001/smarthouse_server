@@ -1,7 +1,7 @@
 /** import */
 import tEvent, { runCallback } from "../../lib/event";
 import { WebSocketServer,WebSocket } from 'ws'
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import {v4 as uuidv4 } from 'uuid'
 import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle,
          PublishPacket, ServerSubscribeHandle, SubscribePacket, SubscribePayload, Subscription}  from "./websocket.interface";

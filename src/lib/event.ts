@@ -1,4 +1,4 @@
-import { createLog } from "./log";
+import { createLog } from "advance-log";
 const _DEBUG=false
 
 const log=createLog("Event","center",_DEBUG);

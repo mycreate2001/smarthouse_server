@@ -1,5 +1,5 @@
 import { WebSocketServer } from 'ws'
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { ModulePackage } from "../../lib/module-loader/module.interface";
 
 const _PORT=8888

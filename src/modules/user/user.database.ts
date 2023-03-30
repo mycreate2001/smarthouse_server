@@ -1,5 +1,5 @@
 import LocalDatabaseLite, { DataConnect } from "local-database-lite";
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { ModulePackage } from "../../lib/module-loader/module.interface";
 export default function startup(infor:ModulePackage,database:LocalDatabaseLite){
     /** 1. Input & verify */

@@ -1,6 +1,6 @@
 import { readFileSync } from "fs";
 import { join } from "path"
-import { createLog } from "../log";
+import { createLog } from "advance-log";
 import { ModulePackage } from "./module.interface";
 
 const _PACKAGE="package.json"

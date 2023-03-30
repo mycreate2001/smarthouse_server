@@ -1,7 +1,7 @@
 import { rmdirSync } from 'fs';
 import LocalDatabase,{DataConnect} from 'local-database-lite'
 import { ModulePackage, toImportConfig } from './module.interface';
-import { createLog } from '../log';
+import { createLog } from 'advance-log';
 import { wildcard } from '../wildcard';
 import { resolve } from 'path';
 const _ISCOMMIT=true

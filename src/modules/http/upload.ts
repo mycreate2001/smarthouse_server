@@ -6,7 +6,7 @@ import unzipper from 'unzipper'
 import { getModuleInfor } from "../../lib/module-loader/module.service";
 import { DataConnect } from "local-database-lite";
 import { ModulePackage } from "../../lib/module-loader/module.interface";
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 const _UPLOAD_PATH=resolve("storage","upload")//require('../../../storage/upload')
 const storage=multer.diskStorage({
     destination:function(req,file,cb){

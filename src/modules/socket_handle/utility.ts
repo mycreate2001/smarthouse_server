@@ -1,7 +1,7 @@
 //////////////// MINI FUNCTIONS ////////////////////
 
 import { PublishPacket } from "packet";
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { toArray } from "../../lib/utility";
 import { SubscribePacket, SubscribePayload, Subscription } from "../websocket/websocket.interface";
 import { WebSocketExt } from "./interface";

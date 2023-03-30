@@ -9,7 +9,8 @@ export interface DeviceServiceBase{
     onConfigure:DeviceConfig;       // handle device get config event
     getInfor:DeviceGetInfor;        // request infor from server
     updateByNetworkId:DeviceUpdateByNetworkId;  //update by search networkid
-    add:DeviceAdd;                  // add new device
+    add:DeviceAdd; 
+    publish:(packet:PublishPacket)=>void;                 // add new device
 }
 
 export type DeviceRemote=(stt:DeviceStatus[])=>void;

@@ -44,7 +44,7 @@ const deviceRoute:DeviceRoute[]=[
     },
     {
        name:'state',
-       ref:'tele/:id/STATE',//tele/E8DB8494B051/STATE
+       ref:'tele/:id/STATE',//tele/E8DB8494B051/STATE tele/E8DB849DBFAE/SENSOR
         handle:(packet,client:any,network:any)=>{
             const payload=JSON.parse(packet.payload.toString())
             const stts:DeviceStatus[]=[];
@@ -78,7 +78,8 @@ const deviceRoute:DeviceRoute[]=[
         }
     },
     {
-        //tele/E8DB849DBFAE/SENSOR
+        //tele/E8DB849DBFAE/SENSOR tele/E8DB849DBFAE/SENSOR
+        //{"ZbReceived":{"0x329F":{"Device":"0x329F","Humidity":69.45,"Endpoint":1,"LinkQuality":92}}}
         //payload:{"ZbReceived":{"0x329F":{"Device":"0x329F","Temperature":27.89,"Endpoint":1,"LinkQuality":94}}}
         name:"value of sensor",
         ref:'tele/:eid/SENSOR',
@@ -91,6 +92,8 @@ const deviceRoute:DeviceRoute[]=[
                 const networkId=dv.Device as string;
                 return {...dv,networkId}
             }) 
+            if(!idvs.length) return;
+            console.log("\n+++ device.route.ts-96 ",idvs);
             service.updateByNetworkId(idvs,client)
         }
     }

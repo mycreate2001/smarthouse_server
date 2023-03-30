@@ -1,5 +1,5 @@
 import LocalDatabaseLite, { DataConnect } from "local-database-lite";
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
 import { UserData } from "../user/user.interfac";
 import UserService from "../user/user.service";

@@ -1,6 +1,6 @@
 import { InputModule, ModulePackage } from "../../lib/module-loader/module.interface";
 import express from 'express'
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { join, resolve } from "path";
 import createRouter from "./upload";
 import LocalDatabaseLite, { DataConnect } from "local-database-lite";

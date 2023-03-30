@@ -1,4 +1,4 @@
-import { createLog } from "../../lib/log";
+import { createLog } from "advance-log";
 import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, 
          NetworkCommon, NetworkHandlePublish, NetworkOnConnect, 
          NetworkPublish, NetworkSubscribe } from "./network.interface";
