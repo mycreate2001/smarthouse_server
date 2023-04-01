@@ -1,12 +1,12 @@
-import LocalDatabaseLite, { DataConnect, toArray } from "local-database-lite";
+import LocalDatabaseLite, { DataConnect, LocalDatabaseQuery, toArray } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
 import { Networkclient, NetworkCommon } from "../network/network.interface";
 import { Device, DeviceAdd, DeviceConfig, DeviceConnect, 
-        DeviceDb, DeviceEdit, DeviceGetInfor, DeviceRemote, 
-        DeviceRoute, DeviceServiceBase, DeviceUpdateByNetworkId, Equipment } from "./device.interface";
+        DeviceDb, DeviceEdit, DeviceGetInfor, DeviceOnUpdate, DeviceRemote, 
+        DeviceServiceBase, DeviceUpdateBySearch, TopicService, TopicServiceDb } from "./device.interface";
 
 const _DEVICE_DB_="devices"
 const _UPDATE_TOPIC_="api/update"
@@ -16,31 +16,34 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     db:DataConnect<Device>;
     network:NetworkCommon;
     ndevices:DeviceDb={};
-    deviceRoutes:DeviceRoute[]=[]
-    constructor(network:NetworkCommon,db:LocalDatabaseLite,deviceRoutes:DeviceRoute[]){
+    topicServices:TopicServiceDb={};
+    constructor(network:NetworkCommon,db:LocalDatabaseLite,topicServices:TopicService[]){
         super();
         this.db=db.connect(_DEVICE_DB_);
         this.network=network
-        this.deviceRoutes=deviceRoutes;
+        /** services */
+        // console.log('\n+++ device.service.ts-25 ',topicServices);
+        topicServices.forEach(service=>{
+            const id=service.id
+            if(!id) log("\n#ERROR(1): service %s is error",service.name||"unname")
+            this.topicServices[id]=service;
+        })
+
         network.onConnect=(online,client,server)=>{
             this.onConnect(online,client)
         }
 
         network.onPublish=(packet,client,server)=>{
             const _client:Networkclient=client?client:{id:"server"}
-            log("%d publish %s \npayload:%s",_client.id,packet.topic,packet.payload.toString())
-            if(!this._dispatch(packet,_client)){
-                const user=_client.user||{id:"root"}
-                log("%d (%s) publish %s \npayload:%s",_client.id,user.id,packet.topic,packet.payload.toString())
-            }
+            // log("\n\n#%d publish %s \npayload:%s",_client.id,packet.topic,packet.payload.toString())
+            this._dispatch(packet,_client,server)
         }
     
-        // console.log("\n\n++++ device.service.ts-33 ",{Routes:this.deviceRoutes,network});
 
     }
 
      /** send update to app */
-     update(type:'full'|'update',devices:Device[]){
+     sendUpdate(type:'full'|'update',devices:Device[]){
         const packet:PublishPacket={
             topic:_UPDATE_TOPIC_,
             payload:JSON.stringify({type,devices}),
@@ -54,7 +57,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
 
     publish= (packet: PublishPacket) => {
         this.network.publish(packet,(err)=>{
-            console.log("\n[publish] %s %s",packet.topic,packet.payload.toString())
+            if(err) log("## [publish] %s =>failed, err:",packet.topic,err.message)
         })
     }
 
@@ -73,19 +76,18 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
                 return this.db.add(dv,false);
             })
             const packet:PublishPacket={
-                topic:`cmnd/${eid}/zbinfo'`,
+                topic:`cmnd/${eid}/zbinfo`,
                 cmd:'publish',
                 retain:false,
                 dup:false,
                 qos:0,
                 payload:''
             }
-            console.log("\n+++ device.service.ts-86");
             this.publish(packet);
             if(!devices.length) return log("[onconnect] NOT CHANGE")
             Promise.all(all).then(_=>{
                 this.db.commit();
-                this.update("update",devices);
+                this.sendUpdate("update",devices);
             })
         })
     }
@@ -97,9 +99,9 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
             const updateList: Device[] = []
             const all:Promise<Device>[]=[]
             idvs.forEach(idv => {
-                const dv = devices.find(d => d.id == idv.id);
+                let dv = devices.find(d => d.id == idv.id);
                 if (!dv)  return log("### '%s' is unregister device", idv.id);
-                Object.assign(dv, idv);
+                dv=Object.assign(dv, idv);
                 //check different
                 updateList.push(dv);
                 const result=this.db.add(dv,false);
@@ -107,18 +109,28 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
             })
             if(!updateList.length) return log("[onEdit] Nothing change")
             Promise.all(all).then(_=>{
-                this.update("update",updateList)
+                this.sendUpdate("update",updateList)
                 this.db.commit();
             })
         })
+        /** new device */
+        idvs.forEach(idv=>{
+            let ndevice=this.ndevices[idv.id];
+            if(!ndevice) return;
+            ndevice=Object.assign(ndevice,idv);
+            this.ndevices[idv.id]=ndevice;
+            log("#device.service.ts-119 ",{ndevice})
+        })
     }
 
-    updateByNetworkId: DeviceUpdateByNetworkId=(idvs,client)=>{
-        const networkId=idvs.networkId;
-        this.db.search({key:'networkId',type:'==',value:networkId})
-        .then(devices=>{
-            devices.forEach(dv=>{
-                console.log("\n++++ device.service.ts ++++ ",dv);
+    updateBySearch: DeviceUpdateBySearch=(keys,idvs:any[],client)=>{
+        const _keys=toArray(keys);
+        idvs.forEach(idv=>{
+            const queries:LocalDatabaseQuery[]=_keys.map(key=>{
+                return {key,type:'==',value:idv[key]}
+            })
+            this.db.search(...queries).then(devices=>{
+                log("#### debug ",devices)
             })
         })
     }
@@ -140,6 +152,10 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
 
     }
 
+    onUpdate: DeviceOnUpdate=(idvs)=>{
+
+    }
+
     add: DeviceAdd=(idvs)=>{
         const ids=idvs.map(i=>i.id);
         this.db.gets(ids).then(devices=>{
@@ -150,16 +166,24 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
             Promise.all(all).then(_=>{
                 this.db.commit();
                 log("[add] update ",nIdvs.map(n=>n.id));
-                this.update("update",nIdvs);
+                this.sendUpdate("update",nIdvs);
             })
         })
     }
 
-    private _dispatch(packet:PublishPacket,client:Networkclient){
+    private _dispatch(packet:PublishPacket,client:Networkclient,server:NetworkCommon):number{
         try{
-            const beCalls=this.deviceRoutes.filter(handle=>!!handle.handle && wildcard(packet.topic,handle.ref))
-            beCalls.forEach(handle=>handle.handle(packet,client,this))
-            return beCalls.length;
+            const topic=packet.topic;
+            const results=Object.keys(this.topicServices).map(id=>{
+                const handle=this.topicServices[id];
+                if(wildcard(topic,handle.ref)) {
+                    handle.handle(packet,client,server,this);
+                    return true;
+                }
+                return false;
+
+            }).filter(x=>!!x)
+            return results.length
         }
         catch(err){
             const msg:string=err instanceof Error?err.message:"other error"
@@ -169,39 +193,4 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     }
 
 
-}
-
-export function getEquipment(payload:string,networkId:string):Equipment{
-    const obj=JSON.parse(payload);
-    const equipment:Equipment={
-        id:obj.mac,
-        name:obj.dn,
-        names:obj.fn as string[],
-        ip:obj.ip,
-        mac:obj.mac,
-        model:obj.md,
-        states:obj.state,
-        version:obj.sw,
-        online:true,
-        networkId
-    }
-    return equipment;
-}
-
-
-export function getDeviceFromEquipment(equipment:Equipment):Device[]{
-    const devices:Device[]=[];
-    equipment.names.forEach((name,pos)=>{
-        if(!name) return;
-        devices.push({
-            id:equipment.id+"@"+(pos+1),
-            name,
-            online:equipment.online,
-            states:equipment.states,
-            status:0,
-            model:equipment.model,
-            networkId:equipment.networkId
-        })
-    })
-    return devices
 }

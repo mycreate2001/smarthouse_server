@@ -1,16 +1,19 @@
 import { PublishPacket } from 'packet';
-import {Networkclient} from '../network/network.interface'
+import {Networkclient, NetworkCommon} from '../network/network.interface'
+import DeviceService from './device.service';
 
 export interface DeviceServiceBase{
     remote:DeviceRemote;            // remote clients (devices)
-    update:DeviceUpdate;            // update to controller (apps)
+    sendUpdate:DeviceUpdate;        // update to controller (apps)
     onEdit:DeviceEdit;              // handle event when get edit from app/client
     onConnect:DeviceConnect;        // handle event device connect/disconnect
     onConfigure:DeviceConfig;       // handle device get config event
     getInfor:DeviceGetInfor;        // request infor from server
-    updateByNetworkId:DeviceUpdateByNetworkId;  //update by search networkid
+    updateBySearch:DeviceUpdateBySearch;  //update by search networkid
     add:DeviceAdd; 
     publish:(packet:PublishPacket)=>void;                 // add new device
+    /** handle update status event*/
+    onUpdate:DeviceOnUpdate;    //handle update status event
 }
 
 export type DeviceRemote=(stt:DeviceStatus[])=>void;
@@ -19,8 +22,9 @@ export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[],client:Networkclien
 export type DeviceConnect=(online:boolean,client:Networkclient)=>void;
 export type DeviceConfig=(idvs:Device[],client:Networkclient)=>void;
 export type DeviceGetInfor=(deviceId:string,client:Networkclient)=>void;
-export type DeviceUpdateByNetworkId=(idvs:any&{networkId:string},client:Networkclient)=>void;
+export type DeviceUpdateBySearch=(keys:string[]|string,idvs:Partial<Device>[],client:Networkclient)=>void;
 export type DeviceAdd=(idvs:Device[])=>void;
+export type DeviceOnUpdate=(idvs:(any&{id:string})[])=>void;
 
 export interface DeviceStatus{
     id:string;
@@ -33,36 +37,49 @@ export interface Equipment{
     id:string;              // id == mac
     name:string;            // device name
     names:string[]          // family name of all device
-    ip:string;              // ipaddress
+    ipAddr:string;              // ipaddress
     mac:string;             // mac
     model:string;           // model
-    states:string[];        // states of all device
+    fns:string[];        // states of all device
     version:string;
     online:boolean;
-    networkId:string;
 }
 
 export interface Device{
     id:string;
     name:string;
     online:boolean;
-    states:string[];
+    fns:string[];
     status:number;
     model:string;
-    networkId:string;
+    ipAddr:string;
+    mac:string;         //mac or IEEEAddress
 }
 
-export interface DeviceBasic{
+export interface DeviceCommon{
     id:string;
+    name:string;
     linkQuality:number;
     modelId:string;
     model:string;
-    address:string;
+    ipAddr:string;
+    mac:string;
+    fns:string;//functions
 }
 
-export interface DeviceOnOff extends DeviceBasic{
-
+export interface DeviceOnOff extends DeviceCommon{
+    type:'ONOFF'
+    power:number;//0=off,1=on
 }
+
+export interface DeviceZigbeeTemp extends DeviceCommon{
+    type:'ZigbeeTemp'
+    temporature:number;
+    humindity:number;
+}
+
+
+
 
 export interface DeviceDb{
     [id:string]:Device
@@ -70,9 +87,14 @@ export interface DeviceDb{
 
 
 /** handle */
-export interface DeviceRoute{
-    name:string;
+export interface TopicService{
+    id:string;
+    name?:string;
     ref:string;
-    handle:DeviceHandle;
+    handle:TopicHandle;
 }
-export type DeviceHandle=(packet:PublishPacket,client:Networkclient,service:DeviceServiceBase)=>void
+export type TopicHandle=(packet:PublishPacket,client:Networkclient,network:NetworkCommon,service:DeviceService)=>void
+
+export interface TopicServiceDb{
+    [id:string]:TopicService
+}

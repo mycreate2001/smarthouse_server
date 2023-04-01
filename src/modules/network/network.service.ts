@@ -3,13 +3,18 @@ import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe
          NetworkCommon, NetworkHandlePublish, NetworkOnConnect, 
          NetworkPublish, NetworkSubscribe } from "./network.interface";
 const log=createLog("Network","center");
+const _DEBUG=true;
 export default class Network implements NetworkCommon{
     servers:NetworkCommon[]=[]
     constructor(...servers:NetworkCommon[]){
         this.servers=servers;
         servers.forEach(server=>{
             // server.on=this.on;
-            server.onPublish=(packet,client,server )=>this.onPublish(packet,client,this);
+            server.onPublish=(packet,client,server )=>{
+                const id=(client&& client.id)?client.id:"server"
+                log("\n# %d publish %s=%s",id,packet.topic,packet.payload.toString())
+                this.onPublish(packet,client,this);
+            }
             server.onConnect=(stt,client,server)=> this.onConnect(stt,client,this);
             server.publish=(packet,callback)=>this.publish(packet,callback);
             server.subscribe=this.subscribe;
@@ -25,7 +30,7 @@ export default class Network implements NetworkCommon{
     }
 
     publish: NetworkPublish=(packet,callback)=>{
-        log("publish %s :%s",packet.topic,packet.payload)
+        // log("publish %s :%s",packet.topic,packet.payload)
         return this.servers.map(server=>server._publish(packet,callback))
     }
 
@@ -50,4 +55,3 @@ export default class Network implements NetworkCommon{
 
 
 }
-

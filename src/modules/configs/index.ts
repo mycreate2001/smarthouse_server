@@ -7,6 +7,6 @@ export default function startupConfig(infor:ModulePackage){
     const path:string=(infor.params.path)?infor.params.path:_PATH_DEFAULT
     //2. execute
     const configs=new Config({path});
-    console.log("\n+++ configs.index.ts-10 ",configs.obj);
+    // console.log("\n+++ configs.index.ts-10 ",configs.obj);
     return configs;
 }
