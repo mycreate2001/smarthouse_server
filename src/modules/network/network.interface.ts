@@ -15,11 +15,11 @@ export interface NetworkCommon{
 }
 
 export type NetworkOn=(topic:"publish"|"subscribe"|"clientDisconnect"|"client",callback:NetworkCallback)=>void;
-export type NetworkHandlePublish=(packet:PublishPacket,client:Networkclient|null,server:NetworkCommon)=>void;
+export type NetworkHandlePublish=(packet:PublishPacket,client:NetworkClient|null,server:NetworkCommon)=>void;
 export type NetworkCallback=(packet:PublishPacket)=>void;
 export type NetworkPublish=(packet:PublishPacket,callback?:NetworkCallbackError)=>void;
 export type NetworkSubscribe=(topic:string,callback:NetworkCallback)=>any
-export type NetworkOnConnect=(stt:boolean,client:Networkclient,server:NetworkCommon)=>void;
+export type NetworkOnConnect=(stt:boolean,client:NetworkClient,server:NetworkCommon)=>void;
 export type NetworkAuthenticate=(
     client:any,
     user:string,
@@ -27,12 +27,17 @@ export type NetworkAuthenticate=(
     done:(err:AuthenticateError|null,success:boolean|null)=>void
 )=>void
 
-export type Networkclient=object&{id:string,user?:UserData}
+export interface NetworkClient{
+    id:string;
+    user?:UserData;
+    publish:NetworkClientPublish;
+}
 export type NetworkCallbackError=(err?:Error)=>void;
 export type NetworkAuthError=(error:Error|null,success:boolean|null)=>void;
 export type NetworkAuthorizeSubscribe= (client:any,subscription:Subscription,callback:NetworkAuthSubscribeError)=>void;
 export type NetworkAuthorizePublish=(client:any,packet:PublishPacket,callback:NetworkHandleError)=>void;
 
+export type NetworkClientPublish=(packet:PublishPacket,callback:NetworkCallbackError)=>void;
 export type NetworkAuthSubscribeError=(err:Error|null|undefined,subscription:Subscription)=>void;
 export type NetworkHandleError=(err:Error|undefined|null)=>void;
 export interface Subscription{

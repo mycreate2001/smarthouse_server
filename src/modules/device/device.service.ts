@@ -3,10 +3,11 @@ import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
-import { Networkclient, NetworkCommon } from "../network/network.interface";
+import { NetworkClient, NetworkCommon } from "../network/network.interface";
 import { Device, DeviceAdd, DeviceConfig, DeviceConnect, 
         DeviceDb, DeviceEdit, DeviceGetInfor, DeviceOnUpdate, DeviceRemote, 
         DeviceServiceBase, DeviceUpdateBySearch, TopicService, TopicServiceDb } from "./device.interface";
+import { createPacket } from "../network/network.service";
 
 const _DEVICE_DB_="devices"
 const _UPDATE_TOPIC_="api/update"
@@ -34,7 +35,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         }
 
         network.onPublish=(packet,client,server)=>{
-            const _client:Networkclient=client?client:{id:"server"}
+            const _client:NetworkClient=client?client:{id:"server",publish:(packet,cb)=>null}
             // log("\n\n#%d publish %s \npayload:%s",_client.id,packet.topic,packet.payload.toString())
             this._dispatch(packet,_client,server)
         }
@@ -67,9 +68,9 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     }
 
     /** handle device connect/disconnect event */
-    onConnect: DeviceConnect=(online,client:any)=>{
+    onConnect: DeviceConnect=(online,client:NetworkClient)=>{
         const eid=client.id;
-        client.publish("It's work!",(err:any)=>console.log(err))
+        client.publish(createPacket({topic:"connect",payload:eid}),(err)=>null)
         this.db.search({key:'eid',type:'==',value:client.id})
         .then(devices=>{
             const all=devices.map(dv=>{
@@ -173,7 +174,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         })
     }
 
-    private _dispatch(packet:PublishPacket,client:Networkclient,server:NetworkCommon):number{
+    private _dispatch(packet:PublishPacket,client:NetworkClient,server:NetworkCommon):number{
         try{
             const topic=packet.topic;
             const results=Object.keys(this.topicServices).map(id=>{

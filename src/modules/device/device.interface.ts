@@ -1,5 +1,5 @@
 import { PublishPacket } from 'packet';
-import {Networkclient, NetworkCommon} from '../network/network.interface'
+import {NetworkClient, NetworkCommon} from '../network/network.interface'
 import DeviceService from './device.service';
 
 export interface DeviceServiceBase{
@@ -18,11 +18,11 @@ export interface DeviceServiceBase{
 
 export type DeviceRemote=(stt:DeviceStatus[])=>void;
 export type DeviceUpdate=(type:DeviceUpdateType,devices:Device[])=>void;
-export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[],client:Networkclient)=>void;
-export type DeviceConnect=(online:boolean,client:Networkclient)=>void;
-export type DeviceConfig=(idvs:Device[],client:Networkclient)=>void;
-export type DeviceGetInfor=(deviceId:string,client:Networkclient)=>void;
-export type DeviceUpdateBySearch=(keys:string[]|string,idvs:Partial<Device>[],client:Networkclient)=>void;
+export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[],client:NetworkClient)=>void;
+export type DeviceConnect=(online:boolean,client:NetworkClient)=>void;
+export type DeviceConfig=(idvs:Device[],client:NetworkClient)=>void;
+export type DeviceGetInfor=(deviceId:string,client:NetworkClient)=>void;
+export type DeviceUpdateBySearch=(keys:string[]|string,idvs:Partial<Device>[],client:NetworkClient)=>void;
 export type DeviceAdd=(idvs:Device[])=>void;
 export type DeviceOnUpdate=(idvs:(any&{id:string})[])=>void;
 
@@ -93,7 +93,7 @@ export interface TopicService{
     ref:string;
     handle:TopicHandle;
 }
-export type TopicHandle=(packet:PublishPacket,client:Networkclient,network:NetworkCommon,service:DeviceService)=>void
+export type TopicHandle=(packet:PublishPacket,client:NetworkClient,network:NetworkCommon,service:DeviceService)=>void
 
 export interface TopicServiceDb{
     [id:string]:TopicService

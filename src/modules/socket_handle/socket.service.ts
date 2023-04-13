@@ -30,12 +30,11 @@ export default class SocketService extends tEvent implements NetworkCommon{
         this.wss.on("connection",(ws)=>{
             ws.id=uuidv4();
             if(!ws.publish){
-                ws.publish=(data:string|object,callback:(err:Error|undefined)=>void)=>{
+                ws.publish=(data:string|object,callback?:(err:Error|undefined)=>void)=>{
                     const _data=typeof data!=='string'?JSON.stringify(data):data
                     ws.send(_data,callback);
                 }
             }
-            // ws.publish()
             log("%d connected",ws.id);
             /** handle login: done */
             const handleLogin=setHandleLogin(this);
@@ -144,7 +143,7 @@ export default class SocketService extends tEvent implements NetworkCommon{
 
 declare module "ws" {
     class _WS extends ws.WebSocket {
-        publish:(packet:string|Object,callback:(err:Error|undefined)=>void)=>void;
+        publish:(packet:string|Object,callback?:(err:Error|undefined)=>void)=>void;
     }
     export interface WebSocket extends _WS {
         id: string;

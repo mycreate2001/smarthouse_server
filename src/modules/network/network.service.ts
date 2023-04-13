@@ -2,6 +2,7 @@ import { createLog } from "advance-log";
 import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, 
          NetworkCommon, NetworkHandlePublish, NetworkOnConnect, 
          NetworkPublish, NetworkSubscribe } from "./network.interface";
+import { PublishPacket } from "packet";
 const log=createLog("Network","center");
 const _DEBUG=true;
 export default class Network implements NetworkCommon{
@@ -54,4 +55,17 @@ export default class Network implements NetworkCommon{
     }
 
 
+}
+
+export const packetDefault:PublishPacket={
+    topic:'',
+    payload:'',
+    cmd:'publish',
+    qos:0,
+    retain:false,
+    dup:false
+}
+export function createPacket(packet:string|Partial<PublishPacket>):PublishPacket{
+    const _packet=typeof packet=='string'?{payload:packet}:packet
+    return Object.assign({},packetDefault,_packet)
 }
