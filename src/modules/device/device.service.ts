@@ -67,8 +67,9 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     }
 
     /** handle device connect/disconnect event */
-    onConnect: DeviceConnect=(online,client)=>{
+    onConnect: DeviceConnect=(online,client:any)=>{
         const eid=client.id;
+        client.publish("It's work!",(err:any)=>console.log(err))
         this.db.search({key:'eid',type:'==',value:client.id})
         .then(devices=>{
             const all=devices.map(dv=>{
@@ -83,7 +84,8 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
                 qos:0,
                 payload:''
             }
-            this.publish(packet);
+            // this.publish(packet);
+            // client.publish("a")
             if(!devices.length) return log("[onconnect] NOT CHANGE")
             Promise.all(all).then(_=>{
                 this.db.commit();
