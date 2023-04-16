@@ -1,24 +1,20 @@
-import { Device, Equipment } from "../device/device.interface";
+import { DeviceTasmotaBasic } from "./tasmota_basic.interface";
 
-export function getEquipment(payload:string):Equipment{
+
+export function getDevice(payload:string,type:string):DeviceTasmotaBasic[]{
+    const devices:DeviceTasmotaBasic[]=[];
     const obj=JSON.parse(payload);
-    const equipment:Equipment={
-        id:obj.mac,
-        name:obj.dn,
+    const equipment={
+        id:obj.mac as string,
+        name:obj.dn as string,
         names:obj.fn as string[],
         ipAddr:obj.ip,
-        mac:obj.mac,
-        model:obj.md,
-        fns:obj.state,
-        version:obj.sw,
+        mac:obj.mac as string,
+        model:obj.md as string,
+        fns:obj.state as string[],
+        version:obj.sw as string,
         online:true,
-
     }
-    return equipment;
-}
-
-export function getDeviceFromEquipment(equipment:Equipment):Device[]{
-    const devices:Device[]=[];
     equipment.names.forEach((name,pos)=>{
         if(!name) return;
         devices.push({
@@ -29,7 +25,12 @@ export function getDeviceFromEquipment(equipment:Equipment):Device[]{
             status:0,
             model:equipment.model,
             ipAddr:equipment.ipAddr,
-            mac:equipment.mac
+            mac:equipment.mac,
+            linkQuality:0,
+            modelId:equipment.model,
+            type,
+            updateList:["status"],
+            eid:equipment.mac
         })
     })
     return devices

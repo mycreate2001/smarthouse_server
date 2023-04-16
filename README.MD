@@ -32,3 +32,20 @@
     test2=name
 ]
 => result={hash:{test1:'100'},network:{test2:'name'}}
+
+# device
++ management by Device as DeviceCommon
++ basic item: 
+    id:string;              //id of device
+    name:string;            // family name
+    linkQuality:number;     // quality of connect
+    modelId:string;         // model id
+    model:string;           // model name
+    ipAddr:string;          // address of device
+    mac:string;             // mac 
+    fns:string;             // functions list
+    type:string;            // it's decide which to remote
+    updateList:string[];    // list item can make event when change value
+
+[2023-Apr-16]
+-bug mqtt.service.publish not execute by publish function wrong logics

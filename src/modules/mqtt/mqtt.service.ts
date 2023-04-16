@@ -59,17 +59,17 @@ export default class MqttService implements NetworkCommon{
         const _callback:NetworkHandleError=(err)=>{
             if(err) log("### error:",err);
         }
-        if(callback) this.mqtt.publish(packet,callback||_callback);
+        this.mqtt.publish(packet,callback||_callback);
     }
 
     // onPublish: Networ=(packet,client,server)=>{
     //     log("[publish] packet:",packet)
     // }
     onPublish: NetworkHandlePublish=(packet,client,server)=>{
-        log("[publish] packet:",packet)
+        log("\n[onPublish] ### WARNING! Not be handler\n\t\t\tpacket:",packet)
     }
     subscribe: NetworkSubscribe=(topic,callback)=>{
-
+        this.mqtt.subscribe(topic,callback,()=>{console.log('\n+++ mqtt.service.ts-72 +++ ',{topic})})
     }
     publish: NetworkPublish=this._publish;
 

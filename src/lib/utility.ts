@@ -46,6 +46,15 @@ export function getParams(topic:string,ref:string){
     }
 }
 
+export function getList(arrs:any|any[],key:string='id'):string[]{
+    const list:string[]=[]
+    toArray(arrs).forEach(arr=>{
+        const val=arr[key]+""
+        if(!list.includes(val)) list.push(val)
+    })
+    return list;
+}
+
 export function createOption<T extends {id:string}>(df:T,opts:Partial<T>):T{
     return Object.assign({},df,opts);
 }

@@ -12,6 +12,7 @@ export default function startDeviceService(infor:ModulePackage,network:any,db:an
     services.forEach(service=>{
         _services=_services.concat(service)
     })
+    console.log("\n+++ device.index.ts-15 +++ _services:",_services)
     const service=new DeviceService(network,db,_services);
     return service; /** success */
 }

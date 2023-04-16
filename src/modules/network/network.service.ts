@@ -31,7 +31,7 @@ export default class Network implements NetworkCommon{
     }
 
     publish: NetworkPublish=(packet,callback)=>{
-        // log("publish %s :%s",packet.topic,packet.payload)
+        log("%d(%s) publish-1 %s=%s","server","root",packet.topic,packet.payload)
         return this.servers.map(server=>server._publish(packet,callback))
     }
 
@@ -65,7 +65,12 @@ export const packetDefault:PublishPacket={
     retain:false,
     dup:false
 }
-export function createPacket(packet:string|Partial<PublishPacket>):PublishPacket{
+
+interface PublishPacketExt extends PublishPacket{
+    payload:any
+}
+export function createPacket(packet:string|Partial<PublishPacketExt>):PublishPacket{
     const _packet=typeof packet=='string'?{payload:packet}:packet
-    return Object.assign({},packetDefault,_packet)
+    const payload=typeof _packet.payload!=='string'?JSON.stringify(_packet.payload):_packet.payload
+    return Object.assign({},packetDefault,_packet,{payload})
 }

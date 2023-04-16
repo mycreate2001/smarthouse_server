@@ -6,8 +6,9 @@ import { wildcard } from "../../lib/wildcard";
 import { NetworkClient, NetworkCommon } from "../network/network.interface";
 import { Device, DeviceAdd, DeviceConfig, DeviceConnect, 
         DeviceDb, DeviceEdit, DeviceGetInfor, DeviceOnUpdate, DeviceRemote, 
-        DeviceServiceBase, DeviceUpdateBySearch, TopicService, TopicServiceDb } from "./device.interface";
+        DeviceServiceBase, DeviceUpdateBySearch, TopicData, TopicService, TopicServiceClient, TopicServiceDb } from "./device.interface";
 import { createPacket } from "../network/network.service";
+import { getList } from "../../lib/utility";
 
 const _DEVICE_DB_="devices"
 const _UPDATE_TOPIC_="api/update"
@@ -17,7 +18,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     db:DataConnect<Device>;
     network:NetworkCommon;
     ndevices:DeviceDb={};
-    topicServices:TopicServiceDb={};
+    topicServices:TopicService[]=[];
     constructor(network:NetworkCommon,db:LocalDatabaseLite,topicServices:TopicService[]){
         super();
         this.db=db.connect(_DEVICE_DB_);
@@ -26,36 +27,34 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         // console.log('\n+++ device.service.ts-25 ',topicServices);
         topicServices.forEach(service=>{
             const id=service.id
-            if(!id) log("\n#ERROR(1): service %s is error",service.name||"unname")
-            this.topicServices[id]=service;
+            if(!id) log("\n#ERROR(1): service is empty id")
+            const pos=this.topicServices.findIndex(t=>t.id==service.id);
+            if(pos==-1) this.topicServices.push(service);
+            else this.topicServices[pos]=service;
         })
 
-        network.onConnect=(online,client,server)=>{
+        network.onConnect=(online,client,network)=>{
             this.onConnect(online,client)
         }
 
-        network.onPublish=(packet,client,server)=>{
+        network.onPublish=(packet,client,network)=>{
             const _client:NetworkClient=client?client:{id:"server",publish:(packet,cb)=>null}
             // log("\n\n#%d publish %s \npayload:%s",_client.id,packet.topic,packet.payload.toString())
-            this._dispatch(packet,_client,server)
+            this._dispatch(packet,_client)
         }
     
 
     }
 
-     /** send update to app */
-     sendUpdate(type:'full'|'update',devices:Device[]){
-        const packet:PublishPacket={
-            topic:_UPDATE_TOPIC_,
-            payload:JSON.stringify({type,devices}),
-            retain:true,
-            qos:0,
-            cmd:'publish',
-            dup:false
-        }
+    /** send update to app */
+    sendUpdate(type: 'full' | 'update', devices: Device[]) {
+        const packet=createPacket({payload:{type,devices},topic:_UPDATE_TOPIC_})
         this.network.publish(packet)
     }
 
+    /* `publish` is a method that takes a `PublishPacket` object as an argument and publishes it to the
+    network using the `network.publish` method. If there is an error during the publishing process,
+    it logs the error message using the `log` function. */
     publish= (packet: PublishPacket) => {
         this.network.publish(packet,(err)=>{
             if(err) log("## [publish] %s =>failed, err:",packet.topic,err.message)
@@ -63,30 +62,37 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     }
 
     /** remote device from server */
-    remote: DeviceRemote=(stts)=>{
-
+    remote: DeviceRemote=(idvs,network)=>{
+        getList(idvs,"type").forEach(type=>{
+            //collect some devices by 'type'
+            const xdvs=idvs.filter(i=>i.type==type);
+            if(!xdvs.length) return;
+            const service=this.topicServices.find(t=>t.id==type&&t.type=='client');
+            if(!service) return log("[remote] type '%s' no handler",type);
+            if(service.type=='client') service.remote(xdvs,network)
+        })
     }
 
-    /** handle device connect/disconnect event */
+    /* The `onConnect` function is a method that handles the event when a device connects to the
+    network. It takes two parameters: `online` (a boolean indicating whether the device is online or
+    not) and `client` (a `NetworkClient` object representing the device that has connected). */
     onConnect: DeviceConnect=(online,client:NetworkClient)=>{
-        const eid=client.id;
-        client.publish(createPacket({topic:"connect",payload:eid}),(err)=>null)
         this.db.search({key:'eid',type:'==',value:client.id})
         .then(devices=>{
             const all=devices.map(dv=>{
                 dv.online=online;
                 return this.db.add(dv,false);
             })
-            const packet:PublishPacket={
-                topic:`cmnd/${eid}/zbinfo`,
-                cmd:'publish',
-                retain:false,
-                dup:false,
-                qos:0,
-                payload:''
-            }
-            // this.publish(packet);
-            // client.publish("a")
+            /** result */
+            /** @@@ test */
+            // this.getInfor(devices,this.network)
+            // this.remote(devices,this.network);
+            const topic=`cmnd/${client.id}/Power`
+            const payload="OFF"
+            const packet=createPacket({payload,topic})
+            // client.publish(createPacket({payload,topic}),()=>console.log("\n+++ device.service.ts-92 +++"))
+            this.network.publish(packet)
+            /** @@@ test end */
             if(!devices.length) return log("[onconnect] NOT CHANGE")
             Promise.all(all).then(_=>{
                 this.db.commit();
@@ -151,8 +157,17 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         })
     }
 
-    getInfor: DeviceGetInfor=(deviceId,client)=>{
-
+    getInfor: DeviceGetInfor=(idvs,network)=>{
+        //group device by type
+        console.log("\n+++ [getInfor] device.service.ts-153 ++ ")
+        const results=getList(idvs,"type").map(type=>{
+            const tIdvs=idvs.filter(i=>i.type===type);
+            const method=this.topicServices.find(t=>t.id===type);
+            if(!method) return log("\n[getInfor] ###ERROR: No way to get infor\n");
+            if(method.type=='client')
+                return method.getInf(tIdvs,network);
+        }).filter(x=>!!x)
+        return results.length
     }
 
     onUpdate: DeviceOnUpdate=(idvs)=>{
@@ -174,23 +189,28 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         })
     }
 
-    private _dispatch(packet:PublishPacket,client:NetworkClient,server:NetworkCommon):number{
-        try{
-            const topic=packet.topic;
-            const results=Object.keys(this.topicServices).map(id=>{
-                const handle=this.topicServices[id];
-                if(wildcard(topic,handle.ref)) {
-                    handle.handle(packet,client,server,this);
-                    return true;
-                }
-                return false;
+    private _dispatch(packet:PublishPacket,client:NetworkClient):number{
 
-            }).filter(x=>!!x)
-            return results.length
+        try{
+            const topic=packet.topic
+            /** get topic data */
+            const results=this.topicServices.reduce((acc:any[],cur:TopicService)=>{
+                return [...acc,...cur.topics]
+            },[])
+            /** execute */
+            .map((handle:TopicData)=>{
+                // console.log("\n+++ device.service.ts-196 +++\nhandle:",handle,"\ntopic:",topic);
+                // console.log("\n+++ device.service.ts-197 +++\nref:",handle.ref);
+                if(!wildcard(topic,handle.ref)) return;
+                handle.handle(packet,client,this.network,this);
+                return true;
+            })
+            .filter(x=>!!x);//filter result
+            return results.length;
         }
         catch(err){
-            const msg:string=err instanceof Error?err.message:"other error"
-            log("dispatch ### ERROR:%s",msg);
+            log("\n[_dispath] ### ERROR: ",err);
+            console.log("\n+++ DEBUG/device.service.ts-207 +++ \n",{topic:packet.topic,client:client.id},"\n-----------------------\n\n")
             return 0;
         }
     }

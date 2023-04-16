@@ -16,12 +16,11 @@ export interface DeviceServiceBase{
     onUpdate:DeviceOnUpdate;    //handle update status event
 }
 
-export type DeviceRemote=(stt:DeviceStatus[])=>void;
 export type DeviceUpdate=(type:DeviceUpdateType,devices:Device[])=>void;
 export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[],client:NetworkClient)=>void;
 export type DeviceConnect=(online:boolean,client:NetworkClient)=>void;
 export type DeviceConfig=(idvs:Device[],client:NetworkClient)=>void;
-export type DeviceGetInfor=(deviceId:string,client:NetworkClient)=>void;
+export type DeviceGetInfor=(idvs:Device[],network:NetworkCommon)=>number;
 export type DeviceUpdateBySearch=(keys:string[]|string,idvs:Partial<Device>[],client:NetworkClient)=>void;
 export type DeviceAdd=(idvs:Device[])=>void;
 export type DeviceOnUpdate=(idvs:(any&{id:string})[])=>void;
@@ -33,68 +32,62 @@ export interface DeviceStatus{
 
 export type DeviceUpdateType="full"|"update"
 
-export interface Equipment{
-    id:string;              // id == mac
-    name:string;            // device name
-    names:string[]          // family name of all device
-    ipAddr:string;              // ipaddress
-    mac:string;             // mac
-    model:string;           // model
-    fns:string[];        // states of all device
-    version:string;
-    online:boolean;
-}
 
+
+/**
+ * all device was storage basse on DeviceCommon
+ * each module have name/id to device as type
+ */
 export interface Device{
-    id:string;
-    name:string;
-    online:boolean;
-    fns:string[];
-    status:number;
-    model:string;
-    ipAddr:string;
-    mac:string;         //mac or IEEEAddress
+    id:string;                  //id
+    name:string;                // name of device
+    linkQuality:number;         // quality of device wifi or zigbee
+    modelId:string;             // modelid
+    model:string;               // model name
+    ipAddr:string;              // address of device
+    mac:string;                 // mac or IEEEAddress
+    fns:string[];                 // functions
+    type:string;/** device type, it's effect to remote device */
+    updateList:string[]; //list item will generate event when change value
+    online:boolean;     // online status true=online
 }
-
-export interface DeviceCommon{
-    id:string;
-    name:string;
-    linkQuality:number;
-    modelId:string;
-    model:string;
-    ipAddr:string;
-    mac:string;
-    fns:string;//functions
-}
-
-export interface DeviceOnOff extends DeviceCommon{
-    type:'ONOFF'
-    power:number;//0=off,1=on
-}
-
-export interface DeviceZigbeeTemp extends DeviceCommon{
-    type:'ZigbeeTemp'
-    temporature:number;
-    humindity:number;
-}
-
-
 
 
 export interface DeviceDb{
-    [id:string]:Device
+    [id:string]:any
 }
 
 
-/** handle */
-export interface TopicService{
+////////////////// HANDLE TOPICS //////////////////////////
+/** export for each handle topic module  */
+export type TopicService=TopicServiceClient|TopicServiceServer
+
+export interface TopicServiceClient {
+    id:string;                                          // handle module id --> add into device database
+    topics:TopicData[];
+    type:'client'                                 // each topic & handle
+    remote:DeviceRemote; //remote 
+    getInf:DeviceGetInfor;
+}
+
+export  interface TopicServiceServer{
     id:string;
-    name?:string;
-    ref:string;
-    handle:TopicHandle;
+    topics:TopicData[];
+    type:'server'
 }
+
+
+/** topic data include handle */
+export interface TopicData{
+    id:string;                  // separate with other
+    name?:string;               // discription
+    ref:string;                 // matching case run or not
+    handle:TopicHandle;         // handle event
+}
+export type DeviceRemote=(idvs:Device[],network:NetworkCommon)=>void; //remote 
 export type TopicHandle=(packet:PublishPacket,client:NetworkClient,network:NetworkCommon,service:DeviceService)=>void
 
-export interface TopicServiceDb{
+
+export interface TopicServiceDb<T>{
     [id:string]:TopicService
 }
