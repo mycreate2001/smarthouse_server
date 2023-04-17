@@ -1,30 +1,59 @@
 import { PublishPacket } from 'packet';
 import {NetworkClient, NetworkCommon} from '../network/network.interface'
 import DeviceService from './device.service';
+import { DataConnect, LocalDatabaseQuery } from 'local-database-lite';
 
 export interface DeviceServiceBase{
-    remote:DeviceRemote;            // remote clients (devices)
-    sendUpdate:DeviceUpdate;        // update to controller (apps)
-    onEdit:DeviceEdit;              // handle event when get edit from app/client
-    onConnect:DeviceConnect;        // handle event device connect/disconnect
-    onConfigure:DeviceConfig;       // handle device get config event
-    getInfor:DeviceGetInfor;        // request infor from server
-    updateBySearch:DeviceUpdateBySearch;  //update by search networkid
-    add:DeviceAdd; 
-    publish:(packet:PublishPacket)=>void;                 // add new device
-    /** handle update status event*/
-    onUpdate:DeviceOnUpdate;    //handle update status event
+    /** variable */
+    db:DataConnect<Device>;
+    network:NetworkCommon;
+
+    /** remote device from server */
+    remote:DeviceRemote;            
+    
+    /** send update devices to apps from server */
+    sendUpdate:DeviceSendUpdate;  
+    
+    /** publish message from server, pass sercurity */
+    publish:(packet:PublishPacket)=>void;
+    
+    /** get request devices infor from server */    
+    getInfor:DeviceGetInfor;
+
+    /** handler Edit devices from app */
+    edit:DeviceEdit; 
+
+    /** delete devices */
+    delDevice:DeviceDelete;
+
+    /** update device */     
+    updateBySearch:DeviceUpdateBySearch;  
+
+    /** update devices from database only*/
+    update:DeviceUpdate;    //handle update status event
+    
+    //// HANDLE EVENTS //////////////
+    /** handler new client connect to server */
+    onConnect:DeviceOnConnect; 
+
 }
 
-export type DeviceUpdate=(type:DeviceUpdateType,devices:Device[])=>void;
-export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[],client:NetworkClient)=>void;
-export type DeviceConnect=(online:boolean,client:NetworkClient)=>void;
+/** main functions */
+export type DeviceDelete=(idvs:(Device|string)[])=>Promise<string[]>;//delete success device list
+export type DeviceSendUpdate=(type:DeviceUpdateType,devices:Device[])=>void;
+export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[])=>Promise<Device[]>;
+export type DeviceOnConnect=(online:boolean,client:NetworkClient)=>void;
 export type DeviceConfig=(idvs:Device[],client:NetworkClient)=>void;
 export type DeviceGetInfor=(idvs:Device[],network:NetworkCommon)=>number;
-export type DeviceUpdateBySearch=(keys:string[]|string,idvs:Partial<Device>[],client:NetworkClient)=>void;
+export type DeviceUpdateBySearch=(updates:DeviceUpdateBySearchData[],client:NetworkClient)=>void;
 export type DeviceAdd=(idvs:Device[])=>void;
-export type DeviceOnUpdate=(idvs:(any&{id:string})[])=>void;
+export type DeviceUpdate=(idvs:(Partial<Device>&{id:string})[],udateList?:string[])=>void;
+export type DeviceRemote=(idvs:Device[],network:NetworkCommon)=>string[]; //remote 
 
+export interface DeviceUpdateBySearchData{
+    queries:LocalDatabaseQuery
+    update:Partial<Device>
+}
 export interface DeviceStatus{
     id:string;
     status:number;
@@ -51,7 +80,6 @@ export interface Device{
     updateList:string[]; //list item will generate event when change value
     online:boolean;     // online status true=online
 }
-
 
 export interface DeviceDb{
     [id:string]:any
@@ -84,10 +112,17 @@ export interface TopicData{
     ref:string;                 // matching case run or not
     handle:TopicHandle;         // handle event
 }
-export type DeviceRemote=(idvs:Device[],network:NetworkCommon)=>void; //remote 
+
 export type TopicHandle=(packet:PublishPacket,client:NetworkClient,network:NetworkCommon,service:DeviceService)=>void
 
 
 export interface TopicServiceDb<T>{
     [id:string]:TopicService
+}
+
+
+export interface ChangeData{
+    key:string;
+    oldVal:any;
+    newVal:any;
 }

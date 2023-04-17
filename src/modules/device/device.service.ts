@@ -1,17 +1,19 @@
-import LocalDatabaseLite, { DataConnect, LocalDatabaseQuery, toArray } from "local-database-lite";
+import LocalDatabaseLite, { DataConnect } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
 import { NetworkClient, NetworkCommon } from "../network/network.interface";
-import { Device, DeviceAdd, DeviceConfig, DeviceConnect, 
-        DeviceDb, DeviceEdit, DeviceGetInfor, DeviceOnUpdate, DeviceRemote, 
-        DeviceServiceBase, DeviceUpdateBySearch, TopicData, TopicService, TopicServiceClient, TopicServiceDb } from "./device.interface";
+import { ChangeData, Device, DeviceAdd, DeviceConfig, DeviceOnConnect, 
+        DeviceDb, DeviceEdit, DeviceGetInfor, DeviceRemote, 
+        DeviceServiceBase, DeviceUpdateBySearch, TopicData, TopicService, DeviceUpdate, DeviceDelete } from "./device.interface";
 import { createPacket } from "../network/network.service";
-import { getList } from "../../lib/utility";
+import { getList, toArray } from "../../lib/utility";
 
 const _DEVICE_DB_="devices"
 const _UPDATE_TOPIC_="api/update"
+const _DEVICE_EVENT="device"
+
 const log=createLog("DeviceService","center")
 
 export default class DeviceService extends tEvent implements DeviceServiceBase{
@@ -46,6 +48,10 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
 
     }
 
+    onConnect: DeviceOnConnect=(online,client)=>{
+        log("\n++++ device.service.ts-52 +++ onConnect")
+    }
+
     /** send update to app */
     sendUpdate(type: 'full' | 'update', devices: Device[]) {
         const packet=createPacket({payload:{type,devices},topic:_UPDATE_TOPIC_})
@@ -61,87 +67,74 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         })
     }
 
-    /** remote device from server */
     remote: DeviceRemote=(idvs,network)=>{
+        let outs:string[]=[]
         getList(idvs,"type").forEach(type=>{
             //collect some devices by 'type'
             const xdvs=idvs.filter(i=>i.type==type);
             if(!xdvs.length) return;
             const service=this.topicServices.find(t=>t.id==type&&t.type=='client');
-            if(!service) return log("[remote] type '%s' no handler",type);
-            if(service.type=='client') service.remote(xdvs,network)
+            if(!service) {
+                log("[remote] type '%s' no handler",type);
+                throw new Error("Not service handle")
+            }
+            if(service.type=='client') {
+                const result=service.remote(xdvs,network)
+                outs=outs.concat(result)
+            }
         })
+        return outs;
     }
 
-    /* The `onConnect` function is a method that handles the event when a device connects to the
-    network. It takes two parameters: `online` (a boolean indicating whether the device is online or
-    not) and `client` (a `NetworkClient` object representing the device that has connected). */
-    onConnect: DeviceConnect=(online,client:NetworkClient)=>{
-        this.db.search({key:'eid',type:'==',value:client.id})
-        .then(devices=>{
-            const all=devices.map(dv=>{
-                dv.online=online;
-                return this.db.add(dv,false);
-            })
-            /** result */
-            /** @@@ test */
-            // this.getInfor(devices,this.network)
-            // this.remote(devices,this.network);
-            const topic=`cmnd/${client.id}/Power`
-            const payload="OFF"
-            const packet=createPacket({payload,topic})
-            // client.publish(createPacket({payload,topic}),()=>console.log("\n+++ device.service.ts-92 +++"))
-            this.network.publish(packet)
-            /** @@@ test end */
-            if(!devices.length) return log("[onconnect] NOT CHANGE")
-            Promise.all(all).then(_=>{
-                this.db.commit();
-                this.sendUpdate("update",devices);
-            })
-        })
-    }
-
-    /** handle event edit device */
-    onEdit: DeviceEdit = (idvs, client) => {
+    /** handler update & add new device 
+     * - update exist devices for new item
+     * - add new devices
+     * - No emitting any event when change
+     * - send updateInfor to apps
+     * - No checking deffirence points
+    */
+    edit: DeviceEdit = async(idvs) => {
         const ids = idvs.map(i => i.id)
-        this.db.gets(ids).then(devices => {
-            const updateList: Device[] = []
-            const all:Promise<Device>[]=[]
+        console.log("\n+++ device.service.ts-98 [edit] ids:",ids);
+        return this.db.gets(ids).then(devices => {
+            console.log("\n+++ device.service.ts-100 [edit] devices:",devices);
+            const tasks:Promise<Device>[]=[];
             idvs.forEach(idv => {
+                console.log("\n+++ device.service.ts-103 [edit] ",{idv});
+                if(!idv.id) return log("[edit] ### device infor wrong")
                 let dv = devices.find(d => d.id == idv.id);
-                if (!dv)  return log("### '%s' is unregister device", idv.id);
-                dv=Object.assign(dv, idv);
-                //check different
-                updateList.push(dv);
-                const result=this.db.add(dv,false);
-                all.push(result)
+                const ndevice=(dv)?Object.assign({},dv,idv): createDevice(idv)
+                tasks.push(this.db.add(ndevice))
             })
-            if(!updateList.length) return log("[onEdit] Nothing change")
-            Promise.all(all).then(_=>{
-                this.sendUpdate("update",updateList)
-                this.db.commit();
+            /** return result */
+            return Promise.all(tasks).then(devices=>{
+                this.sendUpdate("update",devices)
+                if(devices.length) this.db.commit();
+                return devices
             })
-        })
-        /** new device */
-        idvs.forEach(idv=>{
-            let ndevice=this.ndevices[idv.id];
-            if(!ndevice) return;
-            ndevice=Object.assign(ndevice,idv);
-            this.ndevices[idv.id]=ndevice;
-            log("#device.service.ts-119 ",{ndevice})
         })
     }
 
-    updateBySearch: DeviceUpdateBySearch=(keys,idvs:any[],client)=>{
-        const _keys=toArray(keys);
-        idvs.forEach(idv=>{
-            const queries:LocalDatabaseQuery[]=_keys.map(key=>{
-                return {key,type:'==',value:idv[key]}
-            })
-            this.db.search(...queries).then(devices=>{
-                log("#### debug ",devices)
-            })
+    // edit: DeviceEdit=(idvs,client)=>{
+    //     return Promise.resolve([])
+    // }
+
+    delDevice: DeviceDelete=async (idvs)=>{
+        const susList:string[]=[];
+        const errList:string[]=[]
+        toArray(idvs).forEach(idv=>{
+            const id=typeof idv=='string'?idv:idv.id;
+            if(!id) return log("[delDevice] wrong device infor\n\t\t\tdevice:",idv)
+            const result=this.db.delete(idv);
+            if(result) susList.push(id);
+            else errList.push(id)
         })
+        log("[delDevice] ",{success:susList,failured:errList});
+        return susList;
+    }
+
+    updateBySearch: DeviceUpdateBySearch=(updates,client)=>{
+
     }
 
     /** handle event new device -->ndevice */
@@ -157,7 +150,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         })
     }
 
-    getInfor: DeviceGetInfor=(idvs,network)=>{
+    getInfor: DeviceGetInfor=(idvs)=>{
         //group device by type
         console.log("\n+++ [getInfor] device.service.ts-153 ++ ")
         const results=getList(idvs,"type").map(type=>{
@@ -165,28 +158,52 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
             const method=this.topicServices.find(t=>t.id===type);
             if(!method) return log("\n[getInfor] ###ERROR: No way to get infor\n");
             if(method.type=='client')
-                return method.getInf(tIdvs,network);
+                return method.getInf(tIdvs,this.network);
         }).filter(x=>!!x)
         return results.length
     }
 
-    onUpdate: DeviceOnUpdate=(idvs)=>{
 
-    }
-
-    add: DeviceAdd=(idvs)=>{
-        const ids=idvs.map(i=>i.id);
+    /** update to devices & new devices */
+    update: DeviceUpdate=(idvs,updatelist)=>{
+        const _idvs=toArray(idvs);
+        let _list:string[]
+        const ids:string[]=idvs.map(idv=>idv.id).filter(x=>!!x);//get all id of devices
         this.db.gets(ids).then(devices=>{
-            const nIdvs=idvs.filter(idv=>devices.some(dv=>dv.id==idv.id));//new devices
-            //const eIdvs=idvs.filter(idv=>!devices.some(dv=>dv.id==idv.id))  //exist devices
-            const all=nIdvs.map(idv=>this.db.add(idv,false));
-            if(!all.length) return log("NOTHING UPDATE");
-            Promise.all(all).then(_=>{
-                this.db.commit();
-                log("[add] update ",nIdvs.map(n=>n.id));
-                this.sendUpdate("update",nIdvs);
-            })
-        })
+            const updateDb:DeviceDb={}
+            _idvs.forEach(idv=>{
+                //verify
+                if(!idv.id) return log("[update] ### ERROR! Device infor wrong");
+                const device=devices.find(dv=>dv.id==idv.id);
+
+                // Unregister device
+                if(!device){
+                    this.ndevices[idv.id]=Object.assign({},this.ndevices[idv.id],idv)
+                    return;
+                }
+
+                //register device
+                _list=updatelist||Object.keys(idv);
+                _list.forEach(key=>{
+                    const newVal=(idv as any)[key];
+                    const oldVal=(device as any)[key];
+                    if(newVal!==oldVal){
+                        const change:ChangeData={key,newVal,oldVal}
+                        if(device.updateList.includes(key.toLowerCase())){
+                            this.emit(`${_DEVICE_EVENT}/${key}/${newVal}`,change)
+                        }
+                        (device as any)[key]=newVal;
+                        updateDb[idv.id]=device;
+                    }
+                })
+            }) //handle each device
+            const updateDevices:Device[]=Object.keys(updateDb).map(key=>updateDb[key])
+            log("[update] list:",updateDevices.map(u=>u.id))
+            if(updateDevices.length){
+                this.sendUpdate("update",updateDevices);
+            }
+            
+        })// database
     }
 
     private _dispatch(packet:PublishPacket,client:NetworkClient):number{
@@ -217,3 +234,28 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
 
 
 }
+
+
+
+
+/////////// MINI FUNCTIONS //////////////
+
+export const deviceDefault:Device={
+    id:'',
+    name:'',
+    linkQuality:0,
+    model:'',
+    modelId:'',
+    ipAddr:'',
+    mac:'',
+    fns:[],
+    type:'',
+    updateList:[],
+    online:false
+
+}
+export function createDevice(idv:Partial<Device>):Device{
+    return Object.assign({},deviceDefault,idv)
+}
+
+export type DeviceItem=keyof typeof deviceDefault;

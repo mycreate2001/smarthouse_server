@@ -1,5 +1,6 @@
 import { createLog } from "advance-log";
-import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, 
+import { ErrorCode, NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, 
+         NetworkClient, 
          NetworkCommon, NetworkHandlePublish, NetworkOnConnect, 
          NetworkPublish, NetworkSubscribe } from "./network.interface";
 import { PublishPacket } from "packet";
@@ -16,7 +17,7 @@ export default class Network implements NetworkCommon{
                 log("\n# %d publish %s=%s",id,packet.topic,packet.payload.toString())
                 this.onPublish(packet,client,this);
             }
-            server.onConnect=(stt,client,server)=> this.onConnect(stt,client,this);
+            server.onConnect=(online,client,server)=> this.onConnect(online,client,this);
             server.publish=(packet,callback)=>this.publish(packet,callback);
             server.subscribe=this.subscribe;
         })
@@ -26,7 +27,7 @@ export default class Network implements NetworkCommon{
         log("[publish] ### NOT BE HANDLE");
     }
 
-    onConnect: NetworkOnConnect=(stt,client,server)=>{
+    onConnect: NetworkOnConnect=(client,server)=>{
         log("[connect] ### NOT BE HANDLE");
     }
 
@@ -40,7 +41,7 @@ export default class Network implements NetworkCommon{
     }
 
     subscribe: NetworkSubscribe=(topic,callback)=>{
-
+        return this.servers.map(server=>server.subscribe(topic,callback))
     }
 
     authenticate: NetworkAuthenticate=(client,uid,pass,callback)=>{
@@ -74,3 +75,36 @@ export function createPacket(packet:string|Partial<PublishPacketExt>):PublishPac
     const payload=typeof _packet.payload!=='string'?JSON.stringify(_packet.payload):_packet.payload
     return Object.assign({},packetDefault,_packet,{payload})
 }
+
+
+//// handle client publish //////////
+
+/**
+ * This is a TypeScript function that publishes a message directly to client with an optional error
+ * code and returns a success message or an error message.
+ * @param {string} topic - The topic to which the message is being published.
+ * @param {string|object} msg - The message payload that will be sent to the MQTT broker. It can be
+ * either a string or an object. If it is an object, it will be converted to a JSON string before being
+ * sent.
+ * @param {NetworkClient} client - The NetworkClient object that represents the client that is
+ * publishing the message.
+ * @param {number|string} [errCode=0] - The error code to be included in the payload of the MQTT
+ * publish packet. If there is no error, it can be set to 0 or left blank.
+ */
+export function clientPublish(client:NetworkClient,topic:string,errCode:ErrorCode,data?:string|Object){
+    data=data||""
+    const _data=typeof data=='string'?{data}:data
+    let packet=createPacket({payload:Object.assign({...errCode},{..._data}),topic})
+    client.publish(packet,clientPublishMessage(client,packet))
+}
+
+/** handle message for client publish */
+function clientPublishMessage(client:NetworkClient,packet:PublishPacket,code?:string|number){
+    return function errHandle(err:Error|undefined){
+        const result=err?"failred":"success"
+        code=code||""
+        log("%d[private publish] to %s=>%d\n\tmsg:%s",code,client.id,result,packet.payload.toString())
+    }
+}
+
+

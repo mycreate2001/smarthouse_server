@@ -1,7 +1,7 @@
 import { PublishPacket } from "packet";
 import { DeviceGetInfor, DeviceRemote, DeviceStatus, TopicData, TopicService } from "../device/device.interface";
-import { getList } from "../../lib/utility";
-import { createPacket } from "../network/network.service";
+import { getList, getParams } from "../../lib/utility";
+import { clientPublish, createPacket } from "../network/network.service";
 import { DeviceTasmotaBasic } from "./tasmota_basic.interface";
 import { getDevice} from "./tasmota_basic_ultility";
 import { createLog } from "advance-log";
@@ -12,12 +12,22 @@ const _DATA_TYPE="tasmota_basic"
 const tasmotaBasic: TopicData[] = [
     {
         id: 'online',
-        ref: 'tele/:id/LWT',
-        handle: (packet, client, network, service) => {
-            const str = packet.payload.toString();
-            const online = str.toLowerCase() === 'online';
-            const _client = client || { id: "undknow" }
-            service.onConnect(online, _client)
+        ref: 'tele/:eid/LWT',
+        handle(packet, client, network, service){
+            // const str = packet.payload.toString();
+            // const online = str.toLowerCase() === 'online';
+            // const _client = client || { id: "undknow" }
+            // service.onConnect(online, _client)
+            const payload:string=packet.payload.toString().toLowerCase();
+            const topic=packet.topic;
+            const eid=getParams(topic,this.ref)["eid"];
+            const online=payload=="on"?true:false
+            service.db.search({key:'eid',type:'==',value:eid})
+            .then(devices=>{
+                // correct online of device
+                const idvs=devices.map(dv=>Object.assign({id:dv.id},{online}));
+                service.update(idvs,["online"])
+            })
         }
     },
     {
@@ -47,6 +57,7 @@ const tasmotaBasic: TopicData[] = [
             //{"POWER2":"OFF"}
             const stts: DeviceStatus[] = [];
             const eid: string = client.id || ""
+            //get status of devices
             Object.keys(payload).forEach(key => {
                 if (!key.startsWith("POWER")) return
                 const a = key.substring(key.length - 1);
@@ -54,7 +65,8 @@ const tasmotaBasic: TopicData[] = [
                 const status = payload[key] == "ON" ? 1 : 0
                 stts.push({ id: eid + "@" + id, status })
             })
-            if (stts.length) service.onUpdate(stts);
+            //result
+            service.update(stts,["status"]);
         }
     },
     {
@@ -71,7 +83,7 @@ const tasmotaBasic: TopicData[] = [
                 const status = payload[key] == "ON" ? 1 : 0
                 stts.push({ id: eid + "@" + id, status })
             })
-            console.log("\n++++ tasmota.handle.ts-109 ++++", { stts })
+            // console.log("\n++++ tasmota.handle.ts-109 ++++", { stts })
             // if(stts.length) service.update('update',stts);
         }
     },
@@ -88,8 +100,10 @@ const tasmotaBasic: TopicData[] = [
             if (!status || status !== 34) return;
             const fullAddr = ZbState.IEEEAddr;
             const shortAddr = ZbState.ShortAddr;
-            console.log("\n+++ config data +++ ", { fullAddr, shortAddr });
-            service.onEdit([{ id: fullAddr, ipAddr: shortAddr, mac: fullAddr }], client)
+            console.log("\n+++ tasmota_basic.service.ts-103 +++ ", { fullAddr, shortAddr });
+            // service.onEdit([{ id: fullAddr, ipAddr: shortAddr, mac: fullAddr }], client)
+            // service.edit([{id:fullAddr,ipAddr:shortAddr,mac:fullAddr}])
+            service.update([{id:fullAddr,ipAddr:shortAddr,mac:fullAddr}])
         }
     },
     {
@@ -99,17 +113,18 @@ const tasmotaBasic: TopicData[] = [
         id: "value of sensor",
         ref: 'tele/:eid/SENSOR',
         handle(packet, client, network,service){
-            const obj = JSON.parse(packet.payload.toString());
-            const ZbReceived = obj.ZbReceived;
-            if (!ZbReceived) return;
-            const idvs = Object.keys(ZbReceived).map(key => {
-                const dv = ZbReceived[key];
-                const networkId = dv.Device as string;
-                return { ...dv, networkId }
-            })
-            if (!idvs.length) return;
-            console.log("\n+++ device.route.ts-96 ", idvs);
-            service.updateBySearch("ipAddr", idvs, client)
+            // const obj = JSON.parse(packet.payload.toString());
+            // const ZbReceived = obj.ZbReceived;
+            // if (!ZbReceived) return;
+            // const idvs = Object.keys(ZbReceived).map(key => {
+            //     const dv = ZbReceived[key];
+            //     const networkId = dv.Device as string;
+            //     return { ...dv, networkId }
+            // })
+            // if (!idvs.length) return;
+            // console.log("\n+++ device.route.ts-96 ", idvs);
+            // // service.onUpdateBySearch("ipAddr", idvs, client);
+            // const queries={key:"ipAddr",type:"==",value:}
         }
     }
 ]
@@ -124,25 +139,19 @@ const tasmotaBasic: TopicData[] = [
  * topics.
  */
 export const remote:DeviceRemote=(idvs,network)=>{
-    console.log(`\n+++ remote[${_DATA_TYPE}] +++ \n\tidvs:`,idvs)
-    idvs.forEach((cdv:any)=>{
+    const outs:string[]=[]
+    idvs.forEach(cdv=>{
         if(cdv.type!==_DATA_TYPE) return;//Not data type
         const _arrs=cdv.id.split("@");
         const eid=_arrs[0];
         let pos=_arrs[1]
         if(!pos) pos=""
-        // const packet:PublishPacket={
-        //     cmd:'publish',
-        //     payload:cdv.fns[cdv.status],
-        //     dup:false,
-        //     qos:0,
-        //     retain:false,
-        //     topic:`cmnd/${eid}/Power${pos}`
-        // }
-        const status=cdv.fns[cdv.status];
+        const status=cdv.fns[(cdv as DeviceTasmotaBasic).status];
         const packet=createPacket({payload:status,topic:`cmnd/${eid}/Power${pos}`})
-        network.publish(packet)
+        network.publish(packet);
+        outs.push(cdv.id);
     })
+    return outs;
 }
 
 /**
@@ -156,7 +165,7 @@ export const remote:DeviceRemote=(idvs,network)=>{
  * @returns The function `getInf` returns the length of the `results` array, which is the number of
  * unique `type` values in the `idvs` array.
  */
-export const getInf:DeviceGetInfor=(idvs,network)=>{
+const getInf:DeviceGetInfor=(idvs,network)=>{
     const results=getList(idvs,"type").map(type=>{
         const cidvs:any[]=idvs.filter(i=>i.type==type);
         const result=getList(cidvs,"eid").map(eid=>{

@@ -49,3 +49,12 @@
 
 [2023-Apr-16]
 -bug mqtt.service.publish not execute by publish function wrong logics
++ app
+- api/add
+- api/delete    
+- api/request   => [ndevices,devices]
+- api/remote    => done
+- api/respond (direct)
+
+[2023-Apr-17]
+- device.service.ts => just service, no anser any message to client

@@ -41,7 +41,7 @@ export default class MqttService implements NetworkCommon{
     //     this.mqtt.on(topic,callback)
     // }
 
-    onConnect: NetworkOnConnect=(stt,client,server)=>{}
+    onConnect: NetworkOnConnect=(client)=>{}
 
     authenticate: NetworkAuthenticate=(client,uid,pass,callback)=>{
         callback(null,true);

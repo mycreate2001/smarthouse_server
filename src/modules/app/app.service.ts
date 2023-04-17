@@ -1,12 +1,18 @@
 import { createLog } from "advance-log";
 import { Device, TopicData, TopicService } from "../device/device.interface";
-import { createPacket } from "../network/network.service";
-import { NetworkClient } from "../network/network.interface";
-import { PublishPacket } from "packet";
+import { clientPublish } from "../network/network.service";
 import { toArray } from "../../lib/utility";
+import { UpdateDevice } from "./app.interface";
 const log=createLog("app","center");
-const _RESPOND_TOPIC="api/respond"
+
+const _TOPIC_RESPOND_DIRECT="api/respond"
+const _CODE_OK={code:0,msg:"success"};
+const _CODE_001={code:1,msg:"out of case"}
+const _CODE_002={code:2,msg:"cannot get device infor"}
+const _CODE_003={code:3,msg:'edit data is wrong format'}
+const _CODE_004={code:4,msg:'Nothing change'}
 const topics:TopicData[]=[
+    /** request infor */
     {
         id:'request',
         ref:'api/request',
@@ -17,29 +23,28 @@ const topics:TopicData[]=[
                 case 'devices':{
                     service.db.search()
                     .then(devices=>{
-                        const payload={success:1,type:"full",data:devices}
-                        const packet=createPacket({payload,topic:_RESPOND_TOPIC})
-                        client.publish(packet,displayPublish(client,packet,"devices"))
+                        const payload={type:"full",data:devices}
+                        // clientPublish(_TOPIC_RESPOND_DIRECT,payload,client,_CODE_OK.code)
+                        clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,payload)
                     })
                 }
                 break;
 
                 case 'ndevices':{
-                    const payload={success:1,type:"full",data:Object.keys(service.ndevices).map(key=>service.ndevices[key])}
-                    const topic='api/respond'
-                    const packet=createPacket({payload,topic})
-                    client.publish(packet,displayPublish(client,packet,"ndevices"))
+                    const payload={type:"full",data:Object.keys(service.ndevices).map(key=>service.ndevices[key])}
+                    // clientPublish(_TOPIC_RESPOND_DIRECT,payload,client,_CODE_OK.code)
+                    clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,payload)
                 }
                 break;
 
                 default:
-                    const data=_payload.length>20?_payload.substring(0,20)+"...":_payload
-                    const payload={success:0,msg:`cannot find '${data}'`}
-                    const packet=createPacket({payload,topic:_RESPOND_TOPIC})
-                    client.publish(packet,displayPublish(client,packet,"default"))
+                    // clientPublish(_TOPIC_RESPOND_DIRECT,_CODE_001.msg,client,_CODE_001.code)
+                    clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_001)
             }
         }
     },
+
+    /** remote control*/
     {
         id:'remote from app',
         ref:'api/remote',
@@ -47,7 +52,7 @@ const topics:TopicData[]=[
             let idvs=toArray(JSON.parse(packet.payload.toString()) as Device);
             // idvs=[].concat(idvs);
             const ids=idvs.map(i=>i.id).filter(x=>!!x);
-            if(ids.length==0) return publish("cannot get device infor",client)
+            if(ids.length==0) return clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_002);//(_TOPIC_RESPOND_DIRECT,_CODE_002.msg,client,_CODE_002.code)
             service.db.gets(ids).then(devices=>{
                 const _idvs:Device[]=[]
                 devices.forEach(device=>{
@@ -56,37 +61,45 @@ const topics:TopicData[]=[
                     _idvs.push(Object.assign({},device,idv))
                 })
                 service.remote(_idvs,network);
-                const success=idvs.length
-                publish(idvs.map(i=>i.id),client,success)
+                // clientPublish(_TOPIC_RESPOND_DIRECT,_idvs,client,_CODE_OK.code)
+                clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,_idvs)
             })
             
         }
+    },
+
+    /** edit devices (add,remove,edit) */
+    {
+        id:'add_device',
+        ref:'api/edit',
+        handle(packet,client,network,service){
+            console.log("\n+++ app.service.ts-76 [edit] start ")
+            async function execute(){
+                console.log("\n+++ app.service.ts-78 [edit] execute")
+                //1. input & verify
+                const payload=JSON.parse(packet.payload.toString()) as UpdateDevice;
+                console.log("\n+++ app.service.ts-81 [edit] ",{payload})
+                if(!payload||!Object.keys(payload).length) throw new Error("data error");
+                const {devices,removes}=payload
+                const uList=(devices && devices.length)?await service.edit(devices):[];
+                const dList=(removes && removes.length)?await service.delDevice(removes):[];
+                clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,{updateDevices:uList.map(u=>u.id),deleteDevices:dList})
+            }
+            execute();
+        }
     }
+
+
+    /** delete/remove device */
 ]
 
 
-function publish(msg:string|object,client:NetworkClient,success:number=0){
-    const _msg=typeof msg!=='string'?JSON.stringify(msg):msg
-    let packet:PublishPacket
-    if(success) {
-        packet=createPacket({payload:{success:1,data:_msg},topic:_RESPOND_TOPIC})
-    }else{
-        packet=createPacket({payload:{success:0,msg:_msg},topic:_RESPOND_TOPIC})
-    }
-    client.publish(packet,displayPublish(client,packet))
-}
-/** handle message for client publish */
-function displayPublish(client:NetworkClient,packet:PublishPacket,debug?:string){
-    return function errHandle(err:Error|undefined){
-        const result=err?"failred":"success"
-        debug=debug||""
-        log("%d[private publish] to %s=>%d\n\tmsg:%s",debug,client.id,result,packet.payload.toString())
-    }
-}
 const appService:TopicService={
     type:'server',
     id:'app',
     topics,
 }
+
+
 
 export default appService;

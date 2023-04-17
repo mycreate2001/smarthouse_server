@@ -19,7 +19,8 @@ export type NetworkHandlePublish=(packet:PublishPacket,client:NetworkClient|null
 export type NetworkCallback=(packet:PublishPacket)=>void;
 export type NetworkPublish=(packet:PublishPacket,callback?:NetworkCallbackError)=>void;
 export type NetworkSubscribe=(topic:string,callback:NetworkCallback)=>any
-export type NetworkOnConnect=(stt:boolean,client:NetworkClient,server:NetworkCommon)=>void;
+/** handler new client connected */
+export type NetworkOnConnect=(online:boolean,client:NetworkClient,network:NetworkCommon)=>void;
 export type NetworkAuthenticate=(
     client:any,
     user:string,
@@ -47,3 +48,10 @@ export interface Subscription{
 }
 
 export type Qos=0|1|2
+
+
+///// ERROR CODE ////////
+export interface ErrorCode{
+    code:number|string;
+    msg:string;
+}
