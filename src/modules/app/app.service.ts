@@ -11,6 +11,7 @@ const _CODE_001={code:1,msg:"out of case"}
 const _CODE_002={code:2,msg:"cannot get device infor"}
 const _CODE_003={code:3,msg:'edit data is wrong format'}
 const _CODE_004={code:4,msg:'Nothing change'}
+const _CODE_005={code:5,msg:'handle edit error'}
 const topics:TopicData[]=[
     /** request infor */
     {
@@ -83,9 +84,16 @@ const topics:TopicData[]=[
                 const {devices,removes}=payload
                 const uList=(devices && devices.length)?await service.edit(devices):[];
                 const dList=(removes && removes.length)?await service.delDevice(removes):[];
-                clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,{updateDevices:uList.map(u=>u.id),deleteDevices:dList})
+                return {uList,dList}
             }
-            execute();
+            execute()
+            .then(({uList,dList})=>{
+                clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,{updateDevices:uList.map(u=>u.id),deleteDevices:dList})
+            })
+            .catch(err=>{
+                clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_005,{msg:err.message});
+                console.log("\n+++ app.service.ts-88 ++++ ERROR:",err.message,"\n",err,"\n------------------\n")
+            })
         }
     }
 

@@ -45,9 +45,9 @@ export type DeviceEdit=(idvs:(Partial<Device>&{id:string})[])=>Promise<Device[]>
 export type DeviceOnConnect=(online:boolean,client:NetworkClient)=>void;
 export type DeviceConfig=(idvs:Device[],client:NetworkClient)=>void;
 export type DeviceGetInfor=(idvs:Device[],network:NetworkCommon)=>number;
-export type DeviceUpdateBySearch=(updates:DeviceUpdateBySearchData[],client:NetworkClient)=>void;
+export type DeviceUpdateBySearch=(idvs:Partial<Device>[],searchKeys:string[])=>Promise<string[]>;
 export type DeviceAdd=(idvs:Device[])=>void;
-export type DeviceUpdate=(idvs:(Partial<Device>&{id:string})[],udateList?:string[])=>void;
+export type DeviceUpdate=(idvs:(Partial<Device>&{id:string})[],udateList?:string[])=>Promise<string[]>;
 export type DeviceRemote=(idvs:Device[],network:NetworkCommon)=>string[]; //remote 
 
 export interface DeviceUpdateBySearchData{
@@ -79,6 +79,7 @@ export interface Device{
     type:string;/** device type, it's effect to remote device */
     updateList:string[]; //list item will generate event when change value
     online:boolean;     // online status true=online
+    module:string;      // type of device
 }
 
 export interface DeviceDb{

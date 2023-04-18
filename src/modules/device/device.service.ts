@@ -1,10 +1,10 @@
-import LocalDatabaseLite, { DataConnect } from "local-database-lite";
+import LocalDatabaseLite, { DataConnect, LocalDatabaseQuery } from "local-database-lite";
 import { PublishPacket } from "packet";
 import tEvent from "../../lib/event";
 import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
 import { NetworkClient, NetworkCommon } from "../network/network.interface";
-import { ChangeData, Device, DeviceAdd, DeviceConfig, DeviceOnConnect, 
+import { ChangeData, Device, DeviceConfig, DeviceOnConnect, 
         DeviceDb, DeviceEdit, DeviceGetInfor, DeviceRemote, 
         DeviceServiceBase, DeviceUpdateBySearch, TopicData, TopicService, DeviceUpdate, DeviceDelete } from "./device.interface";
 import { createPacket } from "../network/network.service";
@@ -133,8 +133,65 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         return susList;
     }
 
-    updateBySearch: DeviceUpdateBySearch=(updates,client)=>{
 
+    /**
+     * update device without id
+     * @param idvs 
+     * @param list 
+     * @returns 
+     */
+    updateBySearch: DeviceUpdateBySearch=(idvs,list)=>{
+        // get database
+        const tasks=idvs.map(async idv=>{
+            const queries:LocalDatabaseQuery[]=[]
+            list.forEach(key=>{
+                queries.push({key,type:'==',value:(idv as any)[key]})
+            })
+            return {idv,devices:await this.db.search(...queries)}
+        })
+
+        //execute
+        const updateDb:DeviceDb={}
+        return Promise.all(tasks).then(dbs=>{
+            dbs.forEach(({idv,devices})=>{
+                // new device handler
+                if(!devices.length){
+                    /** @@@ new device handle */
+                    return;
+                }
+
+                //existing device handle
+                Object.keys(idv).forEach(key=>{
+                    if(list.includes(key)) return;//ignore
+                    devices.forEach(device=>{
+                        const oldVal=(device as any)[key];
+                        const newVal=(idv as any)[key]
+                        if(oldVal!==newVal){
+                            const change:ChangeData={key,oldVal,newVal}
+                            //emit event
+                            if(device.updateList.includes(key)) 
+                                this.emit(`${_DEVICE_EVENT}/${key}/${newVal}`,change);
+                            //update value
+                            (device as any)[key]=newVal
+                            // update list
+                            updateDb[device.id]=device;
+                        }
+                    })
+                });//check each key
+            });
+
+            // result
+            const updateList:Device[]=Object.keys(updateDb).map(key=>updateDb[key]);
+            if(!updateList.length){
+                return []
+            }
+            const alls=updateList.map(device=>this.db.add(device,false));
+            return Promise.all(alls).then(xDevices=>{
+                this.db.commit();//save database
+                this.sendUpdate("update",xDevices)
+                return xDevices.map(x=>x.id)
+            })
+        })
     }
 
     /** handle event new device -->ndevice */
@@ -169,8 +226,9 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
         const _idvs=toArray(idvs);
         let _list:string[]
         const ids:string[]=idvs.map(idv=>idv.id).filter(x=>!!x);//get all id of devices
-        this.db.gets(ids).then(devices=>{
+        return this.db.gets(ids).then(devices=>{
             const updateDb:DeviceDb={}
+            //each device
             _idvs.forEach(idv=>{
                 //verify
                 if(!idv.id) return log("[update] ### ERROR! Device infor wrong");
@@ -188,20 +246,25 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
                     const newVal=(idv as any)[key];
                     const oldVal=(device as any)[key];
                     if(newVal!==oldVal){
-                        const change:ChangeData={key,newVal,oldVal}
                         if(device.updateList.includes(key.toLowerCase())){
+                            const change:ChangeData={key,newVal,oldVal}
                             this.emit(`${_DEVICE_EVENT}/${key}/${newVal}`,change)
-                        }
+                        };
                         (device as any)[key]=newVal;
                         updateDb[idv.id]=device;
                     }
                 })
             }) //handle each device
+
+            /** handle result */
             const updateDevices:Device[]=Object.keys(updateDb).map(key=>updateDb[key])
-            log("[update] list:",updateDevices.map(u=>u.id))
-            if(updateDevices.length){
-                this.sendUpdate("update",updateDevices);
-            }
+            const tasks=updateDevices.map(dv=>this.db.add(dv,false))
+            return Promise.all(tasks).then(devices=>{
+                //send update
+                if(devices.length) this.sendUpdate("update",devices);
+                //return result
+                return devices.map(dv=>dv.id)
+            })
             
         })// database
     }
@@ -251,7 +314,8 @@ export const deviceDefault:Device={
     fns:[],
     type:'',
     updateList:[],
-    online:false
+    online:false,
+    module:'unknown'
 
 }
 export function createDevice(idv:Partial<Device>):Device{

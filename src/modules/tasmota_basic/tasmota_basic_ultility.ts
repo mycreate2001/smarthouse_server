@@ -30,7 +30,8 @@ export function getDevice(payload:string,type:string):DeviceTasmotaBasic[]{
             modelId:equipment.model,
             type,
             updateList:["status"],
-            eid:equipment.mac
+            eid:equipment.mac,
+            module:'unknown'
         })
     })
     return devices

@@ -1,5 +1,5 @@
 import { PublishPacket } from "packet";
-import { DeviceGetInfor, DeviceRemote, DeviceStatus, TopicData, TopicService } from "../device/device.interface";
+import { DeviceGetInfor, DeviceRemote, DeviceStatus, DeviceUpdateBySearchData, TopicData, TopicService } from "../device/device.interface";
 import { getList, getParams } from "../../lib/utility";
 import { clientPublish, createPacket } from "../network/network.service";
 import { DeviceTasmotaBasic } from "./tasmota_basic.interface";
@@ -14,19 +14,13 @@ const tasmotaBasic: TopicData[] = [
         id: 'online',
         ref: 'tele/:eid/LWT',
         handle(packet, client, network, service){
-            // const str = packet.payload.toString();
-            // const online = str.toLowerCase() === 'online';
-            // const _client = client || { id: "undknow" }
-            // service.onConnect(online, _client)
             const payload:string=packet.payload.toString().toLowerCase();
             const topic=packet.topic;
             const eid=getParams(topic,this.ref)["eid"];
             const online=payload=="on"?true:false
-            service.db.search({key:'eid',type:'==',value:eid})
-            .then(devices=>{
-                // correct online of device
-                const idvs=devices.map(dv=>Object.assign({id:dv.id},{online}));
-                service.update(idvs,["online"])
+            const idvs=[{eid,online}]
+            service.updateBySearch(idvs,["eid"]).then(devices=>{
+                log("[%s] updated ",this.id,devices)
             })
         }
     },
@@ -125,6 +119,30 @@ const tasmotaBasic: TopicData[] = [
             // console.log("\n+++ device.route.ts-96 ", idvs);
             // // service.onUpdateBySearch("ipAddr", idvs, client);
             // const queries={key:"ipAddr",type:"==",value:}
+        }
+    },
+    {   
+        /**
+         * tele/E8DB8494B051/INFO1
+         * {"Info1":{"Module":"PWM Dimmer","Version":"12.4.0.5(tasmota-4M)","FallbackTopic":"cmnd/E8DB8494B051_fb/","GroupTopic":"cmnd/tasmotas/"}}
+         */
+        id:'module',
+        ref:'tele/:eid/INFO1',
+        handle(packet,client,network,service){
+            const payload=packet.payload.toString();
+            const obj=JSON.parse(payload);
+            const infor=obj.Info1;
+            if(!infor) return log("[%s] #001: wrong format",this.id);
+            const module=infor.Module;
+            if(!module) return log("[%s] #002: cannot find module",this.id);
+            const eid=getParams(packet.topic,this.ref)["eid"];
+            if(!eid) return log("[%s] #003: cannot get eid infor",this.id);
+            /** execute */
+            const idvs=[{eid,module}]
+            console.log("\n+++ tasmota_basic.service.ts-148+++ ", idvs)
+           service.updateBySearch(idvs,["eid"]).then(result=>{
+                console.log("\n+++ tasmota_basic.service.ts +++ ",result)
+            })
         }
     }
 ]
