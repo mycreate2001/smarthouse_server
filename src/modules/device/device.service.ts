@@ -9,17 +9,19 @@ import { ChangeData, Device, DeviceConfig, DeviceOnConnect,
         DeviceServiceBase, DeviceUpdateBySearch, TopicData, TopicService, DeviceUpdate, DeviceDelete } from "./device.interface";
 import { createPacket } from "../network/network.service";
 import { getList, toArray } from "../../lib/utility";
+import { TemporaryDatabase } from "../../lib/temporary-database";
 
 const _DEVICE_DB_="devices"
 const _UPDATE_TOPIC_="api/update"
 const _DEVICE_EVENT="device"
+const _EQUIPMENT_DB_="equipments"
 
 const log=createLog("DeviceService","center")
 
 export default class DeviceService extends tEvent implements DeviceServiceBase{
     db:DataConnect<Device>;
     network:NetworkCommon;
-    ndevices:DeviceDb={};
+    ndeviceDb= new TemporaryDatabase<Device>()
     topicServices:TopicService[]=[];
     constructor(network:NetworkCommon,db:LocalDatabaseLite,topicServices:TopicService[]){
         super();
@@ -202,7 +204,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
                 const dv=devices.find(d=>d.id===idv.id);
                 if(dv) return //exist device
                 //new device
-                this.ndevices[idv.id]=idv;
+                this.ndeviceDb.update(idv)
             })
         })
     }
@@ -236,7 +238,7 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
 
                 // Unregister device
                 if(!device){
-                    this.ndevices[idv.id]=Object.assign({},this.ndevices[idv.id],idv)
+                    this.ndeviceDb.update(idv)
                     return;
                 }
 
@@ -314,9 +316,7 @@ export const deviceDefault:Device={
     fns:[],
     type:'',
     updateList:[],
-    online:false,
-    module:'unknown'
-
+    online:false
 }
 export function createDevice(idv:Partial<Device>):Device{
     return Object.assign({},deviceDefault,idv)

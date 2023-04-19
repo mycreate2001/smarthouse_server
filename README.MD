@@ -58,3 +58,7 @@
 
 [2023-Apr-17]
 - device.service.ts => just service, no anser any message to client
+
+[2023-Apr-18]
+- keep functions in Model infor
+- add more table for equipment {eid,model,fns}

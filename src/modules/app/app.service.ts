@@ -32,7 +32,7 @@ const topics:TopicData[]=[
                 break;
 
                 case 'ndevices':{
-                    const payload={type:"full",data:Object.keys(service.ndevices).map(key=>service.ndevices[key])}
+                    const payload={type:"full",data:service.ndeviceDb.all()}
                     // clientPublish(_TOPIC_RESPOND_DIRECT,payload,client,_CODE_OK.code)
                     clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,payload)
                 }

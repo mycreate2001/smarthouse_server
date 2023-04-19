@@ -1,13 +1,63 @@
-import { PublishPacket } from "packet";
-import { DeviceGetInfor, DeviceRemote, DeviceStatus, DeviceUpdateBySearchData, TopicData, TopicService } from "../device/device.interface";
+import { DeviceGetInfor, DeviceRemote,  Equipment, TopicData, TopicService } from "../device/device.interface";
 import { getList, getParams } from "../../lib/utility";
-import { clientPublish, createPacket } from "../network/network.service";
-import { DeviceTasmotaBasic } from "./tasmota_basic.interface";
-import { getDevice} from "./tasmota_basic_ultility";
+import { createPacket } from "../network/network.service";
+import { DeviceTasmotaBasic, InforHandleDb, TasmotaBasicQuipment } from "./tasmota_basic.interface";
+import { InforHandles, getDevice, getEquipment} from "./tasmota_basic_ultility";
 import { createLog } from "advance-log";
+import { TemporaryDatabase } from "../../lib/temporary-database";
+import { DataOptionWithId } from "../../lib/temporary-database/interface";
 
 const log=createLog("tasmota_basic","center")
 const _DATA_TYPE="tasmota_basic"
+
+export class TasmotaBasic{
+    equipmentDb=new TemporaryDatabase<Equipment>();
+    InforHandleDb:InforHandleDb={}
+    constructor(InforHandldb:InforHandleDb){
+        this.InforHandleDb=InforHandldb;
+    }
+
+    /** get & udpate equipment */
+    getEquipment(obj:any):Equipment|undefined{
+        const equipment=getEquipment(obj,_DATA_TYPE);
+        if(!equipment) {
+            console.log("\n+++ tasmota_basic.service.ts-24 +++ wARN: cannot get equipment infor");
+            return;
+        }
+        const results= this.equipmentDb.update(equipment);
+        console.log("\n+++ tasmota_basic.service.ts-29 +++",{equipment,results,allEquipment:this.equipmentDb.all()})
+        return results;
+    }
+
+    getInfor(obj:any,eid:string):DataOptionWithId<DeviceTasmotaBasic>[]|undefined{
+        try{
+            const method=this.equipmentDb.get(eid);
+            if(!method) throw new Error("cannot find method");
+            const infors=new TemporaryDatabase<DeviceTasmotaBasic>()
+            method.fns.forEach(fn=>{
+                const fnc=this.InforHandleDb[fn];
+                if(!fnc) return console.log("\n+++ tasmota_basic.service.ts-27 +++ warn-001:no service ",{eid,fn})
+                const results=fnc(obj,eid)
+                if(!results) return console.log("\n+++ tasmota_basic.service.ts-29 +++ warn-002: no results ",{eid,fn})
+                results.forEach(result=>infors.update(result))
+
+            })
+            //result
+            console.log("\n+++ tasmota_basic.service.ts-47 / getInfor:",infors.all())
+            return infors.all();
+        }
+        catch(err){
+            const msg=err instanceof Error?err.message:"other error"
+            console.log("\n+++ tasmota_basic.service.ts-38 +++ Error-001:%s\n",msg,err)
+            return;
+        }
+        
+    }
+
+}
+
+const tasmotaService=new TasmotaBasic(InforHandles)
+const equipmentDb=new TemporaryDatabase<TasmotaBasicQuipment>();
 
 const tasmotaBasic: TopicData[] = [
     {
@@ -36,49 +86,36 @@ const tasmotaBasic: TopicData[] = [
         id: 'configure',
         ref: 'tasmota/discovery/:id/config',
         handle(packet, client, network, service){
-            const devices:DeviceTasmotaBasic[] = getDevice(packet.payload.toString(),_DATA_TYPE);
+            const payload=packet.payload.toString();
+            const obj=JSON.parse(payload);
+            tasmotaService.getEquipment(obj);
+            const devices:DeviceTasmotaBasic[] = getDevice(payload,_DATA_TYPE);
             log("#config ",devices);
             service.onConfigure(devices, client);
             // devices.forEach(dv => service.getInfor(dv.id, client));
         }
     },
-    {
-        id: 'result',
+    {   //stat/E8DB8494B051/RESULT
+        // {"POWER":"OFF"}
+        id: 'power result',
         ref: 'stat/:id/RESULT',//stat/E8DB8494B051/RESULT //tele/:id/STATE
-        handle: (packet, client, network,service) => {
-            const payload = JSON.parse(packet.payload.toString());
-
-            //{"POWER2":"OFF"}
-            const stts: DeviceStatus[] = [];
+        handle(packet, client, network,service){
+            const obj = JSON.parse(packet.payload.toString());
             const eid: string = client.id || ""
-            //get status of devices
-            Object.keys(payload).forEach(key => {
-                if (!key.startsWith("POWER")) return
-                const a = key.substring(key.length - 1);
-                const id = parseInt(a) || 1
-                const status = payload[key] == "ON" ? 1 : 0
-                stts.push({ id: eid + "@" + id, status })
-            })
-            //result
-            service.update(stts,["status"]);
+            const infors=tasmotaService.getInfor(obj,eid);
+            if(!infors) return log("[%s] #ERROR: cannot get infor",this.id)
+            service.update(infors);
         }
     },
     {
         id: 'state',
         ref: 'tele/:id/STATE',//tele/E8DB8494B051/STATE tele/E8DB849DBFAE/SENSOR
-        handle: (packet, client: any, network,service) => {
-            const payload = JSON.parse(packet.payload.toString())
-            const stts: DeviceStatus[] = [];
+        handle(packet, client: any, network,service){
+            const obj = JSON.parse(packet.payload.toString())
             const eid: string = client.id || ""
-            Object.keys(payload).forEach(key => {
-                if (!key.startsWith("POWER")) return
-                const a = key.substring(key.length - 1);
-                const id = parseInt(a) || 1
-                const status = payload[key] == "ON" ? 1 : 0
-                stts.push({ id: eid + "@" + id, status })
-            })
-            // console.log("\n++++ tasmota.handle.ts-109 ++++", { stts })
-            // if(stts.length) service.update('update',stts);
+            const infors=tasmotaService.getInfor(obj,eid);
+            if(!infors) return log("[%s] #ERROR: cannot get infor",this.id);
+            service.update(infors);
         }
     },
     {
@@ -119,30 +156,6 @@ const tasmotaBasic: TopicData[] = [
             // console.log("\n+++ device.route.ts-96 ", idvs);
             // // service.onUpdateBySearch("ipAddr", idvs, client);
             // const queries={key:"ipAddr",type:"==",value:}
-        }
-    },
-    {   
-        /**
-         * tele/E8DB8494B051/INFO1
-         * {"Info1":{"Module":"PWM Dimmer","Version":"12.4.0.5(tasmota-4M)","FallbackTopic":"cmnd/E8DB8494B051_fb/","GroupTopic":"cmnd/tasmotas/"}}
-         */
-        id:'module',
-        ref:'tele/:eid/INFO1',
-        handle(packet,client,network,service){
-            const payload=packet.payload.toString();
-            const obj=JSON.parse(payload);
-            const infor=obj.Info1;
-            if(!infor) return log("[%s] #001: wrong format",this.id);
-            const module=infor.Module;
-            if(!module) return log("[%s] #002: cannot find module",this.id);
-            const eid=getParams(packet.topic,this.ref)["eid"];
-            if(!eid) return log("[%s] #003: cannot get eid infor",this.id);
-            /** execute */
-            const idvs=[{eid,module}]
-            console.log("\n+++ tasmota_basic.service.ts-148+++ ", idvs)
-           service.updateBySearch(idvs,["eid"]).then(result=>{
-                console.log("\n+++ tasmota_basic.service.ts +++ ",result)
-            })
         }
     }
 ]
