@@ -119,6 +119,14 @@
             "keys": "topic/tasmota",
             "level": 1
         },
+        "zbbridge": {
+            "name": "Zigbee",
+            "path": "zbbridge",
+            "params": {},
+            "imports": {},
+            "keys": "topic/zbbridge",
+            "level": 1
+        },
         "user_service": {
             "name": "User Service",
             "path": "user",

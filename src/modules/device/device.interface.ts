@@ -75,7 +75,6 @@ export interface Device{
     model:string;               // model name
     ipAddr:string;              // address of device
     mac:string;                 // mac or IEEEAddress
-    fns:string[];                 // functions
     type:string;/** device type, it's effect to remote device */
     updateList:string[]; //list item will generate event when change value
     online:boolean;     // online status true=online
@@ -132,39 +131,3 @@ export interface ChangeData{
     oldVal:any;
     newVal:any;
 }
-
-// export interface DatabaseType<T>{
-//     [id:string]:T
-// }
-
-// export class DatabaseClass<T extends {id:string}>{
-//     db:DatabaseType<T>={};
-//     add(data:T):T{
-//         const id=data.id;
-//         this.db[id]=data;
-//         return data;
-//     }
-
-//     update(data:(Partial<T>&{id:string})):T{
-//         const id=data.id;
-//         const db=this.db[id];
-//         const newData={...db,...data}
-//         this.db[id]=newData;
-//         return newData;
-//     }
-
-//     get(id:string|Partial<T>&{id:string}):T|undefined{
-//         const _id=typeof id=='string'?id:id.id;
-//         return this.db[_id]
-//     }
-
-//     search(obj:any):T[]{
-//         if(typeof obj!=='object') return[];
-//         const dbs:T[]=Object.keys(this.db).map(key=>this.db[key])
-//         return dbs.filter(db=>Object.keys(obj).every(key=>obj[key]===(db as any)[obj]))
-//     }
-    
-//     all():T[]{
-//         return Object.keys(this.db).map(key=>this.db[key])
-//     }
-// }

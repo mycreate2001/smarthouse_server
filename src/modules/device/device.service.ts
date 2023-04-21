@@ -51,7 +51,8 @@ export default class DeviceService extends tEvent implements DeviceServiceBase{
     }
 
     onConnect: DeviceOnConnect=(online,client)=>{
-        log("\n++++ device.service.ts-52 +++ onConnect")
+        log("\n++++ device.service.ts-52 +++ onConnect ",{client:client.id,online})
+    
     }
 
     /** send update to app */
@@ -313,7 +314,6 @@ export const deviceDefault:Device={
     modelId:'',
     ipAddr:'',
     mac:'',
-    fns:[],
     type:'',
     updateList:[],
     online:false

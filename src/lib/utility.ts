@@ -58,3 +58,14 @@ export function getList(arrs:any|any[],key:string='id'):string[]{
 export function createOption<T extends {id:string}>(df:T,opts:Partial<T>):T{
     return Object.assign({},df,opts);
 }
+
+export function objParser(obj:any,items:string[]):any|undefined|void{
+    if(!obj || typeof obj!=='object') return;//nothing
+    let out:any=obj;
+    const result=items.every(key=>{
+        out=out[key];
+        if(out==undefined) return false;
+        return true;
+    })
+    if(result) return out;
+}

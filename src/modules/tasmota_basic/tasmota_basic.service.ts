@@ -19,14 +19,16 @@ export class TasmotaBasic{
 
     /** get & udpate equipment */
     getEquipment(obj:any):Equipment|undefined{
-        const equipment=getEquipment(obj,_DATA_TYPE);
-        if(!equipment) {
-            console.log("\n+++ tasmota_basic.service.ts-24 +++ wARN: cannot get equipment infor");
-            return;
+        const equipment = getEquipment(obj, _DATA_TYPE);
+        try {
+            if (!equipment) throw new Error("ERR-001: cannot get equipment infor");
+            const results = this.equipmentDb.update(equipment);
+            return results;
         }
-        const results= this.equipmentDb.update(equipment);
-        console.log("\n+++ tasmota_basic.service.ts-29 +++",{equipment,results,allEquipment:this.equipmentDb.all()})
-        return results;
+        catch (err) {
+            const msg=err instanceof Error?err.message:"other error"
+            log("\n[TasmotaBasic/getEquipment] %s",msg);
+        }
     }
 
     getInfor(obj:any,eid:string):DataOptionWithId<DeviceTasmotaBasic>[]|undefined{
@@ -34,6 +36,8 @@ export class TasmotaBasic{
             const method=this.equipmentDb.get(eid);
             if(!method) throw new Error("cannot find method");
             const infors=new TemporaryDatabase<DeviceTasmotaBasic>()
+            const fns=method.fns;
+            if(!fns||!fns.length) throw new Error("Device is not register");
             method.fns.forEach(fn=>{
                 const fnc=this.InforHandleDb[fn];
                 if(!fnc) return console.log("\n+++ tasmota_basic.service.ts-27 +++ warn-001:no service ",{eid,fn})
@@ -48,8 +52,7 @@ export class TasmotaBasic{
         }
         catch(err){
             const msg=err instanceof Error?err.message:"other error"
-            console.log("\n+++ tasmota_basic.service.ts-38 +++ Error-001:%s\n",msg,err)
-            return;
+            log("\n [TasmotaBasic/getInor] %s",msg)
         }
         
     }
@@ -177,7 +180,7 @@ export const remote:DeviceRemote=(idvs,network)=>{
         const eid=_arrs[0];
         let pos=_arrs[1]
         if(!pos) pos=""
-        const status=cdv.fns[(cdv as DeviceTasmotaBasic).status];
+        const status=(cdv as DeviceTasmotaBasic).status==0?"OFF":"ON";
         const packet=createPacket({payload:status,topic:`cmnd/${eid}/Power${pos}`})
         network.publish(packet);
         outs.push(cdv.id);

@@ -67,7 +67,6 @@ export function getDevice(payload:string,type:string):DeviceTasmotaBasic[]{
             id:equipment.id+"@"+(pos+1),
             name,
             online:equipment.online,
-            fns:equipment.fns,
             status:0,
             model:equipment.model,
             ipAddr:equipment.ipAddr,
@@ -92,6 +91,7 @@ const models:ModelData={
     "Sonoff Dual":["status"],
     "Sonoff TH":["status"],
     "Sonoff 4CH":["status"],
-    "Sonoff 4CH Pro":["status"]
+    "Sonoff 4CH Pro":["status"],
+    "Sonoff ZbBridge":["value"]
 }
 

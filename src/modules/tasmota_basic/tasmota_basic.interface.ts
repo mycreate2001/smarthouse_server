@@ -6,12 +6,14 @@ export interface DeviceTasmotaBasic extends Device{
     eid:string;
 }
 
+export type UpdateListType="status"|"value"|"linkQuality"
+
 export interface ModelData{
     [id:string]:UpdateListType[]
 }
 
-export type UpdateListType="status"|"value" 
-type TasmotaInforHandle=(obj:any,eid:string)=>any
+
+// type TasmotaInforHandle=(obj:any,eid:string)=>any
 
 export interface TasmotaBasicQuipment extends Equipment{
     fns:UpdateListType[];
