@@ -51,7 +51,7 @@ export default class Sercurity{
             const sers=this.sercurities.filter(s=>wildcard(packet.topic,s.ref))
             const result=sers.every(ser=>handleVerify(ser.pubHandles,client))
             if(!result) throw new Error("access deny!")
-            log("%d (%s) publish %s\npayload:%s",client.id,user.id,packet.topic,packet.payload.toString());
+            log("%d (%s) publish '%s'='%s'",client.id,user.id,packet.topic,packet.payload.toString());
             callback(null);
         }
         catch(err){

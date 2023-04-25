@@ -12,6 +12,8 @@ const _CODE_002={code:2,msg:"cannot get device infor"}
 const _CODE_003={code:3,msg:'edit data is wrong format'}
 const _CODE_004={code:4,msg:'Nothing change'}
 const _CODE_005={code:5,msg:'handle edit error'}
+const _CODE_006={code:6,msg:'login by token error'}
+const _CODE_007={code:7,msg:'login failred'}
 const topics:TopicData[]=[
     /** request infor */
     {
@@ -86,6 +88,7 @@ const topics:TopicData[]=[
                 const dList=(removes && removes.length)?await service.delDevice(removes):[];
                 return {uList,dList}
             }
+
             execute()
             .then(({uList,dList})=>{
                 clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,{updateDevices:uList.map(u=>u.id),deleteDevices:dList})
@@ -94,6 +97,42 @@ const topics:TopicData[]=[
                 clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_005,{msg:err.message});
                 console.log("\n+++ app.service.ts-88 ++++ ERROR:",err.message,"\n",err,"\n------------------\n")
             })
+        }
+    },
+
+    {
+        id:'loginByToken',
+        ref:'api/login-by-token',
+        handle(packet,client,network,service){
+            const token=packet.payload.toString();
+            service.userService.loginByToken(token).then(user=>{
+                log("[%s] '%d' =>success (%s)",this.id,token,user.id);
+                clientPublish(client,_TOPIC_RESPOND_DIRECT+"/login",_CODE_OK,user.token)
+            })
+            .catch(err=>{
+                log("[%s] =>fail:",this.id,err.message);
+                clientPublish(client,_TOPIC_RESPOND_DIRECT+"/login",_CODE_006);
+            })
+        }
+    },
+
+    {
+        id:'login',
+        ref:'api/login',
+        handle(packet,client,network,service){
+            try{
+                const payload:{user:string,pass:string}=JSON.parse(packet.payload.toString());
+                const {user,pass}=payload;
+                if(!user ||!pass) throw new Error("data format error");
+                service.userService.login(user,pass).then(user=>{
+                    clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,user);
+                })
+                .catch(err=>{throw err})
+            }
+            catch(err){
+                log("007 [%s] =>failed!",this.id,err);
+                clientPublish(client,_TOPIC_RESPOND_DIRECT+"/login",_CODE_007)
+            }
         }
     }
 

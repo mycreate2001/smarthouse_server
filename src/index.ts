@@ -1,9 +1,9 @@
-import { resolve } from "path";
 import { ModuleLoader } from "./lib/module-loader";
-import { ModulePackage } from "./lib/module-loader/module.interface";
+import Config from 'configure'
 console.clear();
-console.log("\n\n\n\n+++++++++++++++++++++++++++++++++++\ntime:%s\n------------------------------------------------------------------\n",Date.now())
-
+console.log("\n\n\n\n+---------------------------------------+\n|\t\ttime:%s\n+--------------------------------------+\n",Date.now())
+const configs=new Config();
+process.env=configs.obj;//variable
 
 const lModule=new ModuleLoader();
 lModule.startup()

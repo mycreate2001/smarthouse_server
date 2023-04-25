@@ -4,14 +4,14 @@ import { UserData } from "../user/user.interfac";
 
 export interface NetworkCommon{
     // on:NetworkOn;
-    onPublish:NetworkHandlePublish;
+    onPublish(packet:PublishPacket,client:NetworkClient|null,server:NetworkCommon):void;
     onConnect:NetworkOnConnect;
-    publish:NetworkPublish;
+    publish(packet:PublishPacket,callback?:NetworkCallbackError):void;
+    _publish(packet:PublishPacket,callback?:NetworkCallbackError):void;
     subscribe:NetworkSubscribe;
     authenticate:NetworkAuthenticate;
     authorizeSubscribe:NetworkAuthorizeSubscribe;
     authorizePublish:NetworkAuthorizePublish;
-    _publish:NetworkPublish;
 }
 
 export type NetworkOn=(topic:"publish"|"subscribe"|"clientDisconnect"|"client",callback:NetworkCallback)=>void;

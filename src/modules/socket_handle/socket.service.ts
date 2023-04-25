@@ -8,15 +8,16 @@ import { AuthorizePublishHandle, Subscription}  from "../websocket/websocket.int
 import {SocketSavePacket, WebSocketExt} from './interface'
 import { NotFound, parserJSON, setHandleLogin, setHandletopic, setSubscribeHandle } from "./utility";
 import { NetworkAuthenticate, NetworkAuthorizeSubscribe, 
+         NetworkCallbackError, 
+         NetworkClient, 
          NetworkCommon, NetworkHandlePublish, NetworkOnConnect, NetworkSubscribe } from "../network/network.interface";
 import { PublishPacket } from "packet";
-import { UserData } from "../user/user.interfac";
 
 /** default */
 const _SOCKET_PORT=8888;
 const _SYSTEM_KEY="$SYS"
 const _PUBLISH_KEY=_SYSTEM_KEY+"/TOPICS/"
-const _DEBUG=false;
+const _DEBUG=true;
 const log=createLog("Websocket","center",_DEBUG);
 
 export default class SocketService extends tEvent implements NetworkCommon{
@@ -71,17 +72,31 @@ export default class SocketService extends tEvent implements NetworkCommon{
             this.onConnect(true,ws,this);   // execute onconnect =online
             this.emit("client",ws,null)
         })
+
+        this.on("publish",(packet:PublishPacket,client:NetworkClient)=>{
+            this.onPublish(packet,client,this)
+        })
     }
     onConnect: NetworkOnConnect=(stt,client,server)=>{
         log("[onConnect] ### not be handle")
     }
-    /** publish from server 
-     * @returns publish result true/false = success/fail
-    */
-    _publish(packet:PublishPacket){
-        log("_publish %s",packet.topic)
+
+    /**
+     * This function publishes a packet to subscribers and saves it to a database if it has the retain
+     * flag set.
+     * @param {PublishPacket} packet - The MQTT PublishPacket object that contains the message to be
+     * published to the broker.
+     * @param {NetworkCallbackError | undefined} [callback] - The callback parameter is an optional
+     * function that will be called after the publish operation is completed. It can be used to handle
+     * any errors that may occur during the operation. If no callback function is provided, the
+     * operation will be performed synchronously.
+     * @returns If the `topic` of the `packet` is falsy (empty string, null, undefined, 0, false),
+     * nothing is returned and the function exits early.
+     */
+    _publish(packet: PublishPacket, callback?: NetworkCallbackError | undefined): void {
+        log("_publish '%d'='%s'",packet.topic,packet.payload.toString())
         const topic=packet.topic||""
-        if(!topic) return false;
+        if(!topic) return;
         const db=this.db[topic]||{packet,subscribes:[]};
         //save packet
         if(packet.retain){
@@ -90,10 +105,9 @@ export default class SocketService extends tEvent implements NetworkCommon{
         }
         //send packet
         db.subscribes.forEach(sub=>sub.ws.send(JSON.stringify(packet)))
-     }
+    }
+
     publish=this._publish
-    remote(deviceId:string,data:any){}
-    getInfor(deviceId:string){ }
 
     /** subcribe from client (after checking sercurity) 
      * @returns true/false= success/fail
@@ -120,16 +134,10 @@ export default class SocketService extends tEvent implements NetworkCommon{
         return true;
     }
 
-    onPublish: NetworkHandlePublish=(packet,client,server)=>{
-
+    onPublish(packet: PublishPacket, client: NetworkClient | null, server: NetworkCommon): void {
+        
     }
 
-    /** subcribe direct from server bypass sercurity */
-    // subscribe(topic:string,callback:NetworkCallback){
-    //     const that=this;
-    //     const _cb=(ws:WebSocketExt,packet:PublishPacket)=>callback(packet)
-    //     return this.on(_PUBLISH_KEY+topic,_cb)
-    // }
     subscribe: NetworkSubscribe=(topic,callback)=>{
         const that=this;
         const _cb=(ws:WebSocketExt,packet:PublishPacket)=>callback(packet)

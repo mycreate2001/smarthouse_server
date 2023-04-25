@@ -47,7 +47,7 @@
     type:string;            // it's decide which to remote
     updateList:string[];    // list item can make event when change value
 
-[2023-Apr-16]
+# [2023-Apr-16]
 -bug mqtt.service.publish not execute by publish function wrong logics
 + app
 - api/add
@@ -56,9 +56,15 @@
 - api/remote    => done
 - api/respond (direct)
 
-[2023-Apr-17]
+# [2023-Apr-17]
 - device.service.ts => just service, no anser any message to client
 
-[2023-Apr-18]
+# [2023-Apr-18]
 - keep functions in Model infor
 - add more table for equipment {eid,model,fns}
+
+# [2023-Apr-24]
+- fixed websocket.service.ts/onPublish
+- change configure from module to library (process.env)
+- add jwt service
+- fixed error jwt.verify

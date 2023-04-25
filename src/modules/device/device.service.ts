@@ -10,6 +10,7 @@ import { ChangeData, Device, DeviceConfig, DeviceOnConnect,
 import { createPacket } from "../network/network.service";
 import { getList, toArray } from "../../lib/utility";
 import { TemporaryDatabase } from "../../lib/temporary-database";
+import UserService from "../user/user.service";
 
 const _DEVICE_DB_="devices"
 const _UPDATE_TOPIC_="api/update"
@@ -20,13 +21,15 @@ const log=createLog("DeviceService","center")
 
 export default class DeviceService extends tEvent implements DeviceServiceBase{
     db:DataConnect<Device>;
+    userService:UserService;
     network:NetworkCommon;
     ndeviceDb= new TemporaryDatabase<Device>()
     topicServices:TopicService[]=[];
-    constructor(network:NetworkCommon,db:LocalDatabaseLite,topicServices:TopicService[]){
+    constructor(network:NetworkCommon,db:LocalDatabaseLite,topicServices:TopicService[],userService:UserService){
         super();
-        this.db=db.connect(_DEVICE_DB_);
+        this.userService=userService;
         this.network=network
+        this.db=db.connect(_DEVICE_DB_);
         /** services */
         // console.log('\n+++ device.service.ts-25 ',topicServices);
         topicServices.forEach(service=>{

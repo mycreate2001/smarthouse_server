@@ -4,5 +4,6 @@ export interface UserData{
     clientId:string;
     pass:string;
     lastLogin:string;
-    level:number
+    level:number;
+    token:string;
 }
