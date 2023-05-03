@@ -68,3 +68,6 @@
 - change configure from module to library (process.env)
 - add jwt service
 - fixed error jwt.verify
+
+# [2023APR26]
+- sercurity >> get from services

@@ -2,6 +2,7 @@ import { PublishPacket } from 'packet';
 import {NetworkClient, NetworkCommon} from '../network/network.interface'
 import DeviceService from './device.service';
 import { DataConnect, LocalDatabaseQuery } from 'local-database-lite';
+import { SercurityData } from '../sercurity/interface';
 
 export interface DeviceServiceBase{
     /** variable */
@@ -115,6 +116,8 @@ export interface TopicData{
     id:string;                  // separate with other
     name?:string;               // discription
     ref:string;                 // matching case run or not
+    subcribe?:SercurityData[];     // sercurity data for subscribe
+    publish?:SercurityData[];      // sercurity data for publish
     handle:TopicHandle;         // handle event
 }
 
