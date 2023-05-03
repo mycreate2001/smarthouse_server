@@ -69,3 +69,14 @@ export function objParser(obj:any,items:string[]):any|undefined|void{
     })
     if(result) return out;
 }
+
+
+export type KeyOfType<T>=keyof T 
+export function createObject<T extends {}>(obj:T,list:KeyOfType<T>):any{
+    const out:any={};
+    Object.keys(obj).forEach(key=>{
+        const val=(obj as any)[key]
+        out[key]=val
+    })
+    return out;
+}
