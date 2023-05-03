@@ -1,9 +1,9 @@
 import { createLog } from "advance-log";
 import { wildcard } from "../../lib/wildcard";
 import UserService from "../user/user.service";
-import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
+// import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
 import { Sercurity, SercurityCommon, SercurityFunc } from "./interface";
-import { NetworkClient } from "../network/network.interface";
+import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, NetworkClient } from "../network/network.interface";
 import { getParams } from "../../lib/utility";
 import { toArray } from "local-database-lite";
 const log=createLog("sercurity","center");
@@ -18,7 +18,7 @@ export default class SercurityService implements SercurityCommon{
     constructor(service:UserService){
         this.service=service
     }
-    authenticate:AuthenticateHandle=(client,uid,pass,callback)=>{
+    authenticate:NetworkAuthenticate=(client,uid,pass,callback)=>{
         this.service.login(uid,pass.toString())
         .then(user=>{
             log("%d login '%s'=>success",client.id,uid);
@@ -32,7 +32,7 @@ export default class SercurityService implements SercurityCommon{
         })
     }
 
-    authorizeSubscribe:AuthorizeSubscribeHandle=(client,sub,callback)=>{
+    authorizeSubscribe:NetworkAuthorizeSubscribe=(client,sub,callback)=>{
         const user=client.user||{id:"unknown"}
         const topic=sub.topic;
         try{
@@ -49,7 +49,7 @@ export default class SercurityService implements SercurityCommon{
         }
     }
 
-    authorizePublish:AuthorizePublishHandle=(client,packet,callback)=>{
+    authorizePublish:NetworkAuthorizePublish=(client,packet,callback)=>{
         const user=client.user||{id:"unknown"}
         const topic=packet.topic;
         try{

@@ -1,13 +1,13 @@
 /** import */
 import tEvent, { runCallback } from "../../lib/event";
-import { WebSocket, WebSocketServer } from 'ws'
+import { WebSocketServer } from 'ws'
 import * as ws from 'ws'
 import { createLog } from "advance-log";
 import {v4 as uuidv4 } from 'uuid'
-import { AuthorizePublishHandle, Subscription}  from "../websocket/websocket.interface";
+import { Subscription}  from "../websocket/websocket.interface";
 import {SocketSavePacket, WebSocketExt} from './interface'
 import { NotFound, parserJSON, setHandleLogin, setHandletopic, setSubscribeHandle } from "./utility";
-import { NetworkAuthenticate, NetworkAuthorizeSubscribe, 
+import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe, 
          NetworkCallbackError, 
          NetworkClient, 
          NetworkCommon, NetworkHandlePublish, NetworkOnConnect, NetworkSubscribe } from "../network/network.interface";
@@ -28,7 +28,7 @@ export default class SocketService extends tEvent implements NetworkCommon{
         this.wss=socket;
 
         /** connect */
-        this.wss.on("connection",(ws)=>{
+        this.wss.on("connection",(ws,req)=>{
             ws.id=uuidv4();
             if(!ws.publish){
                 ws.publish=(data:string|object,callback?:(err:Error|undefined)=>void)=>{
@@ -146,7 +146,7 @@ export default class SocketService extends tEvent implements NetworkCommon{
 
     authenticate:NetworkAuthenticate=(client,user,pass,callback)=>callback(null,true);
     authorizeSubscribe:NetworkAuthorizeSubscribe=(client,subscription,callback)=>callback(null,subscription);
-    authorizePublish:AuthorizePublishHandle=(client,packet,callback)=>callback(null)
+    authorizePublish:NetworkAuthorizePublish=(client,packet,callback)=>callback(null)
 }
 
 declare module "ws" {

@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 import { JwtServiceCommon, JwtSignFunc, JwtSignFuncType, JwtVerifyFunc } from './interface';
 const _MAIN_KEY="thanh@"
-const _TOKEN_EXP={"ACCESS":60*60*60,"REFRESH":60*60*24*30}
+const _TOKEN_EXP={"ACCESS":60*5,"REFRESH":'30d'}
 export class JwtService implements JwtServiceCommon{
     key:string=''
     constructor(){

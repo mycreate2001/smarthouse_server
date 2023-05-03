@@ -1,4 +1,4 @@
-import { AuthenticateHandle, AuthorizePublishHandle, AuthorizeSubscribeHandle } from "../websocket/websocket.interface";
+import { NetworkAuthenticate, NetworkAuthorizePublish, NetworkAuthorizeSubscribe } from "../network/network.interface";
 
 export interface Sercurity{
     id:string;
@@ -20,8 +20,8 @@ export type SercurityFunc={
 }
 
 export interface SercurityCommon{
-    authenticate:AuthenticateHandle;
-    authorizeSubscribe:AuthorizeSubscribeHandle;
-    authorizePublish:AuthorizePublishHandle;
+    authenticate:NetworkAuthenticate;
+    authorizeSubscribe:NetworkAuthorizeSubscribe;
+    authorizePublish:NetworkAuthorizePublish;
     setSercurity(sercurities:Sercurity[]):void
 }

@@ -1,7 +1,7 @@
 import { createLog } from "advance-log";
 import { Device, TopicData, TopicService } from "../device/device.interface";
 import { clientPublish } from "../network/network.service";
-import { toArray } from "../../lib/utility";
+import { createObject, toArray } from "../../lib/utility";
 import { UpdateDevice } from "./app.interface";
 const log=createLog("app","center");
 
@@ -106,10 +106,12 @@ const topics:TopicData[]=[
         handle(packet,client,network,service){
             const token=packet.payload.toString();
             service.userService.loginByToken(token).then(user=>{
+                client.user=user;
                 log("[%s] '%d' =>success (%s)",this.id,token,user.id);
                 clientPublish(client,_TOPIC_RESPOND_DIRECT+"/login",_CODE_OK,user.token)
             })
             .catch(err=>{
+                client.user=undefined;
                 log("[%s] =>fail:",this.id,err.message);
                 clientPublish(client,_TOPIC_RESPOND_DIRECT+"/login",_CODE_006);
             })
@@ -125,7 +127,9 @@ const topics:TopicData[]=[
                 const {user,pass}=payload;
                 if(!user ||!pass) throw new Error("data format error");
                 service.userService.login(user,pass).then(user=>{
-                    clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,user);
+                    client.user=user;
+                    const _sendUser=createObject(user,["id","lastLogin","level","token","name"])
+                    clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,_sendUser);
                 })
                 .catch(err=>{throw err})
             }
