@@ -1,3 +1,10 @@
+/**
+ * The function checks if a given reference matches a given topic using wildcard characters.
+ * @param {string} topic - A string representing the topic to be matched against.
+ * @param {string} ref - The reference string that needs to be checked against the topic string for a
+ * wildcard match.
+ * @returns a boolean value.
+ */
 export function wildcard(topic:string,ref:string):boolean{
     const aTopic:string[]=topic.split("/");
     const aRef:string[]=ref.split("/");

@@ -29,6 +29,7 @@ export default class SocketService extends tEvent implements NetworkCommon{
 
         /** connect */
         this.wss.on("connection",(ws,req)=>{
+            // console.log("\n++ serocket_handle.service.ts-32 req:",req);
             ws.id=uuidv4();
             if(!ws.publish){
                 ws.publish=(data:string|object,callback?:(err:Error|undefined)=>void)=>{

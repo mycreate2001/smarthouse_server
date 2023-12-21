@@ -92,9 +92,7 @@ export function createPacket(packet:string|Partial<PublishPacketExt>):PublishPac
  * publish packet. If there is no error, it can be set to 0 or left blank.
  */
 export function clientPublish(client:NetworkClient,topic:string,errCode:ErrorCode,data?:string|Object){
-    data=data||""
-    const _data=typeof data=='string'?{data}:data
-    let packet=createPacket({payload:Object.assign({...errCode},{..._data}),topic})
+    let packet=createPacket({payload:Object.assign({...errCode},{data}),topic})
     client.publish(packet,clientPublishMessage(client,packet))
 }
 

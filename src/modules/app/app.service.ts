@@ -121,17 +121,16 @@ const topics:TopicData[]=[
     {
         id:'login',
         ref:'api/login',
-        handle(packet,client,network,service){
+        async handle(packet,client,network,service){
             try{
                 const payload:{user:string,pass:string}=JSON.parse(packet.payload.toString());
                 const {user,pass}=payload;
                 if(!user ||!pass) throw new Error("data format error");
-                service.userService.login(user,pass).then(user=>{
-                    client.user=user;
-                    const _sendUser=createObject(user,["id","lastLogin","level","token","name"])
-                    clientPublish(client,_TOPIC_RESPOND_DIRECT,_CODE_OK,_sendUser);
-                })
-                .catch(err=>{throw err})
+                const _user=await service.userService.login(user,pass);
+                client.user=_user;
+                const _sendUser=createObject(_user,["id","lastLogin","level","token","name"])
+                console.log("\n+++ app.service.ts-132 +++ ",_sendUser);
+                clientPublish(client,_TOPIC_RESPOND_DIRECT+"/login",_CODE_OK,_sendUser);
             }
             catch(err){
                 log("007 [%s] =>failed!",this.id,err);

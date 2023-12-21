@@ -69,7 +69,8 @@ export default class UserService{
             return {...user,token}
         }
         catch(err){
-            console.log("\n+++ user.service.ts-73 +++ err:",err);
+            const msg=err instanceof Error?err.message:"other error"
+            console.log("\n+++ user.service.ts-73 +++ loginByToken(%s)=>ERROR:",token,msg);
             throw err;
         }
     }

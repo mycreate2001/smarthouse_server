@@ -17,12 +17,14 @@ export class JwtService implements JwtServiceCommon{
 
     verify(token: string): string | jwt.JwtPayload | undefined {
         try{
+           if(!token) throw new Error("token is empty")
            const decode= jwt.verify(token,this.key);
-           console.log("\n+++ jwt.service.ts-21 +++ decode:",decode);
+           console.log("\n+++ jwt.service.ts-21 +++ verify(%s)=>OK,",token,decode);
            return decode;
         }
         catch(err){
-            console.log("\n+++ jwt.service.ts-25 +++ ERROR:",err);
+            const msg:string=err instanceof Error?err.message:"other code"
+            console.log("\n+++ jwt.service.ts-25 +++ verify(%s)=>ERROR:",token,msg);
             return;
         }
     }

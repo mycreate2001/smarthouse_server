@@ -1,3 +1,12 @@
+/**
+ * The function converts a single value or an array of values to an array.
+ * @param {T|T[]} data - The parameter `data` is of type `T | T[]`, which means it can either be a
+ * single value of type `T` or an array of values of type `T`. The function `toArray` converts this
+ * input into an array of type `T[]`.
+ * @returns The function `toArray` returns an array of type `T[]`. If the input `data` is `undefined`,
+ * an empty array is returned. If `data` is already an array, it is returned as is. Otherwise, `data`
+ * is wrapped in an array and returned.
+ */
 export function toArray<T>(data:T|T[]):T[]{
     if(typeof data==undefined) return [];
     return Array.isArray(data)?data:[data]
@@ -20,11 +29,17 @@ export function shortMsg(msg:string|object,length?:number):string{
 }
 
 
+
 /**
- * get parameter from topic
- * @param topic 
- * @param ref 
- * @returns 
+ * The function takes in a topic and a reference string, splits them into arrays, and returns an object
+ * with key-value pairs where the keys are extracted from the reference string and the values are taken
+ * from the corresponding positions in the topic array.
+ * @param {string} topic - A string representing a topic that contains values separated by forward
+ * slashes ("/").
+ * @param {string} ref - ref is a string parameter that represents a reference path.
+ * @returns an object containing key-value pairs where the keys are extracted from the `ref` string and
+ * the values are extracted from the `topic` string based on their positions. If there is an error, an
+ * empty object is returned.
  */
 export function getParams(topic:string,ref:string){
     try{
@@ -46,6 +61,15 @@ export function getParams(topic:string,ref:string){
     }
 }
 
+/**
+ * The function takes an array of objects and returns an array of unique values for a specified key in
+ * those objects.
+ * @param {any|any[]} arrs - An array of objects or a single object.
+ * @param {string} [key=id] - The key parameter is a string that specifies the property name of the
+ * objects in the array that should be used to create the list. By default, it is set to 'id'.
+ * @returns an array of strings, which contains unique values of a specific property (specified by the
+ * `key` parameter) from an array or an array of objects (specified by the `arrs` parameter).
+ */
 export function getList(arrs:any|any[],key:string='id'):string[]{
     const list:string[]=[]
     toArray(arrs).forEach(arr=>{
@@ -74,9 +98,10 @@ export function objParser(obj:any,items:string[]):any|undefined|void{
 export type KeyOfType<T>=keyof T 
 export function createObject<T extends {}>(obj:T,list:KeyOfType<T>[]):any{
     const out:any={};
-    Object.keys(obj).forEach(key=>{
+    list.forEach(key=>{
         const val=(obj as any)[key]
         out[key]=val
     })
+    console.log("\n+++ utility.ts-105 [creteObject] ",{obj,out,list})
     return out;
 }
