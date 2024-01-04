@@ -1,1 +1,318 @@
-{"modules":{"socket_handle":{"name":"socket handle","path":"socket_handle","params":{},"imports":{"websocket":"network/websocket"},"keys":"network/websocket","level":3},"mqtt":{"name":"mqtt","path":"mqtt","params":{"port":1883},"imports":{},"keys":"network/mqtt","level":2},"http":{"name":"http","path":"http","params":{"port":3000},"imports":{"database":"database/#"},"keys":"http","level":2},"network":{"name":"network","path":"network","params":{},"imports":{"network":{"ref":"network/#","type":"array"}},"keys":"network","level":5},"websocket":{"name":"websocket","path":"websocket","params":{"port":8888},"imports":{},"keys":"network/websocket","level":2},"cryption":{"name":"engypt/degypt password","path":"cryption","params":{},"imports":{},"keys":"hash/cryption","level":2},"jwt":{"name":"jwt","path":"jwt","params":{},"imports":{},"keys":"engypt/jwt","level":2},"database":{"name":"database","path":"database","params":{},"imports":{},"keys":"database/basic","level":1},"sercurity":{"name":"sercurity","path":"sercurity","params":{},"imports":{"network":{"ref":"network/#","type":"array"},"user_service":"service/user","database":"database/basic"},"keys":"sercurity","level":4},"device":{"name":"device","path":"device","params":{},"imports":{"network":"network","database":"database/basic","services":{"ref":"topic/#","type":"array"},"userService":"service/user","sercurity":"sercurity"},"keys":"device","level":7},"tasmota_basic":{"name":"tasmota","path":"tasmota_basic","params":{},"imports":{},"keys":"topic/tasmota","level":1},"zbbridge":{"name":"Zigbee","path":"zbbridge","params":{},"imports":{},"keys":"topic/zbbridge","level":1},"user_service":{"name":"User Service","path":"user","params":{},"imports":{"database":"database/basic","hash":"hash/#","jwt":"engypt/jwt"},"keys":"service/user","level":3},"app":{"name":"app api","path":"app","params":{},"imports":{},"keys":"topic/app","level":1}},"users":{"admin":{"name":"","clientId":"","pass":"U2FsdGVkX1+qsog0GVHFr4Zu118if9+H47Fy4mB2WHY=","lastLogin":"2023-03-16T08:35:21.891Z","level":10,"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhZG1pbiIsImlhdCI6MTY5NDkxNzAxOCwiZXhwIjoxNjk1MDAzNDE4fQ.6jwyz-dNCHqDnixUPjrwhAYMHT9PUWriq3O0NgLsHlM"}},"sercurities":{"cv48n705_1679634103719":{"name":"mobile","ref":"api/update","handles":[],"subHandles":["login","level:3"],"pubHandles":["login","level:3"]},"3yj89t3d_1679634103719":{"name":"online","ref":"tele/:id/LWT","handles":[],"pubHandles":["login"],"subHandles":["login"]},"dm8sfnds_1679634103719":{"name":"configure","ref":"tasmota/discovery/:id/config","handles":[],"subHandles":["login"],"pubHandles":["login"]},"560vl3l3_1679634103719":{"name":"result","ref":"stat/:id/RESULT","handles":[],"pubHandles":["login"],"subHandles":["login"]},"gj4aji0n_1679634103719":{"name":"state","ref":"tele/:id/STATE","handles":[],"pubHandles":["login"],"subHandles":["login"]},"gj4aji0n_1679634103720":{"name":"state","ref":"cmnd/:id/#","handles":[],"pubHandles":["login"],"subHandles":["login"]}},"devices":{"E8DB8494B051@1":{"name":"test","online":false,"fns":["OFF","ON","TOGGLE","HOLD"],"status":0,"model":"Sonoff T1 3CH","ipAddr":"192.168.137.224","mac":"E8DB8494B051","linkQuality":0,"modelId":"Sonoff T1 3CH","type":"tasmota_basic","updateList":["status"],"eid":"E8DB8494B051","module":"PWM Dimmer"},"E8DB8494B051@2":{"name":"Tasmota2","linkQuality":0,"model":"Sonoff T1 3CH","modelId":"Sonoff T1 3CH","ipAddr":"192.168.137.108","mac":"E8DB8494B051","fns":["OFF","ON","TOGGLE","HOLD"],"type":"tasmota_basic","updateList":["status"],"online":false,"status":0,"eid":"E8DB8494B051","module":"PWM Dimmer"},"E8DB8494B051@3":{"name":"Tasmota3","linkQuality":0,"model":"Sonoff T1 3CH","modelId":"Sonoff T1 3CH","ipAddr":"192.168.137.108","mac":"E8DB8494B051","fns":["OFF","ON","TOGGLE","HOLD"],"type":"tasmota_basic","updateList":["status"],"online":false,"status":0,"eid":"E8DB8494B051","module":"PWM Dimmer"}},"equipments":{}}
+{
+    "modules": {
+        "socket_handle": {
+            "name": "socket handle",
+            "path": "socket_handle",
+            "type":"module",
+            "params": {},
+            "imports": {
+                "websocket": "network/websocket"
+            },
+            "keys": "network/websocket",
+            "level": 3
+        },
+        "mqtt": {
+            "name": "mqtt",
+            "path": "mqtt",
+            "type":"module",
+            "params": {
+                "port": 1883
+            },
+            "imports": {},
+            "keys": "network/mqtt",
+            "level": 2
+        },
+        "http": {
+            "name": "http",
+            "path": "http",
+            "type":"module",
+            "params": {
+                "port": 3000
+            },
+            "imports": {
+                "database": "database/#"
+            },
+            "keys": "http",
+            "level": 2
+        },
+        "network": {
+            "name": "network",
+            "path": "network",
+            "type":"module",
+            "params": {},
+            "imports": {
+                "network": {
+                    "ref": "network/#",
+                    "type": "array"
+                }
+            },
+            "keys": "network",
+            "level": 5
+        },
+        "websocket": {
+            "name": "websocket",
+            "path": "websocket",
+            "type":"module",
+            "params": {
+                "port": 8888
+            },
+            "imports": {},
+            "keys": "network/websocket",
+            "level": 2
+        },
+        "cryption": {
+            "name": "engypt/degypt password",
+            "path": "cryption",
+            "type":"module",
+            "params": {},
+            "imports": {},
+            "keys": "hash/cryption",
+            "level": 2
+        },
+        "jwt": {
+            "name": "jwt",
+            "path": "jwt",
+            "type":"module",
+            "params": {},
+            "imports": {},
+            "keys": "engypt/jwt",
+            "level": 2
+        },
+        "database": {
+            "name": "database",
+            "path": "database",
+            "type":"module",
+            "params": {},
+            "imports": {},
+            "keys": "database/basic",
+            "level": 1
+        },
+        "sercurity": {
+            "name": "sercurity",
+            "path": "sercurity",
+            "type":"module",
+            "params": {},
+            "imports": {
+                "network": {
+                    "ref": "network/#",
+                    "type": "array"
+                },
+                "user_service": "service/user",
+                "database": "database/basic"
+            },
+            "keys": "sercurity",
+            "level": 4
+        },
+        "device": {
+            "name": "device",
+            "path": "device",
+            "type":"module",
+            "params": {},
+            "imports": {
+                "network": "network",
+                "database": "database/basic",
+                "services": {
+                    "ref": "topic/#",
+                    "type": "array"
+                },
+                "userService": "service/user",
+                "sercurity": "sercurity"
+            },
+            "keys": "device",
+            "level": 7
+        },
+        "tasmota_basic": {
+            "name": "tasmota",
+            "path": "tasmota_basic",
+            "type":"module",
+            "params": {},
+            "imports": {},
+            "keys": "topic/tasmota",
+            "level": 1
+        },
+        "zbbridge": {
+            "name": "Zigbee",
+            "path": "zbbridge",
+            "type":"module",
+            "params": {},
+            "imports": {},
+            "keys": "topic/zbbridge",
+            "level": 1
+        },
+        "user_service": {
+            "name": "User Service",
+            "path": "user",
+            "type":"module",
+            "params": {},
+            "imports": {
+                "database": "database/basic",
+                "hash": "hash/#",
+                "jwt": "engypt/jwt"
+            },
+            "keys": "service/user",
+            "level": 3
+        },
+        "app": {
+            "name": "app api",
+            "path": "app",
+            "type":"module",
+            "params": {},
+            "imports": {},
+            "keys": "topic/app",
+            "level": 1
+        }
+    },
+    "users": {
+        "admin": {
+            "name": "",
+            "clientId": "",
+            "pass": "U2FsdGVkX1+qsog0GVHFr4Zu118if9+H47Fy4mB2WHY=",
+            "lastLogin": "2023-03-16T08:35:21.891Z",
+            "level": 10,
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhZG1pbiIsImlhdCI6MTY5NDkxNzAxOCwiZXhwIjoxNjk1MDAzNDE4fQ.6jwyz-dNCHqDnixUPjrwhAYMHT9PUWriq3O0NgLsHlM"
+        }
+    },
+    "sercurities": {
+        "cv48n705_1679634103719": {
+            "name": "mobile",
+            "ref": "api/update",
+            "handles": [],
+            "subHandles": [
+                "login",
+                "level:3"
+            ],
+            "pubHandles": [
+                "login",
+                "level:3"
+            ]
+        },
+        "3yj89t3d_1679634103719": {
+            "name": "online",
+            "ref": "tele/:id/LWT",
+            "handles": [],
+            "pubHandles": [
+                "login"
+            ],
+            "subHandles": [
+                "login"
+            ]
+        },
+        "dm8sfnds_1679634103719": {
+            "name": "configure",
+            "ref": "tasmota/discovery/:id/config",
+            "handles": [],
+            "subHandles": [
+                "login"
+            ],
+            "pubHandles": [
+                "login"
+            ]
+        },
+        "560vl3l3_1679634103719": {
+            "name": "result",
+            "ref": "stat/:id/RESULT",
+            "handles": [],
+            "pubHandles": [
+                "login"
+            ],
+            "subHandles": [
+                "login"
+            ]
+        },
+        "gj4aji0n_1679634103719": {
+            "name": "state",
+            "ref": "tele/:id/STATE",
+            "handles": [],
+            "pubHandles": [
+                "login"
+            ],
+            "subHandles": [
+                "login"
+            ]
+        },
+        "gj4aji0n_1679634103720": {
+            "name": "state",
+            "ref": "cmnd/:id/#",
+            "handles": [],
+            "pubHandles": [
+                "login"
+            ],
+            "subHandles": [
+                "login"
+            ]
+        }
+    },
+    "devices": {
+        "E8DB8494B051@1": {
+            "name": "test",
+            "online": false,
+            "fns": [
+                "OFF",
+                "ON",
+                "TOGGLE",
+                "HOLD"
+            ],
+            "status": 0,
+            "model": "Sonoff T1 3CH",
+            "ipAddr": "192.168.137.224",
+            "mac": "E8DB8494B051",
+            "linkQuality": 0,
+            "modelId": "Sonoff T1 3CH",
+            "type": "tasmota_basic",
+            "updateList": [
+                "status"
+            ],
+            "eid": "E8DB8494B051",
+            "module": "PWM Dimmer"
+        },
+        "E8DB8494B051@2": {
+            "name": "Tasmota2",
+            "linkQuality": 0,
+            "model": "Sonoff T1 3CH",
+            "modelId": "Sonoff T1 3CH",
+            "ipAddr": "192.168.137.108",
+            "mac": "E8DB8494B051",
+            "fns": [
+                "OFF",
+                "ON",
+                "TOGGLE",
+                "HOLD"
+            ],
+            "type": "tasmota_basic",
+            "updateList": [
+                "status"
+            ],
+            "online": false,
+            "status": 0,
+            "eid": "E8DB8494B051",
+            "module": "PWM Dimmer"
+        },
+        "E8DB8494B051@3": {
+            "name": "Tasmota3",
+            "linkQuality": 0,
+            "model": "Sonoff T1 3CH",
+            "modelId": "Sonoff T1 3CH",
+            "ipAddr": "192.168.137.108",
+            "mac": "E8DB8494B051",
+            "fns": [
+                "OFF",
+                "ON",
+                "TOGGLE",
+                "HOLD"
+            ],
+            "type": "tasmota_basic",
+            "updateList": [
+                "status"
+            ],
+            "online": false,
+            "status": 0,
+            "eid": "E8DB8494B051",
+            "module": "PWM Dimmer"
+        }
+    },
+    "equipments": {},
+    "startups": {
+        "websocket":{"order":0}
+        
+    }
+}

@@ -1,11 +1,10 @@
-import { ModulePackage } from "../../lib/module-loader/module.interface";
 import { toArray } from "../../lib/utility";
 import { Sercurity, SercurityCommon } from "../sercurity/interface";
 import { TopicService } from "./device.interface";
 
 import DeviceService from "./device.service";
 
-export default function startDeviceService(infor:ModulePackage,network:any,db:any,services:any[],userService:any,sercurity:SercurityCommon){
+export default function startDeviceService(infor:any,network:any,db:any,services:any[],userService:any,sercurity:SercurityCommon){
    //1. input & verify
     if(!db)throw new Error("load database error");
     if(!network) throw new Error("load network error")

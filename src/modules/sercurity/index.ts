@@ -1,7 +1,6 @@
-import { ModulePackage } from "../../lib/module-loader/module.interface";
 import UserService from "../user/user.service";
 import SercurityService from "./service";
-export default function startup(infor:ModulePackage,networks:any[],userService:UserService,db:any){
+export default function startup(infor:any,networks:any[],userService:UserService,db:any){
     //1. input & verify
     if(!networks||!networks.length) throw new Error("load network failred!")
     if(!userService) throw new Error("load userService failred")

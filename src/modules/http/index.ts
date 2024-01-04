@@ -1,9 +1,9 @@
-import { InputModule, ModulePackage } from "../../lib/module-loader/module.interface";
 import express from 'express'
 import { createLog } from "advance-log";
 import { join, resolve } from "path";
 import createRouter from "./upload";
 import LocalDatabaseLite, { DataConnect } from "local-database-lite";
+import { ModulePackage } from 'module-loader/interface';
 const _PORT=3000
 export default function startupExpress(infor:ModulePackage,database:LocalDatabaseLite){
     const log=createLog(infor.id,"center")

@@ -1,6 +1,6 @@
 import LocalDatabaseLite from "local-database-lite";
-import { ModulePackage } from "../../lib/module-loader/module.interface";
-export default function startup(infor:ModulePackage,database:LocalDatabaseLite){
+
+export default function startup(infor:any,database:LocalDatabaseLite){
     //1. input & verify
     if(!database) throw new Error("database error")
 

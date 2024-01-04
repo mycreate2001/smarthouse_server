@@ -3,11 +3,11 @@ import { resolve } from "path";
 import multer from 'multer'
 import { createReadStream,unlinkSync } from "fs";
 import unzipper from 'unzipper'
-import { getModuleInfor } from "../../lib/module-loader/module.service";
 import { DataConnect } from "local-database-lite";
-import { ModulePackage } from "../../lib/module-loader/module.interface";
 import { createLog } from "advance-log";
-const _UPLOAD_PATH=resolve("storage","upload")//require('../../../storage/upload')
+import { ModulePackage } from "module-loader/interface";
+import { getModuleInfor } from 'module-loader/service'
+const _UPLOAD_PATH=resolve("storage","upload")
 const storage=multer.diskStorage({
     destination:function(req,file,cb){
         cb(null,_UPLOAD_PATH)

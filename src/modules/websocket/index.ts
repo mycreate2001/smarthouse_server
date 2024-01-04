@@ -1,6 +1,6 @@
 import { WebSocketServer } from 'ws'
 import { createLog } from "advance-log";
-import { ModulePackage } from "../../lib/module-loader/module.interface";
+import { ModulePackage } from 'module-loader/interface';
 
 const _PORT=8888
 export default function startup(infor:ModulePackage){
