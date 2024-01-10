@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "advance-log": "github:mycreate2001/advance-log",
+    "advance-log": "file:../LIB/advance-log",
     "aedes": "^0.48.1",
     "configure": "github:mycreate2001/config",
     "crypto-js": "^4.1.1",

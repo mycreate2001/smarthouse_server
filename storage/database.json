@@ -3,18 +3,18 @@
         "socket_handle": {
             "name": "socket handle",
             "path": "socket_handle",
-            "type":"module",
+            "type": "module",
             "params": {},
             "imports": {
                 "websocket": "network/websocket"
             },
             "keys": "network/websocket",
-            "level": 3
+            "level": 4
         },
         "mqtt": {
             "name": "mqtt",
             "path": "mqtt",
-            "type":"module",
+            "type": "module",
             "params": {
                 "port": 1883
             },
@@ -22,144 +22,28 @@
             "keys": "network/mqtt",
             "level": 2
         },
-        "http": {
-            "name": "http",
-            "path": "http",
-            "type":"module",
-            "params": {
-                "port": 3000
-            },
-            "imports": {
-                "database": "database/#"
-            },
-            "keys": "http",
-            "level": 2
-        },
-        "network": {
-            "name": "network",
-            "path": "network",
-            "type":"module",
+        "install": {
+            "name": "install package",
+            "path": "install",
+            "type": "module",
+            "keys": "sys/install",
+            "level": 3,
             "params": {},
             "imports": {
-                "network": {
-                    "ref": "network/#",
-                    "type": "array"
-                }
-            },
-            "keys": "network",
-            "level": 5
+                "database": "database/#",
+                "http": "http"
+            }
         },
         "websocket": {
             "name": "websocket",
             "path": "websocket",
-            "type":"module",
+            "type": "module",
             "params": {
                 "port": 8888
             },
             "imports": {},
             "keys": "network/websocket",
             "level": 2
-        },
-        "cryption": {
-            "name": "engypt/degypt password",
-            "path": "cryption",
-            "type":"module",
-            "params": {},
-            "imports": {},
-            "keys": "hash/cryption",
-            "level": 2
-        },
-        "jwt": {
-            "name": "jwt",
-            "path": "jwt",
-            "type":"module",
-            "params": {},
-            "imports": {},
-            "keys": "engypt/jwt",
-            "level": 2
-        },
-        "database": {
-            "name": "database",
-            "path": "database",
-            "type":"module",
-            "params": {},
-            "imports": {},
-            "keys": "database/basic",
-            "level": 1
-        },
-        "sercurity": {
-            "name": "sercurity",
-            "path": "sercurity",
-            "type":"module",
-            "params": {},
-            "imports": {
-                "network": {
-                    "ref": "network/#",
-                    "type": "array"
-                },
-                "user_service": "service/user",
-                "database": "database/basic"
-            },
-            "keys": "sercurity",
-            "level": 4
-        },
-        "device": {
-            "name": "device",
-            "path": "device",
-            "type":"module",
-            "params": {},
-            "imports": {
-                "network": "network",
-                "database": "database/basic",
-                "services": {
-                    "ref": "topic/#",
-                    "type": "array"
-                },
-                "userService": "service/user",
-                "sercurity": "sercurity"
-            },
-            "keys": "device",
-            "level": 7
-        },
-        "tasmota_basic": {
-            "name": "tasmota",
-            "path": "tasmota_basic",
-            "type":"module",
-            "params": {},
-            "imports": {},
-            "keys": "topic/tasmota",
-            "level": 1
-        },
-        "zbbridge": {
-            "name": "Zigbee",
-            "path": "zbbridge",
-            "type":"module",
-            "params": {},
-            "imports": {},
-            "keys": "topic/zbbridge",
-            "level": 1
-        },
-        "user_service": {
-            "name": "User Service",
-            "path": "user",
-            "type":"module",
-            "params": {},
-            "imports": {
-                "database": "database/basic",
-                "hash": "hash/#",
-                "jwt": "engypt/jwt"
-            },
-            "keys": "service/user",
-            "level": 3
-        },
-        "app": {
-            "name": "app api",
-            "path": "app",
-            "type":"module",
-            "params": {},
-            "imports": {},
-            "keys": "topic/app",
-            "level": 1
         }
     },
     "users": {
@@ -312,7 +196,9 @@
     },
     "equipments": {},
     "startups": {
-        "websocket":{"order":0}
-        
+        "mqtt": {
+            "order": 0
+        },
+        "socket_handle":{"order":1}
     }
 }

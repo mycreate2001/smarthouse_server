@@ -79,8 +79,14 @@ export function getList(arrs:any|any[],key:string='id'):string[]{
     return list;
 }
 
-export function createOption<T extends {id:string}>(df:T,opts:Partial<T>):T{
-    return Object.assign({},df,opts);
+export function createOption<T extends object>(df:T,opts?:Partial<T>):T{
+    const _opts:any={}
+    Object.keys(df).forEach(key=>{
+        const val=(opts as any)[key];
+        if(val===undefined) _opts[key]=(df as any)[key];
+        else _opts[key]=val
+    })
+    return Object.assign({},_opts);
 }
 
 export function objParser(obj:any,items:string[]):any|undefined|void{
@@ -104,4 +110,21 @@ export function createObject<T extends {}>(obj:T,list:KeyOfType<T>[]):any{
     })
     console.log("\n+++ utility.ts-105 [creteObject] ",{obj,out,list})
     return out;
+}
+
+/**
+ * The `uuid` function generates a unique identifier by combining a random string with the current
+ * timestamp.
+ * @param {string[]} list - The `list` parameter is an optional array of strings. It is used to check
+ * if the generated UUID already exists in the list. If the generated UUID already exists in the list,
+ * a new UUID will be generated until a unique one is found.
+ * @returns a randomly generated UUID (Universally Unique Identifier) as a string.
+ */
+export function uuid(list:string[]=[]):string{
+    let id:string=''
+    while(1){
+        id=Math.random().toString(36).substring(2)+"-"+Date.now().toString(36);
+        if(!list.includes(id)) break;
+    }
+    return id;
 }

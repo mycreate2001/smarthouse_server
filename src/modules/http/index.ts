@@ -1,29 +1,24 @@
-import express from 'express'
 import { createLog } from "advance-log";
-import { join, resolve } from "path";
-import createRouter from "./upload";
-import LocalDatabaseLite, { DataConnect } from "local-database-lite";
-import { ModulePackage } from 'module-loader/interface';
-const _PORT=3000
-export default function startupExpress(infor:ModulePackage,database:LocalDatabaseLite){
-    const log=createLog(infor.id,"center")
-    /** verify */
-    if(!database) throw new Error("load database error")
+const _PORT_DEFAULT=3000
+export default function startup(inf:any,express:any){
+    /** check */
+    if(!express) throw new Error("cannot get 'express'");
     /** execute */
-    const db=database.connect("modules") as DataConnect<ModulePackage>;
-    const router=createRouter(db);
-    const port=infor.params.port?infor.params.port:_PORT
+    const log=createLog(inf.id,"center");
+    const port=inf.params.port||_PORT_DEFAULT;
     const app=express();
-    app.use(express.static(resolve("publish")));
-    app.get("/",(req,res)=>{
-        log("new request")
-        res.json("it's works!")
+    app.get("/",(req:any,res:any)=>{
+        res.json({error:0,msg:"server runing well"})
     })
 
-    app.get("/packet")
-
-    app.use("/module",router);
-
-    app.listen(port,()=>log("http startup port:",port));
-    return app;
+    app.listen(port,()=>{
+        log("start at '%d'",port);
+    })
+    
+    // const router=express.Router();
+    // router.get("*",(req:any,res:any)=>{
+    //     res.json({msg:"OK nhe"})
+    // })
+    // app.use("/test",router)
+    return {app,Router:express.Router};
 }
