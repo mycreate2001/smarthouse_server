@@ -39,7 +39,7 @@ export default function createUpload(db:any,Router:any){
   /** handle upload packet.zip */
   function uploadModule(db:any){
     return (req:any,res:any,next:()=>void)=>{
-        const log=createLog("uploadModule","center")
+        const log=createLog("uploadModule")
         try{
             const file=req.file
             if(!file) throw new Error("upload not include file");

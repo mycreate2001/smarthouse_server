@@ -1,29 +1,33 @@
+import { UserDataExt } from "./user.interface";
+
 export const PUBLISH_TIMEOUT_SEC_DEFAULT=10;    // time for sending success to client
-export interface GeneralNetwork{
-    onConnect:GeneralNetworkConnect      // handle when network connection/disconnect
-    // onMessage:GeneralOnMessage;             // handle when server get a new messager
-    authenticate :GeneralAuthenticate;                  // handle login
-    authorizePublish:GeneralAuthorizePublish;           // handle when get publish message from client
-    authSubscribe:GeneralAuthorizeSubscribe;            // handle when new publish from client
+export interface CommonNetwork{
+    onConnect:CommonNetworkConnect      // handle when network connection/disconnect
+    // onMessage:CommonOnMessage;             // handle when server get a new messager
+    authenticate :CommonAuthenticate;                  // handle login
+    authorizePublish:CommonAuthorizePublish;           // handle when get publish message from client
+    authSubscribe:CommonAuthorizeSubscribe;            // handle when new publish from client
     publish(topic:string,payload:object|string,opts?:Partial<Packet>):void;  // publish from server, it's pass throw the sercurity
+    // _subscribe(client:CommonClient,sub:Subscription[]|Subscription):void
+    on(title:string,callback:(client:CommonClient,...data:any[])=>void):void;
+    once(title:string,callback:(client:CommonClient,...data:any[])=>void):void;
 }
 
-type PublishPacket=Omit<Packet,"payload">
-
-export interface GeneralClient{
+export interface CommonClient{
     id:string;
+    user?:UserDataExt
 }
 
 /** Handle each function */
-export type GeneralNetworkConnect=(client:GeneralClient,online:boolean)=>void;
-export type GeneralOnMessage=(packet:Packet,client:GeneralClient)=>void;
-export type GeneralAuthenticate =(client:GeneralClient,uid:string,pass:string,callback:GeneralHandleAuth)=>void;
-export type GeneralAuthorizePublish=(client:GeneralClient,packet:Packet,callback:GeneralHandleAuthPub)=>void;
-export type GeneralAuthorizeSubscribe =(client:GeneralClient,subs:Subscription|Subscription[],callback:GeneralHandleAuthSub)=>void;
+export type CommonNetworkConnect=(client:CommonClient,online:boolean)=>void;
+export type CommonOnMessage=(packet:Packet,client:CommonClient)=>void;
+export type CommonAuthenticate =(client:CommonClient,uid:string,pass:string,callback:CommonHandleAuth)=>void;
+export type CommonAuthorizePublish=(client:CommonClient,packet:Packet,callback:CommonHandleAuthPub)=>void;
+export type CommonAuthorizeSubscribe =(client:CommonClient,subs:Subscription,callback:CommonHandleAuthSub)=>void;
 
-export type GeneralHandleAuthPub=(err:any)=>void
-export type GeneralHandleAuthSub=(err:any|null,sub?:Subscription|null|undefined)=>void;
-export type GeneralHandleAuth=(error:any,sucess:boolean)=>void;
+export type CommonHandleAuthPub=(err:any)=>void
+export type CommonHandleAuthSub=(err:any|null,sub:SubscripStd|undefined)=>void;
+export type CommonHandleAuth=(error:any,sucess:boolean)=>void;
 export interface PublishOption{
     timeout_sec:number;
 }
@@ -57,9 +61,15 @@ export type Qos=0|1|2
 export declare class Network{
     port:number;
     constructor(opts?:Partial<NetworkOptions>);
-    onConnect:GeneralNetworkConnect;
+    onConnect:CommonNetworkConnect;
 }
 
 export interface NetworkOptions{
     port:number
+}
+
+
+//////// functions ////////////
+export function correctSubsciption(sub:Subscription):SubscripStd{
+    return typeof sub==='string'?{topic:sub,qos:0}:sub
 }

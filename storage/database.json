@@ -1,15 +1,55 @@
 {
     "modules": {
-        "socket_handle": {
-            "name": "socket handle",
-            "path": "socket_handle",
+        "database": {
+            "name": "database basic",
+            "path": "database",
+            "type": "module",
+            "params": {
+                "path": "storage/database.json"
+            },
+            "level": 1,
+            "keys": "database/basic"
+        },
+        "device_database": {
+            "name": "device database",
+            "path": "devicedb",
+            "type": "module",
+            "params": {
+                "dbkey": "devices"
+            },
+            "level": 2,
+            "keys": "database/device"
+        },
+        "user": {
+            "name": "user service",
+            "path": "user",
+            "type": "module",
+            "params": {
+                "userdb": "users"
+            },
+            "level": 3,
+            "keys": "user/service",
+            "imports": {
+                "db": "database/basic",
+                "hash": "hash/cryption",
+                "jwt": "hash/jwt"
+            }
+        },
+        "cryption": {
+            "name": "Cryption",
+            "path": "cryption",
             "type": "module",
             "params": {},
-            "imports": {
-                "websocket": "network/websocket"
-            },
-            "keys": "network/websocket",
-            "level": 4
+            "level": 1,
+            "keys": "hash/cryption"
+        },
+        "jwt": {
+            "name": "jwt",
+            "path": "jwt",
+            "type": "module",
+            "params": {},
+            "level": 1,
+            "keys": "hash/jwt"
         },
         "mqtt": {
             "name": "mqtt",
@@ -20,7 +60,18 @@
             },
             "imports": {},
             "keys": "network/mqtt",
-            "level": 2
+            "level": 1
+        },
+        "mqtt_driver":{
+            "name":"mqtt driver",
+            "path":"mqtt_driver",
+            "type":"module",
+            "keys":"network/mqtt",
+            "level":3,
+            "params":{},
+            "imports":{
+                "mqtt":"network/mqtt"
+            }
         },
         "install": {
             "name": "install package",
@@ -42,18 +93,55 @@
                 "port": 8888
             },
             "imports": {},
-            "keys": "network/websocket",
+            "keys": "protocol/websocket",
             "level": 2
+        },
+        "socket_service": {
+            "name": "socket service",
+            "path": "socket-service",
+            "type": "module",
+            "params": {},
+            "imports": {
+                "websocket": "protocol/websocket"
+            },
+            "keys": "network/websocket",
+            "level": 4
+        },
+        "socket_driver": {
+            "name": "socket driver",
+            "path": "websocket_driver",
+            "type": "module",
+            "level": 5,
+            "keys": "driver/socket",
+            "params": {},
+            "imports": {
+                "socket": "network/websocket",
+                "database": "database/basic"
+            }
+        },
+        "socket_sercurity": {
+            "name": "socket sercurity",
+            "path": "socket_sercurity",
+            "type": "module",
+            "level": 10,
+            "keys": "sercurity/websocket",
+            "params": {},
+            "imports": {
+                "socket": "network/websocket",
+                "database": "database/basic",
+                "userservice": "user/service",
+                "socketdriver": "driver/socket"
+            }
         }
     },
     "users": {
         "admin": {
-            "name": "",
+            "name": "krzyw443diq-lrg3zs7f",
             "clientId": "",
-            "pass": "U2FsdGVkX1+qsog0GVHFr4Zu118if9+H47Fy4mB2WHY=",
-            "lastLogin": "2023-03-16T08:35:21.891Z",
-            "level": 10,
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhZG1pbiIsImlhdCI6MTY5NDkxNzAxOCwiZXhwIjoxNjk1MDAzNDE4fQ.6jwyz-dNCHqDnixUPjrwhAYMHT9PUWriq3O0NgLsHlM"
+            "pass": "U2FsdGVkX190kavurSakAgIRmTFUEKeGS/6wsE83GAk=",
+            "lastLogin": 1705462338908,
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhZG1pbiIsImlhdCI6MTcwNTQ2MjMzOCwiZXhwIjoxNzA1NTQ4NzM4fQ.ZNmHFFGKKw5FHiOtSWeME-HT07ZsmzqybhUrH889cnE",
+            "groupId": "admin"
         }
     },
     "sercurities": {
@@ -196,9 +284,23 @@
     },
     "equipments": {},
     "startups": {
-        "mqtt": {
-            "order": 0
+        "socket_driver": {
+            "order": 1
         },
-        "socket_handle":{"order":1}
+        "socket_sercurity": {
+            "order": 3
+        },
+        "mqtt_driver":{"order":1}
+    },
+    "groups": {
+        "admin": {
+            "name": "admin",
+            "subs": [
+                "connect"
+            ],
+            "pubs": [
+                "connect"
+            ]
+        }
     }
 }

@@ -1,12 +1,13 @@
-import LocalDatabaseLite from "local-database-lite";
+// import LocalDatabaseLite from "local-database-lite";
+import { LocalDatabaseLite } from "local-database-lite";
 import { ModulePackage } from "module-loader/interface";
-import { join } from "path";
-const _PATH=join(__dirname,"..",'..','..','storage',"database.json");
+const _PATH='storage/database.json';
 export default function startup(infor:ModulePackage){
     //1. input & verify
     const path:string=infor.params.path||_PATH
+    const _paths:string[]=path.split("/");
 
     //2. execute
-    const db=new LocalDatabaseLite(path);
+    const db=new LocalDatabaseLite(..._paths)
     return db;
 }

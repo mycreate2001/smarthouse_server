@@ -1,8 +1,8 @@
-import { createLog } from "advance-log";
+import { createLog } from "advance-log"
 
 const _LABEL_DEFAULT="Mqtt>Log"
 export default function MqttLog(mqtt:any,label:string=_LABEL_DEFAULT){
-    const log=createLog(label,"center");
+    const log=createLog(label);
     mqtt.on("publish",(packet:any,client:any)=>{
         const _client=client||{id:'server'};
         const topic=packet.topic;

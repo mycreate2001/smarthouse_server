@@ -4,7 +4,7 @@ export default function startup(inf:any,express:any){
     /** check */
     if(!express) throw new Error("cannot get 'express'");
     /** execute */
-    const log=createLog(inf.id,"center");
+    const log=createLog(inf.id);
     const port=inf.params.port||_PORT_DEFAULT;
     const app=express();
     app.get("/",(req:any,res:any)=>{
