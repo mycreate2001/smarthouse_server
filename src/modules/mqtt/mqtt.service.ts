@@ -86,6 +86,7 @@ export default class MqttService implements CommonNetwork{
     }
 
     authenticate: CommonAuthenticate=(client,uid,pass,cb)=>{
+        log("%d login => success ",client.id,{uid,pass})
         cb(null,true);//bypass
     }
     authorizePublish: CommonAuthorizePublish=(client,packet,cb)=>{

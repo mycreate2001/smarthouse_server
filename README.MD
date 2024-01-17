@@ -80,3 +80,6 @@
 - SocketService extends CommonNetwork
 - SocketDriver extends CommonDriver
 - SocketSercurity
+
+# [2024Jan17-1]
+- Use common SercurityService for both Websocket,mqtt

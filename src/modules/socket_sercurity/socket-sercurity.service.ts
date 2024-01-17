@@ -77,7 +77,7 @@ export default function socketSercurity(socket: CommonNetwork,driver:SocketDrive
             log("%d publish %s =>failed '%s'",client.id,topic,msg);
             const close=(client as any).close
             if(close && typeof close==='function') close(1);
-            return false;
+            return cb(err);
         }
 
 
