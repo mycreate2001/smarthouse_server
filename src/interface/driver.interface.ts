@@ -1,24 +1,26 @@
-import { CommonClient, CommonNetwork, Packet } from "./network.interface";
+import { CommonDriverService } from "./device.interface";
+import { CommonClient, Packet } from "./network.interface";
 
-export interface DriverServiceData{
-    [id:string]:DriverData
-}
 
-export interface DriverData{
+/** handle each topic */
+export interface DriverHook{
+    id:string;
     name:string;    // name of driver
     ref:string;     // path of driver
-    handler:(client:CommonClient,packet:Packet,server:CommonNetwork,ref:string)=>any
+    handler:( 
+                client:CommonClient,    // client
+                packet:Packet,          // packet data
+                infor:DriverHook,       // hook driver
+                driverService:CommonDriverService   //driver service
+            )=>any
 }
 
-export interface DriverDataExt extends DriverData{
-    id:string;
+export interface DriverPacket{
+    services:DriverHook[];
+    control:DriverControl;
+    type:string;
 }
 
-export function intDriver(handlers:DriverServiceData,server:CommonNetwork){
-    Object.keys(handlers).forEach(id=>{
-        const handle={id,...handlers[id]};
-        server.on(handle.ref,(client,packet)=>{
-            handle.handler(client,packet,server,handle.ref)
-        })
-    })
+export interface DriverControl{
+   [id:string]:Function;
 }

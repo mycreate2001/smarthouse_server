@@ -162,7 +162,7 @@ export interface PublishOption{
     qos:Qos;
     retain:boolean;
 }
-export interface SocketExt extends WebSocket{
+export interface SocketExt extends WebSocket,CommonClient{
     id:string;
     subs:any[]
 }

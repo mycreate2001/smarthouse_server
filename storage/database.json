@@ -1,1 +1,213 @@
-{"modules":{},"startups":{}}
+{
+    "modules": {
+        "database": {
+            "name": "database basic",
+            "path": "database",
+            "type": "module",
+            "params": {
+                "path": "storage/database.json"
+            },
+            "level": 1,
+            "keys": "database/basic"
+        },
+        "device_database": {
+            "name": "device database",
+            "path": "devicedb",
+            "type": "module",
+            "params": {
+                "dbkey": "devices"
+            },
+            "level": 2,
+            "keys": "database/device"
+        },
+        "user": {
+            "name": "user service",
+            "path": "user",
+            "type": "module",
+            "params": {
+                "userdb": "users"
+            },
+            "level": 3,
+            "keys": "user/service",
+            "imports": {
+                "db": "database/basic",
+                "hash": "hash/cryption",
+                "jwt": "hash/jwt"
+            }
+        },
+        "device":{
+            "name":"device",
+            "path":"device",
+            "type":"module",
+            "level":5,
+            "keys":"driver/common",
+            "params":{},
+            "imports":{
+                "drivers":{"type":"mutil","ref":"driver/service/#"}
+            }
+        },
+        "cryption": {
+            "name": "Cryption",
+            "path": "cryption",
+            "type": "module",
+            "params": {},
+            "level": 1,
+            "keys": "hash/cryption"
+        },
+        "jwt": {
+            "name": "jwt",
+            "path": "jwt",
+            "type": "module",
+            "params": {},
+            "level": 1,
+            "keys": "hash/jwt"
+        },
+        "mqtt": {
+            "name": "mqtt",
+            "path": "mqtt",
+            "type": "module",
+            "params": {
+                "port": 1883
+            },
+            "imports": {},
+            "keys": "network/mqtt",
+            "level": 1
+        },
+        "mqtt_driver_service": {
+            "name": "mqtt driver",
+            "path": "driver",
+            "type": "module",
+            "keys": "driver/service/mqtt",
+            "level": 3,
+            "params": {},
+            "imports": {
+                "mqtt": "network/mqtt",
+                "driver": "driver/handle/mqtt",
+                "database": "database/basic"
+            }
+        },
+        "mqtt_sercurity": {
+            "name": "mqtt sercurity",
+            "path": "sercurity",
+            "type": "module",
+            "level": 10,
+            "keys": "sercurity/mqtt",
+            "params": {},
+            "imports": {
+                "userservice": "user/service",
+                "driver": "driver/service/mqtt",
+                "server": "network/mqtt"
+            }
+        },
+        "install": {
+            "name": "install package",
+            "path": "install",
+            "type": "module",
+            "keys": "sys/install",
+            "level": 3,
+            "params": {},
+            "imports": {
+                "database": "database/#",
+                "http": "http"
+            }
+        },
+        "websocket": {
+            "name": "websocket",
+            "path": "websocket",
+            "type": "module",
+            "params": {
+                "port": 8888
+            },
+            "imports": {},
+            "keys": "protocol/websocket",
+            "level": 1
+        },
+        "socket_service": {
+            "name": "socket service",
+            "path": "socket-service",
+            "type": "module",
+            "params": {},
+            "keys": "network/websocket",
+            "level": 2,
+            "imports": {
+                "websocket": "protocol/websocket"
+            }
+        },
+        "socket_driver_service": {
+            "name": "socket driver",
+            "path": "driver",
+            "type": "module",
+            "level": 3,
+            "keys": "driver/service/websocket",
+            "params": {},
+            "imports": {
+                "socket": "network/websocket",
+                "driver": "driver/handle/websocket",
+                "database": "database/basic"
+            }
+        },
+        "socket_driver": {
+            "name": "socket driver",
+            "path": "driver_socket",
+            "type": "module",
+            "level": 1,
+            "keys": "driver/handle/websocket",
+            "params": {},
+            "imports": {}
+        },
+        "driver_mqtt": {
+            "name": "handle topic for mqtt",
+            "path": "driver_mqtt",
+            "type": "module",
+            "level": 1,
+            "keys": "driver/handle/mqtt",
+            "params": {},
+            "imports": {}
+        },
+        "socket_sercurity": {
+            "name": "mqtt sercurity",
+            "path": "sercurity",
+            "type": "module",
+            "level": 10,
+            "keys": "sercurity/mqtt",
+            "params": {},
+            "imports": {
+                "userservice": "user/service",
+                "driver": "driver/service/websocket",
+                "server": "network/websocket"
+            }
+        }
+    },
+    "users": {
+        "admin": {
+            "name": "krzyw443diq-lrg3zs7f",
+            "clientId": "",
+            "pass": "U2FsdGVkX190kavurSakAgIRmTFUEKeGS/6wsE83GAk=",
+            "lastLogin": 1705500843478,
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJhZG1pbiIsImlhdCI6MTcwNTUwMDg0MywiZXhwIjoxNzA1NTg3MjQzfQ.QXsms5BTE4IP64VsQ0mBxQm9lwHr42pG_vetfDpYGPM",
+            "groupId": "admin"
+        }
+    },
+    "startups": {
+        "socket_driver": {
+            "order": 1
+        },
+        "socket_sercurity": {
+            "order": 4
+        },
+        "device":{"order":2}
+    },
+    "groups": {
+        "admin": {
+            "name": "admin",
+            "subs": [
+                "connect"
+            ],
+            "pubs": [
+                "connect"
+            ]
+        }
+    },
+    "devices": {
+    }
+}

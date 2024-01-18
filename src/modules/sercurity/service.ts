@@ -1,4 +1,5 @@
-import MqttDriverService from "../mqtt_driver/service";
+// import MqttDriverService from "../handle_mqtt/service";
+import { CommonDriverService } from "../../interface/device.interface";
 import { CommonNetwork } from "../../interface/network.interface";
 import UserService from "../user/user.service";
 import { createDebug, createLog } from "advance-log";
@@ -12,10 +13,10 @@ const _DEBUG:boolean=false;
 
 export default class SercurityService{
     server:CommonNetwork;
-    driver:MqttDriverService;
+    driver:CommonDriverService;
     userService:UserService;
     log:any;
-    constructor(server:CommonNetwork,driver:MqttDriverService,userService:UserService,opts?:Partial<SercurityServiceOpts>){
+    constructor(server:CommonNetwork,driver:CommonDriverService,userService:UserService,opts?:Partial<SercurityServiceOpts>){
         this.server=server;
         this.driver=driver;
         this.userService=userService;

@@ -15,6 +15,7 @@ export interface CommonNetwork{
 
 export interface CommonClient{
     id:string;
+    eid?:string;
     user?:UserDataExt
 }
 
