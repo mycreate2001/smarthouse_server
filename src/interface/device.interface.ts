@@ -1,3 +1,4 @@
+import { LocalDatabaseQuery } from "local-database-lite";
 
 /** device */
 export const _DB_DEVICE='devices'
@@ -14,16 +15,28 @@ export interface Device{
 }
 
 /** must have id */
-export type DeviceOpt =Partial<Device>&{id:string}
+export interface DeviceBasic extends Partial<Omit<Device,"values">>{
+    id:string;
+    values?:ValuesBasic[]
+}
+export interface ValuesBasic{
+    id:string;
+    value:number;
+}
+
+export type DeviceOpt=Partial<Device> &{id:string}
+
 
 /** device service (common) */
 export interface CommonDriverService{
-    connect:(eid:string,online:boolean)=>void;        // handle connect
-    remote:(device:Device)=>void;                     // remote device
-    // onUpdate(id:string,value:DeviceValueData):void; // update status of device
-    update:(devices:DeviceOpt[])=>void;                     // update values of device
-    getServices():CommonDriverList[]                // get service list for authorization
-
+    /** event from device */
+    onConnect:(eid:string,online:boolean)=>void;        // handle connect
+    onUpdate:(devices:DeviceBasic[])=>void;             // update values of device
+    onUpdateBySearch:(idv:Partial<Device>,...queries:LocalDatabaseQuery[])=>any;
+    /** control */
+    remote:(device:Device)=>void; 
+    getServices():CommonDriverList[]                    // get service list for authorization
+    register:(idvs:DeviceOpt[])=>any;
 }
 
 

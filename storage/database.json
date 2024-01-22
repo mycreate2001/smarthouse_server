@@ -10,16 +10,6 @@
             "level": 1,
             "keys": "database/basic"
         },
-        "device_database": {
-            "name": "device database",
-            "path": "devicedb",
-            "type": "module",
-            "params": {
-                "dbkey": "devices"
-            },
-            "level": 2,
-            "keys": "database/device"
-        },
         "user": {
             "name": "user service",
             "path": "user",
@@ -35,15 +25,19 @@
                 "jwt": "hash/jwt"
             }
         },
-        "device":{
-            "name":"device",
-            "path":"device",
-            "type":"module",
-            "level":5,
-            "keys":"driver/common",
-            "params":{},
-            "imports":{
-                "drivers":{"type":"mutil","ref":"driver/service/#"}
+        "device": {
+            "name": "device",
+            "path": "device",
+            "type": "module",
+            "level": 5,
+            "keys": "driver/common",
+            "params": {},
+            "imports": {
+                "drivers": {
+                    "type": "mutil",
+                    "ref": "driver/service/#"
+                },
+                "database": "database/basic"
             }
         },
         "cryption": {
@@ -82,8 +76,7 @@
             "params": {},
             "imports": {
                 "mqtt": "network/mqtt",
-                "driver": "driver/handle/mqtt",
-                "database": "database/basic"
+                "driver": "driver/handle/mqtt"
             }
         },
         "mqtt_sercurity": {
@@ -142,8 +135,7 @@
             "params": {},
             "imports": {
                 "socket": "network/websocket",
-                "driver": "driver/handle/websocket",
-                "database": "database/basic"
+                "driver": "driver/handle/websocket"
             }
         },
         "socket_driver": {
@@ -176,6 +168,19 @@
                 "driver": "driver/service/websocket",
                 "server": "network/websocket"
             }
+        },
+        "api": {
+            "name": "api service",
+            "path": "api",
+            "type": "module",
+            "level": 3,
+            "keys": "api/service",
+            "params": {},
+            "imports": {
+                "database":"database/basic",
+                "device_service":"driver/common",
+                "network":"network/mqtt"
+            }
         }
     },
     "users": {
@@ -195,7 +200,10 @@
         "socket_sercurity": {
             "order": 4
         },
-        "device":{"order":2}
+        "device": {
+            "order": 2
+        },
+        "api_service":{"order":5}
     },
     "groups": {
         "admin": {
@@ -208,6 +216,5 @@
             ]
         }
     },
-    "devices": {
-    }
+    "devices": {}
 }

@@ -1,3 +1,4 @@
+import { DeviceServiceData } from "../modules/device/service";
 import { CommonDriverService } from "./device.interface";
 import { CommonClient, Packet } from "./network.interface";
 
@@ -11,7 +12,7 @@ export interface DriverHook{
                 client:CommonClient,    // client
                 packet:Packet,          // packet data
                 infor:DriverHook,       // hook driver
-                driverService:CommonDriverService   //driver service
+                driverService:CommonDriverService|DeviceServiceData   //driver service
             )=>any
 }
 

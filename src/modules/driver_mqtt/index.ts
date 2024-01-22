@@ -2,7 +2,7 @@ import { createDebug, createLog } from "advance-log";
 import { DriverControl, DriverHook, DriverPacket } from "../../interface/driver.interface";
 import { getParams } from "ultility-tools";
 import { CommonClient } from "../../interface/network.interface";
-import { Device, DeviceOpt } from "../../interface/device.interface";
+import { Device, DeviceBasic, DeviceOpt } from "../../interface/device.interface";
 
 const _LABEL="mqtt-driver"
 const _DEVICE_TYPE="tasmota1"
@@ -20,7 +20,7 @@ export const services:DriverHook[]=[
             const eid:string=getParams(topic,inf.ref)['eid'];
             const online=packet.payload.toLowerCase()==='online'?true:false
             debug(1,"connect {eid:%s,online:%d}",eid,online);
-            driver.connect(eid,online)
+            driver.onConnect(eid,online)
         },
     },
 
@@ -32,8 +32,8 @@ export const services:DriverHook[]=[
             const payload=JSON.parse(packet.payload);
             const equipment=getEquipmentInf(payload);
             const devices=getDeviceInf(equipment);
-            driverService.update(devices);
-            log("%d %s",client.id,inf.id,{devices})
+            log("config devices ",devices);
+            driverService.onUpdate(devices);
         }
     },
     {   
@@ -42,9 +42,19 @@ export const services:DriverHook[]=[
         ref: "stat/:eid/RESULT",
         handler(client: CommonClient, packet, inf, driverService) {
             const payload=JSON.parse(packet.payload);
+            const topic=packet.topic;
             const status=GetStatus(payload);
-            log("%d %s",client.id,inf.id,{status,payload})
+            const eid=getParams(topic,inf.ref)['eid'];
+            const devices=status.map(st=>{
+                const device:DeviceBasic={
+                    id:eid+"@"+st.id,
+                    values:[{id:'status',value:st.status}]
+                }
+                return device
+            })
 
+            driverService.onUpdate(devices);
+            log("update %s",topic,devices);
         }
     },
 
@@ -54,9 +64,17 @@ export const services:DriverHook[]=[
         ref: "tele/:eid/STATE",
         handler(client: CommonClient, packet, inf, driverService) {
             const payload=JSON.parse(packet.payload);
+            const topic=packet.topic;
+            const eid:string=getParams(topic,inf.ref)['eid']
             const status=GetStatus(payload);
-            debug(1,{status,payload})
-
+            const devices=status.map(st=>{
+                const device:DeviceBasic={
+                    id:eid+"@"+st.id,
+                    values:[{id:'status',value:st.status}]
+                }
+                return device
+            })
+            driverService.onUpdate(devices);
         }
     },
 
@@ -64,18 +82,20 @@ export const services:DriverHook[]=[
         id:'update',
         name:'update feedback topic',
         ref:'tele/:eid/INFO1',
-        handler(client, packet, infor, driverService) {
+        handler(client, packet, inf, driverService) {
             const payload=JSON.parse(packet.payload);
+            const topic=packet.topic;
+            const eid=getParams(topic,inf.ref)['eid']
             const info=payload.Info1;
             const list=[{n:"fallbackTopic",k:"FallbackTopic"},{n:"groupTopic",k:"GroupTopic"}]
-            const out:any={}
+            const update:any={}
             list.forEach(item=>{
                 const val=info[item.k];
                 if(val===undefined) return;
-                out[item.n]=val;
+                update[item.n]=val;
             })
-
-            log("infor1",out);
+            log("infor1",update);
+            driverService.onUpdateBySearch(update,{key:'eid',type:'==',value:eid})
         },
     },
 
@@ -137,7 +157,7 @@ function getEquipmentInf(payload:object):Equipment{
 function getDeviceInf(equipment:Equipment):DeviceOpt[]{
     return equipment.names.map((name,i)=>{
         const device:DeviceOpt={
-            id: equipment.id + '@' + i,
+            id: equipment.id + '@' + (i+1),
             type:equipment.type,
             name,
             eid: equipment.id,

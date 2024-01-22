@@ -1,26 +1,28 @@
 import { createLog } from "advance-log";
-import { CommonDriverList, CommonDriverService, Device, DeviceOpt, _DB_DEVICE } from "../../interface/device.interface";
+import { CommonDriverList, CommonDriverService, Device, DeviceBasic, DeviceOpt, _DB_DEVICE } from "../../interface/device.interface";
 
 import { DriverHook, DriverPacket } from "../../interface/driver.interface";
 import { CommonNetwork } from "../../interface/network.interface";
-import { DataConnect, LocalDatabaseLite } from "local-database-lite";
+import { DataConnect, LocalDatabaseLite, LocalDatabaseQuery } from "local-database-lite";
 
 const _LABEL="driver"
 const log=createLog(_LABEL,{enablePos:true})
 
 export default class DriverService implements CommonDriverService{
     server:CommonNetwork
-    db:DataConnect<Device>
-    // driver:DriverServiceData;
     type:string=''
-    constructor(server:CommonNetwork,driver:DriverPacket,db:LocalDatabaseLite){
+    services:DriverHook[]=[]
+    constructor(server:CommonNetwork,driver:DriverPacket){
         this.server=server;
-        this.db=db.connect(_DB_DEVICE);
-        // this.driver=driver.services;
         this.type=driver.type;      //type as tasmota, websocket,...
-        this._initialDriver(driver.services)
+        this._initialDriver(driver.services);
+        this.services=driver.services;
     }
-    update=(devices: DeviceOpt[])=> {
+    
+    onUpdateBySearch=(idv: Partial<Device>, ...queries: LocalDatabaseQuery[]) => {
+        log("### WARNING: 'update' not be handle")
+    }
+    onUpdate=(device: DeviceBasic[])=> {
         log("### WARNING: 'update' not be handle")
     }
     private _initialDriver(drivers:DriverHook[]){
@@ -30,15 +32,17 @@ export default class DriverService implements CommonDriverService{
             })
         })
     }
-    connect=(eid: string, online: boolean)=>{
+    onConnect=(eid: string, online: boolean)=>{
         log("### WARNING: 'connect' not be handle")
     };
     remote=(device: Device)=>{
         log("### WARNING: 'remote' not be handle")
     }
     getServices(): CommonDriverList[] {
-        throw new Error("Method not implemented.");
+        return this.services
     }
     
-
+    register(idvs: DeviceOpt[]){
+        log("### WARING: register not implemented")
+    }
 }
