@@ -2,12 +2,16 @@
 import { WebSocketServer } from "ws";
 // import { ModulePackage } from "../../lib/module-loader/module.interface";
 import SocketService from "./socket.service";
+import { CommonNetworkPacket } from "../../interface/network.interface";
+import { ModulePackage } from "module-loader/interface";
 
+const _NETWORK_ID="webswocket"
 
-export default function startup(infor:any,websocket:WebSocketServer){
+export default function startup(infor:ModulePackage,websocket:WebSocketServer):CommonNetworkPacket{
     //1. input & verify
     if(!websocket||!(websocket instanceof WebSocketServer)) throw new Error("load websocket error")
+    const id:string=infor.params.networkId||_NETWORK_ID;
     // 2. execute
-    const socket_handle=new SocketService(websocket);
-    return socket_handle
+    const service=new SocketService(websocket);
+    return {service,id}
 }

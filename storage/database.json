@@ -25,21 +25,6 @@
                 "jwt": "hash/jwt"
             }
         },
-        "device": {
-            "name": "device",
-            "path": "device",
-            "type": "module",
-            "level": 5,
-            "keys": "driver/common",
-            "params": {},
-            "imports": {
-                "drivers": {
-                    "type": "mutil",
-                    "ref": "driver/service/#"
-                },
-                "database": "database/basic"
-            }
-        },
         "cryption": {
             "name": "Cryption",
             "path": "cryption",
@@ -61,24 +46,14 @@
             "path": "mqtt",
             "type": "module",
             "params": {
-                "port": 1883
+                "port": 1883,
+                "networkId":"mqtt"
             },
             "imports": {},
             "keys": "network/mqtt",
             "level": 1
         },
-        "mqtt_driver_service": {
-            "name": "mqtt driver",
-            "path": "driver",
-            "type": "module",
-            "keys": "driver/service/mqtt",
-            "level": 3,
-            "params": {},
-            "imports": {
-                "mqtt": "network/mqtt",
-                "driver": "driver/handle/mqtt"
-            }
-        },
+
         "mqtt_sercurity": {
             "name": "mqtt sercurity",
             "path": "sercurity",
@@ -119,68 +94,45 @@
             "name": "socket service",
             "path": "socket-service",
             "type": "module",
-            "params": {},
+            "params": {
+                "networkId":"websocket"
+            },
             "keys": "network/websocket",
             "level": 2,
             "imports": {
                 "websocket": "protocol/websocket"
             }
         },
-        "socket_driver_service": {
-            "name": "socket driver",
-            "path": "driver",
-            "type": "module",
-            "level": 3,
-            "keys": "driver/service/websocket",
-            "params": {},
-            "imports": {
-                "socket": "network/websocket",
-                "driver": "driver/handle/websocket"
+        "global_driver":{
+            "name":"device",
+            "path":"global_driver",
+            "type":"module",
+            "level":5,
+            "keys":"driver/global",
+            "params":{},
+            "imports":{
+                "drivers":{"type":"mutil","ref":"driver/#"},
+                "network":{"type":"mutil","ref":"network/#"},
+                "database":"database/#"
             }
         },
-        "socket_driver": {
-            "name": "socket driver",
-            "path": "driver_socket",
-            "type": "module",
-            "level": 1,
-            "keys": "driver/handle/websocket",
-            "params": {},
-            "imports": {}
+        "tasmota_driver":{
+            "name":"tasmota",
+            "path":"drivers/tasmota.js",
+            "type":"module",
+            "level":1,
+            "keys":"driver/tasmota",
+            "params":{},
+            "imports":{}
         },
-        "driver_mqtt": {
-            "name": "handle topic for mqtt",
-            "path": "driver_mqtt",
-            "type": "module",
-            "level": 1,
-            "keys": "driver/handle/mqtt",
-            "params": {},
-            "imports": {}
-        },
-        "socket_sercurity": {
-            "name": "mqtt sercurity",
-            "path": "sercurity",
-            "type": "module",
-            "level": 10,
-            "keys": "sercurity/mqtt",
-            "params": {},
-            "imports": {
-                "userservice": "user/service",
-                "driver": "driver/service/websocket",
-                "server": "network/websocket"
-            }
-        },
-        "api": {
-            "name": "api service",
-            "path": "api",
-            "type": "module",
-            "level": 3,
-            "keys": "api/service",
-            "params": {},
-            "imports": {
-                "database":"database/basic",
-                "device_service":"driver/common",
-                "network":"network/mqtt"
-            }
+        "api-v1":{
+            "name":"tasmota",
+            "path":"drivers/api-1",
+            "type":"module",
+            "level":1,
+            "keys":"driver/api",
+            "params":{},
+            "imports":{}
         }
     },
     "users": {
@@ -194,16 +146,7 @@
         }
     },
     "startups": {
-        "socket_driver": {
-            "order": 1
-        },
-        "socket_sercurity": {
-            "order": 4
-        },
-        "device": {
-            "order": 2
-        },
-        "api_service":{"order":5}
+        "global_driver":{"order":2}
     },
     "groups": {
         "admin": {

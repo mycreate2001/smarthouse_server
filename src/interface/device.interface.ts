@@ -12,7 +12,10 @@ export interface Device{
     eid:string;                 // equipment id
     model:string;
     address:string;             // ip or mac
+    mac:string;
 }
+// can update from device
+export const deviceUpdateList:string[]="address".split(",")
 
 /** must have id */
 export interface DeviceBasic extends Partial<Omit<Device,"values">>{
@@ -30,13 +33,14 @@ export type DeviceOpt=Partial<Device> &{id:string}
 /** device service (common) */
 export interface CommonDriverService{
     /** event from device */
-    onConnect:(eid:string,online:boolean)=>void;        // handle connect
-    onUpdate:(devices:DeviceBasic[])=>void;             // update values of device
-    onUpdateBySearch:(idv:Partial<Device>,...queries:LocalDatabaseQuery[])=>any;
+    onConnect(eid:string,online:boolean):any;        // handle connect
+    onUpdate(devices:DeviceBasic[]):any;             // update values of device
+    onUpdateBySearch(idv:Partial<Device>,...queries:LocalDatabaseQuery[]):any;
     /** control */
-    remote:(device:Device)=>void; 
+    remote(device:Device):any; 
     getServices():CommonDriverList[]                    // get service list for authorization
-    register:(idvs:DeviceOpt[])=>any;
+    register(idvs:DeviceOpt[]):any;
+    // nDevices:DeviceBasic[];
 }
 
 

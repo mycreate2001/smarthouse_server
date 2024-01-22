@@ -13,6 +13,11 @@ export interface CommonNetwork{
     once(title:string,callback:(client:CommonClient,...data:any[])=>void):void;
 }
 
+export interface CommonNetworkPacket{
+    service:CommonNetwork;          // service of network
+    id:string;                    // type of network
+}
+
 export interface CommonClient{
     id:string;
     eid?:string;

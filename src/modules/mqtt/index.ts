@@ -1,17 +1,19 @@
 import { createLog } from 'advance-log';
 import { ModulePackage } from 'module-loader/interface';
-import MqttLog from './mqtt.log';
 import MqttService from './mqtt.service';
+import { CommonNetworkPacket } from '../../interface/network.interface';
 const _PORT=1884;
-const _LOG=true
-export default function startup(infor:ModulePackage){
+const _NETWORK_ID="mqtt"
+
+export default function startup(infor:ModulePackage):CommonNetworkPacket{
     //1. input & verify
-    const port:number=process.env.MQTT_PORT||infor.params.port||_PORT
+    const port:number=infor.params.port||_PORT
+    const id:string=infor.params.networkId||_NETWORK_ID
     //2. execute
     const log=createLog(infor.id);
     const mqtt= new MqttService(port,()=>{
         log("start at %d",port)
     });
     // if(_LOG) MqttLog(mqtt)
-    return mqtt
+    return {service:mqtt,id}
 }
