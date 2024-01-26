@@ -1,5 +1,5 @@
 import { getParams } from "ultility-tools";
-import { DriverControl, DriverHook, DriverPacket } from "../../interface/driver.interface";
+import { DriverControl, DriverHook, DriverPacket } from "../../interface/device-service.interface";
 import { createLog } from "advance-log";
 import { DeviceBasic } from "../../interface/device.interface";
 const _TYPE='tasmota-basic'

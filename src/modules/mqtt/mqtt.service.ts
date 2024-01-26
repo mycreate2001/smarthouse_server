@@ -15,19 +15,10 @@ const _PACKET_DEFAULT:PublishPacket={
     retain:false,
     topic:'',
     payload:'',
-    qos:0
+    qos:0,
 }
 
 
-// export default function mqttService(port:number,callback?:()=>void){
-//     const mqtt=new Aedes.default()
-//     const server=Net.createServer(mqtt.handle);
-//     server.listen(port,()=>{
-//         if(!callback||typeof callback!=='function') return;
-//         callback();
-//     })
-//     return mqtt;
-// }
 
 export default class MqttService implements CommonNetwork{
     mqtt:Aedes.Aedes
@@ -96,9 +87,10 @@ export default class MqttService implements CommonNetwork{
         const _subs=correctSubsciption(subs);
         cb(null,_subs)
     }
-    publish(topic: string, payload: string | object, opts?: Partial<Packet> | undefined): void {
-        const _payload=Buffer.from(typeof payload==='object'?JSON.stringify(payload):payload)
-        const packet:PublishPacket=Object.assign({},_PACKET_DEFAULT,opts,{payload:_payload})
+    publish(topic: string, payload: string | object, opts: Partial<Packet>={}): void {
+        payload=payload||""
+        const _payload:string=typeof payload!=='string'?JSON.stringify(payload):payload
+        const packet:PublishPacket=Object.assign({},_PACKET_DEFAULT,opts,{payload:_payload,topic});
         this.mqtt.publish(packet,(err)=>{
             log("%d publish %s","server=>",topic,err?"failed":"success");
         })

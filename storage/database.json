@@ -47,13 +47,12 @@
             "type": "module",
             "params": {
                 "port": 1883,
-                "networkId":"mqtt"
+                "networkId": "mqtt"
             },
             "imports": {},
             "keys": "network/mqtt",
             "level": 1
         },
-
         "mqtt_sercurity": {
             "name": "mqtt sercurity",
             "path": "sercurity",
@@ -95,7 +94,7 @@
             "path": "socket-service",
             "type": "module",
             "params": {
-                "networkId":"websocket"
+                "networkId": "websocket"
             },
             "keys": "network/websocket",
             "level": 2,
@@ -103,36 +102,42 @@
                 "websocket": "protocol/websocket"
             }
         },
-        "global_driver":{
-            "name":"device",
-            "path":"global_driver",
-            "type":"module",
-            "level":5,
-            "keys":"driver/global",
-            "params":{},
-            "imports":{
-                "drivers":{"type":"mutil","ref":"driver/#"},
-                "network":{"type":"mutil","ref":"network/#"},
-                "database":"database/#"
+        "device": {
+            "name": "device",
+            "path": "device",
+            "type": "module",
+            "level": 5,
+            "keys": "device/global",
+            "params": {},
+            "imports": {
+                "drivers": {
+                    "type": "mutil",
+                    "ref": "driver/#"
+                },
+                "network": {
+                    "type": "mutil",
+                    "ref": "network/#"
+                },
+                "database": "database/#"
             }
         },
-        "tasmota_driver":{
-            "name":"tasmota",
-            "path":"drivers/tasmota.js",
-            "type":"module",
-            "level":1,
-            "keys":"driver/tasmota",
-            "params":{},
-            "imports":{}
+        "tasmota_driver": {
+            "name": "tasmota",
+            "path": "drivers/tasmota.js",
+            "type": "module",
+            "level": 1,
+            "keys": "driver/tasmota",
+            "params": {},
+            "imports": {}
         },
-        "api-v1":{
-            "name":"tasmota",
-            "path":"drivers/api-1",
-            "type":"module",
-            "level":1,
-            "keys":"driver/api",
-            "params":{},
-            "imports":{}
+        "api-v1": {
+            "name": "tasmota",
+            "path": "drivers/api-1",
+            "type": "module",
+            "level": 1,
+            "keys": "driver/api",
+            "params": {},
+            "imports": {}
         }
     },
     "users": {
@@ -146,7 +151,9 @@
         }
     },
     "startups": {
-        "global_driver":{"order":2}
+        "device": {
+            "order": 2
+        }
     },
     "groups": {
         "admin": {
@@ -159,5 +166,50 @@
             ]
         }
     },
-    "devices": {}
+    "devices": {
+        "tasmota_E8DB8494ED16@1": {
+            "name": "tasmota_E8DB8494ED16",
+            "eid": "tasmota_E8DB8494ED16",
+            "type": "unknown",
+            "group": "default",
+            "values": [],
+            "model": "Sonoff 4CHPROR3",
+            "address": "192.168.137.136",
+            "mac": "E8DB8494ED16",
+            "icon": ""
+        },
+        "tasmota_E8DB8494ED16@2": {
+            "name": "tasmota_E8DB8494ED16",
+            "eid": "tasmota_E8DB8494ED16",
+            "type": "unknown",
+            "group": "default",
+            "values": [],
+            "model": "Sonoff 4CHPROR3",
+            "address": "192.168.137.136",
+            "mac": "E8DB8494ED16",
+            "icon": ""
+        },
+        "tasmota_E8DB8494ED16@3": {
+            "name": "tasmota_E8DB8494ED16",
+            "eid": "tasmota_E8DB8494ED16",
+            "type": "unknown",
+            "group": "default",
+            "values": [],
+            "model": "Sonoff 4CHPROR3",
+            "address": "192.168.137.136",
+            "mac": "E8DB8494ED16",
+            "icon": ""
+        },
+        "tasmota_E8DB8494ED16@4": {
+            "name": "tasmota_E8DB8494ED16",
+            "eid": "tasmota_E8DB8494ED16",
+            "type": "unknown",
+            "group": "default",
+            "values": [],
+            "model": "Sonoff 4CHPROR3",
+            "address": "192.168.137.136",
+            "mac": "E8DB8494ED16",
+            "icon": ""
+        }
+    }
 }

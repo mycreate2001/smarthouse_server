@@ -1,6 +1,6 @@
 import { DataConnect, LocalDatabaseLite, LocalDatabaseQuery } from "local-database-lite";
-import { CommonDriverList, CommonDriverService, Device, DeviceBasic, DeviceOpt, DeviceValue, ValuesBasic, _DB_DEVICE, deviceUpdateList } from "../../interface/device.interface";
-import { DriverPacket } from "../../interface/driver.interface";
+import { CommonDriverList, CommonDriverService, Device, DeviceBasic, DeviceOpt, DeviceValue, ValuesBasic, _DB_DEVICE, deviceUpdateList, deviceValueDefault } from "../../interface/device.interface";
+import { DriverPacket } from "../../interface/device-service.interface";
 import { CommonClient, CommonNetwork, CommonNetworkPacket } from "../../interface/network.interface";
 import { createOption, getList, toArray } from "ultility-tools";
 import { createLog } from "advance-log";
@@ -10,12 +10,14 @@ const _LABEL="device"
 const _ONLINE_KEY="online";             // search online for device values
 const _DEVICE_EVENT_KEY="device"
 const _CHANGE_KEY="change"              // change event label, example device/<deviceid>/CHANGE
+const _DEFAULT_GROUP="default"
+const _DEFAULT_TYPE="unknown"
 const log=createLog(_LABEL,{enablePos:true})
 
-export default class DriverService extends tEvent implements CommonDriverService{
+export default class DeviceService extends tEvent implements CommonDriverService {
     drivers:DriverPacket[];
     networks:CommonNetworkPacket[];
-    deviceDb:DataConnect<Device>;
+    dbDevice:DataConnect<Device>;
     nDevices:DeviceBasic[]=[];
     constructor(drivers:DriverPacket[],networks:CommonNetworkPacket[],database:LocalDatabaseLite){
         super();
@@ -23,36 +25,38 @@ export default class DriverService extends tEvent implements CommonDriverService
         log('### test-002: drivers ',drivers);
         this.drivers=drivers;
         this.networks=networks;
-        this.deviceDb=database.connect(_DB_DEVICE);
+        this.dbDevice=database.connect(_DB_DEVICE);
         this._init();
     }
-    private _init(){
-        const networks=getList(this.networks,"id");
-        networks.forEach(id=>{
-            const networkPacket=this.networks.find(n=>n.id===id);
-            if(!networkPacket) return log("## ERROR-001: intenal error");
-            const network=networkPacket.service;
-            const drivers=this.drivers.filter(d=>d.networkId===id);
-            if(!drivers || !drivers.length) return log("## WARNING-002: no support driver networkId:%d, drivers:",id,drivers);
-            // const list=drivers.services.map(driver=>{
-            //     network.on(driver.ref,(client:any,packet:any)=>{
-            //         driver.handler(client,packet,driver,this,network);
-            //     })
-            //     return {id:driver.id,name:driver.name,ref:driver.ref}
-            // })
-            drivers.forEach(driver=>{
-                driver.services.forEach(service=>{
-                    network.on(service.ref,(client:any,packet:any)=>{
-                        service.handler(client,packet,service,this,network)
-                    })
-                })
+    
+    getDevices(...queries: LocalDatabaseQuery[]): Promise<Device[]> {
+       return this.dbDevice.search(...queries)
+    }
+
+    async adDevice(idvs: DeviceBasic | DeviceBasic[]):Promise<string[]> {
+        console.log(idvs);
+        const _idvs:DeviceBasic[]=toArray(idvs);
+        return this.dbDevice.gets(_idvs.map(i=>i.id))
+        .then(devices=>{
+            const list:string[]=[];
+            _idvs.forEach(idv=>{
+                const _device=devices.find(d=>d.id===idv.id);
+                if(_device) return log("## WARING: already register ",{id:idv.id,name:_device.name});
+                list.push(idv.id);
+                const device=createDeviceFromBasic(idv);
+                this.dbDevice.add(device,false)
             })
+            //commit
+            if(list.length) this.dbDevice.commit();
+            //return
+            return list
         })
     }
+    
 
     /** connect */
     onConnect(eid: string, online: boolean) {
-        this.deviceDb.search({key:'eid',type:'==',value:eid})
+        this.dbDevice.search({key:'eid',type:'==',value:eid})
         .then(devices=>{
             let isCommit:boolean=false; // commit or not (for localdatabaseLite only)
             const value=online?1:0      //value of online or offline in devicevalues
@@ -60,7 +64,7 @@ export default class DriverService extends tEvent implements CommonDriverService
                 const ndevice:DeviceBasic={id:device.id,values:[{id:_ONLINE_KEY,value}]}
                 if(this._updateDevice(device,ndevice)) isCommit=true
             })
-            if(isCommit) this.deviceDb.commit();
+            if(isCommit) this.dbDevice.commit();
         })
         
     }
@@ -68,7 +72,7 @@ export default class DriverService extends tEvent implements CommonDriverService
     /** update device from device */
     onUpdate(idvs: DeviceBasic[]) {
         const ids:string[]=idvs.map(idv=>idv.id)
-        this.deviceDb.gets(ids)
+        this.dbDevice.gets(ids)
         .then(devices=>{
             //check in database
             const nDevices:DeviceBasic[]=[];
@@ -79,14 +83,14 @@ export default class DriverService extends tEvent implements CommonDriverService
                 if(this._updateDevice(device,idv)) isCommit=true;
             })
             // add new device
-            if(nDevices.length) this.addNewDevice(nDevices)
+            if(nDevices.length) this._addNewDevice(nDevices)
             // commit
-            if(isCommit) this.deviceDb.commit();
+            if(isCommit) this.dbDevice.commit();
         })
     }
 
     /** add new device */
-    addNewDevice(idvs:DeviceBasic|DeviceBasic[]){
+    private _addNewDevice(idvs:DeviceBasic|DeviceBasic[]){
         toArray(idvs).forEach(idv=>{
             const pos=this.nDevices.findIndex(d=>d.id===idv.id);
             if(pos==-1) this.nDevices.push(idv);
@@ -144,19 +148,37 @@ export default class DriverService extends tEvent implements CommonDriverService
             }
         })
         //update
-        if(isUpdate) this.deviceDb.add(oDevice,_opts.isCommit);
+        if(isUpdate) this.dbDevice.add(oDevice,_opts.isCommit);
         return isUpdate?true:false;
     }
 
+    private _init(){
+        const networks=getList(this.networks,"id");
+        networks.forEach(id=>{
+            const networkPacket=this.networks.find(n=>n.id===id);
+            if(!networkPacket) return log("## ERROR-001: intenal error");
+            const network=networkPacket.service;
+            const drivers=this.drivers.filter(d=>d.networkId===id);
+            if(!drivers || !drivers.length) return log("## WARNING-002: no support driver networkId:%d, drivers:",id,drivers);
+            drivers.forEach(driver=>{
+                driver.services.forEach(service=>{
+                    network.on(service.ref,(client:any,packet:any)=>{
+                        service.handler(client,packet,service,this,network)
+                    })
+                })
+            })
+        })
+    }
+
     onUpdateBySearch(idv: Partial<Device>, ...queries: LocalDatabaseQuery[]) {
-        this.deviceDb.search(...queries)
+        this.dbDevice.search(...queries)
         .then(devices=>{
             let isCommit:boolean=false;//commit database
             devices.forEach(device=>{
                 const ndevice:DeviceBasic={...device,...idv};
                 if(this._updateDevice(device,ndevice)) isCommit=true;
             });
-            if(isCommit) this.deviceDb.commit();
+            if(isCommit) this.dbDevice.commit();
         })
     }
 
@@ -169,13 +191,41 @@ export default class DriverService extends tEvent implements CommonDriverService
         throw new Error("Method not implemented.");
     }
     register(idvs: DeviceOpt[]) {
-        throw new Error("Method not implemented.");
+        
+    }
+
+    test(msg:string){
+        log("test is success, msg:",msg);
     }
 
 
     
 }
 
+///////////// MINI FUNCTIONS /////////////////
+export function createDeviceFromBasic(idv:DeviceBasic):Device{
+    const tmp:ValuesBasic[]=idv.values||[];
+    const values:DeviceValue[]=[];
+    tmp.forEach(val=>{
+        const value=deviceValueDefault[val.id];
+        if(!value) return log("### WARING: value dont have template ",val);//not find
+        value.value=val.value;
+        values.push(value)
+    })
+    const device:Device={
+        id: idv.id,
+        name: idv.eid || idv.id,
+        eid: idv.eid || "",
+        type: idv.type || _DEFAULT_TYPE,
+        group: idv.group || _DEFAULT_GROUP,
+        values,
+        model: idv.model || "",
+        address: idv.address || "",
+        mac: idv.mac || "",
+        icon: ""
+    }
+    return device
+}
 
 export interface DataChange{
     id:string;

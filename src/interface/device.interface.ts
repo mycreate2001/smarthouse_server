@@ -1,4 +1,4 @@
-import { LocalDatabaseQuery } from "local-database-lite";
+import { LocalDatabaseLite, LocalDatabaseQuery } from "local-database-lite";
 
 /** device */
 export const _DB_DEVICE='devices'
@@ -40,7 +40,9 @@ export interface CommonDriverService{
     remote(device:Device):any; 
     getServices():CommonDriverList[]                    // get service list for authorization
     register(idvs:DeviceOpt[]):any;
-    // nDevices:DeviceBasic[];
+    nDevices:DeviceBasic[];
+    adDevice(idvs:DeviceBasic|DeviceBasic[]):Promise<string[]>;
+    getDevices(...queries:LocalDatabaseQuery[]):Promise<Device[]>
 }
 
 
@@ -53,11 +55,33 @@ export interface CommonDriverList{
     ref:string;             // ref for service
 }
 
-interface DbType<T>{
-    [id:string]:T
+interface DbType<T extends {id:string}>{
+    [id:string]:Omit<T,"id">
 }
 
 
+///////////// values ////////////////
+export const deviceValueDefault:DeviceValueDb={
+    power:{
+        id:"power",
+        type:"list",
+        name: "power",
+        value: 0,
+        isControl: true,
+        listNames:["off","on"]
+    },
+    online:{
+        id:"online",
+        type:"list",
+        name: "online",
+        value: 0,
+        isControl: true,
+        listNames:["offline","online"]
+    }
+}
+export interface DeviceValueDb{
+    [id:string]:DeviceValue
+}
 export type DeviceValue=DeviceValueList|DeviceValueRange
 
 export interface DeviceValueDataCommon{
