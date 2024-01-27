@@ -7,13 +7,5 @@ export default function startup(inf:any,drivers:any[],networks:any[],database:an
 
     /** execute */
     const service=new DriverService(drivers,networks,database);
-    console.log("\n\n**** TEST ***");
-    getProperty(service);
     return service;
 }
-
-function getProperty(abc:any){
-    const list=Object.getOwnPropertyNames(abc)
-    console.log(list);
-}
-

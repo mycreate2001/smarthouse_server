@@ -22,7 +22,7 @@ export default class DeviceService extends tEvent implements CommonDriverService
     constructor(drivers:DriverPacket[],networks:CommonNetworkPacket[],database:LocalDatabaseLite){
         super();
         // log("### test-001:networks/n",networks.map(network=>network.id));
-        log('### test-002: drivers ',drivers);
+        // log('### test-002: drivers ',drivers);
         this.drivers=drivers;
         this.networks=networks;
         this.dbDevice=database.connect(_DB_DEVICE);
@@ -158,7 +158,7 @@ export default class DeviceService extends tEvent implements CommonDriverService
             const networkPacket=this.networks.find(n=>n.id===id);
             if(!networkPacket) return log("## ERROR-001: intenal error");
             const network=networkPacket.service;
-            const drivers=this.drivers.filter(d=>d.networkId===id);
+            const drivers=this.drivers.filter(d=>d.networkIds.includes(id));
             if(!drivers || !drivers.length) return log("## WARNING-002: no support driver networkId:%d, drivers:",id,drivers);
             drivers.forEach(driver=>{
                 driver.services.forEach(service=>{
@@ -170,7 +170,12 @@ export default class DeviceService extends tEvent implements CommonDriverService
         })
     }
 
-    onUpdateBySearch(idv: Partial<Device>, ...queries: LocalDatabaseQuery[]) {
+    onUpdateBySearch(idv: Partial<Device|DeviceBasic>, search:Partial<Device>) {
+        const queries=Object.keys(search).map(key=>{
+            const value=(search as any)[key]
+            const query:LocalDatabaseQuery={key,type:'==',value}
+            return query
+        })
         this.dbDevice.search(...queries)
         .then(devices=>{
             let isCommit:boolean=false;//commit database
@@ -180,12 +185,33 @@ export default class DeviceService extends tEvent implements CommonDriverService
             });
             if(isCommit) this.dbDevice.commit();
         })
+        
+        //new device
+        this.nDevices.filter(ndv=>{
+            const check=Object.keys(search).every(key=>(search as any)[key]===(ndv as any)[key]);
+            if(!check) return;
+            //update
+            Object.assign(ndv,idv);
+        })
     }
 
-    remote(device: Device) {
-        const remote=this.drivers.find(dv=>dv.type===device.type);
-        if(!remote) return log("### ERROR:Not remote service");
-        log("### WARING: not handle")
+    remote(idvs: DeviceBasic|DeviceBasic[],network:CommonNetwork) {
+        // const remote=this.drivers.find(dv=>dv.type===device.type);
+        // if(!remote) return log("### ERROR:Not remote service");
+        // log("### WARING: not handle")
+        const _idvs=toArray(idvs);
+        log("remote ",{idvs:_idvs.map(i=>i.id)})
+        const ids=_idvs.map(d=>d.id);
+        this.dbDevice.gets(ids)
+        .then(devices=>{
+            _idvs.forEach(idv=>{
+                const device=devices.find(d=>d.id===idv.id);
+                if(!device) return log("### WARNING: not inside database ",idv);
+                const remote=this.drivers.find(dv=>dv.type===device.type);
+                if(!remote) return log("### WARING: No method for remote ",{drivers:this.drivers,idv});
+                remote.control.power({...idv,type:device.type},network);
+            })
+        })
     }
     getServices(): CommonDriverList[] {
         throw new Error("Method not implemented.");

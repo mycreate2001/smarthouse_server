@@ -1,4 +1,5 @@
 import { LocalDatabaseLite, LocalDatabaseQuery } from "local-database-lite";
+import { CommonNetwork } from "./network.interface";
 
 /** device */
 export const _DB_DEVICE='devices'
@@ -13,6 +14,12 @@ export interface Device{
     model:string;
     address:string;             // ip or mac
     mac:string;
+}
+
+export interface DeviceRemote{
+    id:string;
+    type:string;
+    values:DeviceValue[]
 }
 // can update from device
 export const deviceUpdateList:string[]="address".split(",")
@@ -35,9 +42,9 @@ export interface CommonDriverService{
     /** event from device */
     onConnect(eid:string,online:boolean):any;        // handle connect
     onUpdate(devices:DeviceBasic[]):any;             // update values of device
-    onUpdateBySearch(idv:Partial<Device>,...queries:LocalDatabaseQuery[]):any;
+    onUpdateBySearch(idv:Partial<Device|DeviceBasic>,obj:Partial<Device|DeviceBasic>):any;
     /** control */
-    remote(device:Device):any; 
+    remote(idvs:DeviceRemote|DeviceRemote[],network:CommonNetwork):any; 
     getServices():CommonDriverList[]                    // get service list for authorization
     register(idvs:DeviceOpt[]):any;
     nDevices:DeviceBasic[];
@@ -56,11 +63,14 @@ export interface CommonDriverList{
 }
 
 interface DbType<T extends {id:string}>{
-    [id:string]:Omit<T,"id">
+    [id:string]:T
 }
 
 
 ///////////// values ////////////////
+export type DeviceValueIds=keyof typeof deviceValueDefault
+// export type DeviceValueDb= DbType<[id:DeviceValueType]:any
+export type DeviceValueDb=DbType<DeviceValue>
 export const deviceValueDefault:DeviceValueDb={
     power:{
         id:"power",
@@ -77,11 +87,34 @@ export const deviceValueDefault:DeviceValueDb={
         value: 0,
         isControl: true,
         listNames:["offline","online"]
-    }
+    },
+    temp:{
+        id:"temp",
+        type:"range",
+        name: "Temperature",
+        value: 0,
+        isControl: false,
+        range:[0,100]
+    },
+    humi:{
+        id:"humi",
+        type:"range",
+        name: "Humidity",
+        value: 0,
+        isControl: false,
+        range:[0,100]
+    },
+    network:{
+        id:"network",
+        type:"range",
+        name: "LinkQuality",
+        value: 0,
+        isControl: false,
+        range:[0,200]
+    },
 }
-export interface DeviceValueDb{
-    [id:string]:DeviceValue
-}
+
+
 export type DeviceValue=DeviceValueList|DeviceValueRange
 
 export interface DeviceValueDataCommon{

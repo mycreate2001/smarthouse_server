@@ -20,9 +20,9 @@ export default class SocketService extends Event implements CommonNetwork{
             ws.id=uuid();
             ws.subs=[];
             const uid:string=toArray(req.headers.uid).join("") ||"";
-            const pass:string=toArray(req.headers.pass).join("")||""
+            const pass:string=toArray(req.headers.pass).join("")||"";
             // login
-            if(this.authenticate && typeof this.authenticate=='function'){
+            if(req.headers.uid && this.authenticate && typeof this.authenticate=='function'){
                 this.authenticate(ws,uid,pass,(err,success)=>{
                     if(err ||!success) {
                         log("%d login falred {uid:%s,pass:%s}",ws.id,uid,pass);
@@ -32,7 +32,7 @@ export default class SocketService extends Event implements CommonNetwork{
             }
             
             ws.on("message",(rawMsg)=>{
-                const callbacks=[parserJSON,subscribe(this),handleTopic(this)];
+                const callbacks=[parserJSON,subscribe(this),login(this),loginByToken(this),handleTopic(this)];
                 runCallback(callbacks,0,ws,rawMsg.toString())
             })
 
@@ -57,8 +57,9 @@ export default class SocketService extends Event implements CommonNetwork{
     }
 
     authenticate: CommonAuthenticate=(client,uid,pass,callback)=>{
-        if(uid!=='admin' || pass!=='admin') return callback(null,false);
-        // debug(1,"%d login {uid:%s,pass:%s}",client.id,uid,pass);
+        // if(uid!=='admin' || pass!=='admin') return callback(null,false);
+        log("%d login success",client.id,{uid,pass});
+        log("%d bypass login","WARING: ")
         callback(null,true);
     }
     authorizePublish: CommonAuthorizePublish=(client,packet,callback)=>{
@@ -75,6 +76,18 @@ export default class SocketService extends Event implements CommonNetwork{
         const _payload:string=typeof payload==='string'?payload:JSON.stringify(payload)
         const packet:Packet=createPacket({...opts,payload:_payload,topic})
         this.emit(topic,null,packet)
+    }
+
+    authByToken(client:CommonClient,token:string,cb:(err:any,success?:boolean)=>void){
+        log("%d login by token success ",client.id,{token});
+        log("%d bypass by default","### WARNING:");
+        const send=(client as any).send;
+        if(send && typeof send==='function'){
+            const payload:string=JSON.stringify({code:0,data:[]})
+            const packet=createPacket({topic:'login-res',payload})
+            send(packet)
+        }
+        cb(null,true);
     }
 
     _subscribe(client: SocketExt, subs: Subscription | Subscription[]): void {
@@ -113,7 +126,7 @@ function parserJSON(ws:SocketExt,msg:string,next:Function){
         return next(ws,obj);
     }
     catch(err){
-        log("parserJSON: ### ERROR ###\n\t\t",err);
+        log("parserJSON: ### ERROR ###\n\t\t",err,"\n",msg);
         return ws.send(JSON.stringify({error:1,msg:"you message is wrong format"}));
     }
 }
@@ -148,6 +161,38 @@ function subscribe(service:SocketService){
         if(topic!==_SUBSCRIBE_KEY) return next(ws,packet)
         const subs:Subscription|Subscription[]=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
         service._subscribe(ws,subs)
+    }
+}
+
+/** handle login */
+const _LOGIN_KEY="login"
+function login(service:SocketService){
+    return (ws:SocketExt,packet:Packet,next:Function)=>{
+        const topic=packet.topic||""
+        if(topic!==_LOGIN_KEY) return next(ws,packet)
+        const {uid,pass}=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
+        service.authenticate(ws,uid,pass,(err,success)=>{
+            if(err ||!success) {
+                log("%d login falred {uid:%s,pass:%s}",ws.id,uid,pass);
+                return ws.close();
+            }
+        })
+    }
+}
+
+/** handle login */
+const _LOGIN_BYTOKEN_KEY="login-by-token"
+function loginByToken(service:SocketService){
+    return (ws:SocketExt,packet:Packet,next:Function)=>{
+        const topic=packet.topic||""
+        if(topic!==_LOGIN_BYTOKEN_KEY) return next(ws,packet)
+        const {token}=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
+        service.authByToken(ws,token,(err,success)=>{
+            if(err||!success){
+                log("%d login falred {token:%s}",ws.id,token);
+                ws.close();
+            }
+        })
     }
 }
 

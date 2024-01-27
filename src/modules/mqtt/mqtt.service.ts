@@ -89,6 +89,7 @@ export default class MqttService implements CommonNetwork{
     }
     publish(topic: string, payload: string | object, opts: Partial<Packet>={}): void {
         payload=payload||""
+        log("publish / ### TEST-001: start ",{topic,payload})
         const _payload:string=typeof payload!=='string'?JSON.stringify(payload):payload
         const packet:PublishPacket=Object.assign({},_PACKET_DEFAULT,opts,{payload:_payload,topic});
         this.mqtt.publish(packet,(err)=>{

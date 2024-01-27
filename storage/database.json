@@ -130,6 +130,15 @@
             "params": {},
             "imports": {}
         },
+        "tasmota-zigbee":{
+            "name": "tasmota for zigbee",
+            "path": "drivers/tasmota-zigbee.js",
+            "type": "module",
+            "level": 1,
+            "keys": "driver/tasmota-zigbee",
+            "params": {},
+            "imports": {}
+        },
         "api-v1": {
             "name": "tasmota",
             "path": "drivers/api-1",
@@ -167,47 +176,115 @@
         }
     },
     "devices": {
-        "tasmota_E8DB8494ED16@1": {
-            "name": "tasmota_E8DB8494ED16",
-            "eid": "tasmota_E8DB8494ED16",
-            "type": "unknown",
+        "E8DB8494ED16@1": {
+            "name": "E8DB8494ED16",
+            "eid": "E8DB8494ED16",
+            "type": "tasmota-basic",
             "group": "default",
-            "values": [],
+            "values": [
+                {
+                    "name": "online",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "online",
+                    "value": 1
+                },
+                {
+                    "name": "power",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "power",
+                    "value": 0
+                }
+            ],
             "model": "Sonoff 4CHPROR3",
-            "address": "192.168.137.136",
+            "address": "192.168.137.188",
             "mac": "E8DB8494ED16",
             "icon": ""
         },
-        "tasmota_E8DB8494ED16@2": {
-            "name": "tasmota_E8DB8494ED16",
-            "eid": "tasmota_E8DB8494ED16",
-            "type": "unknown",
+        "E8DB8494ED16@2": {
+            "name": "E8DB8494ED16",
+            "eid": "E8DB8494ED16",
+            "type": "tasmota-basic",
             "group": "default",
-            "values": [],
+            "values": [
+                {
+                    "name": "online",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "online",
+                    "value": 1
+                },
+                {
+                    "name": "power",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "power",
+                    "value": 0
+                }
+            ],
             "model": "Sonoff 4CHPROR3",
-            "address": "192.168.137.136",
+            "address": "192.168.137.188",
             "mac": "E8DB8494ED16",
             "icon": ""
         },
-        "tasmota_E8DB8494ED16@3": {
-            "name": "tasmota_E8DB8494ED16",
-            "eid": "tasmota_E8DB8494ED16",
-            "type": "unknown",
+        "E8DB8494ED16@3": {
+            "name": "E8DB8494ED16",
+            "eid": "E8DB8494ED16",
+            "type": "tasmota-basic",
             "group": "default",
-            "values": [],
+            "values": [
+                {
+                    "name": "online",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "online",
+                    "value": 1
+                },
+                {
+                    "name": "power",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "power",
+                    "value": 0
+                }
+            ],
             "model": "Sonoff 4CHPROR3",
-            "address": "192.168.137.136",
+            "address": "192.168.137.188",
             "mac": "E8DB8494ED16",
             "icon": ""
         },
-        "tasmota_E8DB8494ED16@4": {
-            "name": "tasmota_E8DB8494ED16",
-            "eid": "tasmota_E8DB8494ED16",
-            "type": "unknown",
+        "E8DB8494ED16@4": {
+            "name": "E8DB8494ED16",
+            "eid": "E8DB8494ED16",
+            "type": "tasmota-basic",
             "group": "default",
-            "values": [],
+            "values": [
+                {
+                    "name": "online",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "online",
+                    "value": 1
+                },
+                {
+                    "name": "power",
+                    "type": "range",
+                    "range": [],
+                    "isControl": true,
+                    "id": "power",
+                    "value": 0
+                }
+            ],
             "model": "Sonoff 4CHPROR3",
-            "address": "192.168.137.136",
+            "address": "192.168.137.188",
             "mac": "E8DB8494ED16",
             "icon": ""
         }
