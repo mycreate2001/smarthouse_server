@@ -1,30 +1,38 @@
 import { getParams, toArray } from "ultility-tools";
-import { DriverControl, DriverHook, DriverPacket } from "../../interface/device-service.interface";
+import { DriverControl, DriverHook, DriverHookDb, DriverPacket } from "../../interface/device-service.interface";
 import { createLog } from "advance-log";
-import { DeviceBasic,DeviceRemote } from "../../interface/device.interface";
+import { Device, DeviceBasic,DeviceRemote } from "../../interface/device.interface";
 import { CommonNetwork } from '../../interface/network.interface'
 const _TYPE='tasmota-basic'
-const log=createLog(_TYPE)
+const _log=createLog(_TYPE)
 const _NETWORK_IDs=['mqtt']
 const _SEPARATE_KEY="@"
 const _FEED_BACK_TOPIC="_fb"
-const services:DriverHook[]=[
-    {
-        id:'connect',
+// const log=(msg)
+const log=(infor:DriverHook,msg:any,...data:any)=>{
+    _log(infor.id+" "+msg,...data)
+}
+const services:DriverHookDb={
+    connect:{
+        type:'connect',
         name:'tasmota connect',
         ref:'tele/:eid/LWT',
         handler(client, packet, infor, driverService, network) {
+            log(infor,packet.payload);
             const topic=packet.topic
             const eid:string=getParams(topic,infor.ref)['eid'];
-            const online=packet.payload.toLowerCase()==='online'?true:false
-            driverService.onConnect(eid,online)
+            const value=packet.payload.toLowerCase()==='online'?1:0
+            const device:Partial<DeviceBasic>={values:[{id:'online',value}]}
+            const search:Partial<Device>={eid,type:_TYPE}
+            driverService.onUpdateBySearch(device,search)
         },
     },
-    {
-        id:'update',
+    updateConfig:{
+        type:'update',
         name:"update config",
         ref:'tasmota/discovery/:eid/config',
         handler(client, packet, infor, driverService, network) {
+            log(infor,"start ",packet.payload);
             const payload=packet.payload;
             // log("config/test1 ",payload);
             const equipment=getEquipment(JSON.parse(payload));
@@ -32,44 +40,34 @@ const services:DriverHook[]=[
             driverService.onUpdate(devices);
         },
     },
-    {
-        id:'update',
+    updatePower: {
+        type:'update',
         name:"update power",
         ref:'tele/:eid/STATE',
         handler(client, packet, infor, driverService, network) {
+            log(infor,"start ",packet.payload);
             const payload=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload;
             const eid=getParams(packet.topic,infor.ref)['eid']
             const devices=getUpdatePower(payload,eid);
-            log("update devices ",devices);
+            log(infor,"update devices ",devices);
             driverService.onUpdate(devices);
         },
     },
-    {
-        id:'update',
+    updatePower2:{
+        type:'update',
         name:"update power",
         ref:'stat/:eid/RESULT',
         handler(client, packet, infor, driverService, network) {
+            log(infor,"start ",packet.payload);
             const payload=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload;
             const eid=getParams(packet.topic,infor.ref)['eid']
             const devices=getUpdatePower(payload,eid);
-            log("update devices ",devices);
+            log(infor, "update devices ",devices);
             driverService.onUpdate(devices);
         },
     },
-    //{"Info1":{"Module":"Sonoff 4CHPROR3","Version":"13.3.0(tasmota)","FallbackTopic":"cmnd/E8DB8494ED16_fb/","GroupTopic":"cmnd/tasmotas/"}}
-    // {
-    //     id:'update',
-    //     name:"update power",
-    //     ref:'stat/:eid/RESULT',
-    //     handler(client, packet, infor, driverService, network) {
-    //         const payload=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload;
-    //         const eid=getParams(packet.topic,infor.ref)['eid']
-    //         const devices=getUpdatePower(payload,eid);
-    //         log("update devices ",devices);
-    //         driverService.onUpdate(devices);
-    //     },
-    // }
-];
+
+};
 
 const control:DriverControl={
     power(idvs:DeviceRemote|DeviceRemote[],network:CommonNetwork){

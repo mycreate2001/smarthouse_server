@@ -1,6 +1,6 @@
 import { DataConnect, LocalDatabaseLite, LocalDatabaseQuery } from "local-database-lite";
 import { CommonDriverList, CommonDriverService, Device, DeviceBasic, DeviceOpt, DeviceValue, ValuesBasic, _DB_DEVICE, deviceUpdateList, deviceValueDefault } from "../../interface/device.interface";
-import { DriverPacket } from "../../interface/device-service.interface";
+import { DriverHook, DriverPacket } from "../../interface/device-service.interface";
 import { CommonClient, CommonNetwork, CommonNetworkPacket } from "../../interface/network.interface";
 import { createOption, getList, toArray } from "ultility-tools";
 import { createLog } from "advance-log";
@@ -20,7 +20,7 @@ export default class DeviceService extends tEvent implements CommonDriverService
     dbDevice:DataConnect<Device>;
     nDevices:DeviceBasic[]=[];
     constructor(drivers:DriverPacket[],networks:CommonNetworkPacket[],database:LocalDatabaseLite){
-        super();
+        super(true);
         // log("### test-001:networks/n",networks.map(network=>network.id));
         // log('### test-002: drivers ',drivers);
         this.drivers=drivers;
@@ -161,7 +161,8 @@ export default class DeviceService extends tEvent implements CommonDriverService
             const drivers=this.drivers.filter(d=>d.networkIds.includes(id));
             if(!drivers || !drivers.length) return log("## WARNING-002: no support driver networkId:%d, drivers:",id,drivers);
             drivers.forEach(driver=>{
-                driver.services.forEach(service=>{
+                Object.keys(driver.services).forEach(serviceId=>{
+                    const service:DriverHook={...driver.services[serviceId],id:serviceId}
                     network.on(service.ref,(client:any,packet:any)=>{
                         service.handler(client,packet,service,this,network)
                     })

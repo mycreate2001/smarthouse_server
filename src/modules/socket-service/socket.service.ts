@@ -2,7 +2,7 @@ import { WebSocket, WebSocketServer } from "ws";
 import { CommonAuthenticate, CommonAuthorizePublish, CommonAuthorizeSubscribe, CommonClient, CommonHandleAuthSub, CommonNetwork, CommonNetworkConnect, CommonOnMessage, Packet, SubscripStd, Subscription, createPacket } from "../../interface/network.interface";
 
 import { createDebug, createLog } from "advance-log";
-import { Event, toArray, uuid,runCallback } from "ultility-tools";
+import { tEvent, toArray, uuid,runCallback } from "ultility-tools";
 import { Qos } from "../../interface/websocket.interface";
 const _SYSTEM_KEY="$"
 
@@ -10,11 +10,11 @@ const _LABEL="SocketService"
 const log=createLog(_LABEL,{enablePos:true});
 const debug=createDebug(_LABEL,1);
 
-export default class SocketService extends Event implements CommonNetwork{
+export default class SocketService extends tEvent implements CommonNetwork{
     wss!:WebSocketServer;
     db:any={}
     constructor(socket:WebSocketServer){
-        super();
+        super(true);
         this.wss=socket;
         this.wss.on("connection",(ws:SocketExt,req)=>{
             ws.id=uuid();

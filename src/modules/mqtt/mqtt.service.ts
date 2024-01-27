@@ -22,7 +22,7 @@ const _PACKET_DEFAULT:PublishPacket={
 
 export default class MqttService implements CommonNetwork{
     mqtt:Aedes.Aedes
-    event=new tEvent();
+    event=new tEvent(true);
     port:number;
     constructor(port:number,callback?:()=>void){
         const mqtt=new Aedes.default();

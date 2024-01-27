@@ -1,12 +1,12 @@
 import { createLog } from "advance-log";
 import { CommonDriverService, DeviceBasic, DeviceValueDataCommon } from "../../interface/device.interface";
-import { DriverControl, DriverHook, DriverPacket } from "../../interface/device-service.interface";
+import { DriverControl, DriverHook, DriverHookDb, DriverPacket } from "../../interface/device-service.interface";
 const log=createLog("API V1",{enablePos:true})
 const _TYPE='api-v1'
 const _NETWORK_ID='mqtt,websocket'.split(",");
-const services:DriverHook[]=[
-    {
-        id:'get-new-devices',
+const services:DriverHookDb={
+    getNewDevices:{
+        type:'get-new-devices',
         name:'get new devices',
         ref:'api/v1/ndevice/req',
         handler(client, packet, infor, driverService, network){
@@ -14,8 +14,8 @@ const services:DriverHook[]=[
             // network.publish('api1/ndevice/result',ndevices);
         },
     },
-    {
-        id:'register',
+    register:{
+        type:'register',
         name:'register device',
         ref:'api/v1/register',
         handler(client, packet, infor, driverService, network) {
@@ -23,8 +23,8 @@ const services:DriverHook[]=[
             driverService.adDevice(devices).then(list=>log("#update devices ",list))
         }
     },
-    {
-        id:'get-device',
+    getDevice:{
+        type:'get-device',
         name:'get devices',
         ref:'api/v1/infor',
         handler(client, packet, infor, driverService, network) {
@@ -41,8 +41,8 @@ const services:DriverHook[]=[
             }
         }
     },
-    {
-        id:'remote',
+    remote: {
+        type:'remote',
         name:'remote control',
         ref:'api/:eid/remote',
         handler(client, packet, infor, driverService, network) {
@@ -58,7 +58,7 @@ const services:DriverHook[]=[
             }
         },
     }
-]
+}
 const control:DriverControl={}
 
 ////// main ////////////////////
