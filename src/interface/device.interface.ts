@@ -19,6 +19,8 @@ export interface Device{
 export interface DeviceRemote{
     id:string;
     type:string;
+    eid:string;
+    address:string;
     values:DeviceValue[]
 }
 // can update from device
@@ -41,14 +43,13 @@ export type DeviceOpt=Partial<Device> &{id:string}
 export interface CommonDriverService{
     /** event from device */
     onConnect(eid:string,online:boolean):any;        // handle connect
-    onUpdate(devices:DeviceBasic[]):any;             // update values of device
-    onUpdateBySearch(idv:Partial<Device|DeviceBasic>,obj:Partial<Device|DeviceBasic>):any;
+    onUpdate(devices:DeviceBasic[],label?:string):any;             // update values of device
+    onUpdateBySearch(idv:Partial<Device|DeviceBasic>,obj:Partial<Device|DeviceBasic>,label?:string):any;
     /** control */
-    remote(idvs:DeviceRemote|DeviceRemote[],network:CommonNetwork):any; 
+    remote(idvs:DeviceRemote|DeviceRemote[],network:CommonNetwork,label?:string):any; 
     getServices():CommonDriverList[]                    // get service list for authorization
-    register(idvs:DeviceOpt[]):any;
     nDevices:DeviceBasic[];
-    adDevice(idvs:DeviceBasic|DeviceBasic[]):Promise<string[]>;
+    register(idvs:DeviceBasic|DeviceBasic[]):Promise<string[]>;
     getDevices(...queries:LocalDatabaseQuery[]):Promise<Device[]>
 }
 
@@ -112,6 +113,31 @@ export const deviceValueDefault:DeviceValueDb={
         isControl: false,
         range:[0,200]
     },
+    contact:{
+        id:'contact',
+        type:'list',
+        name:'contact',
+        isControl:false,
+        listNames:["open","close"],
+        value:0
+    },
+    batt:{
+        id:'batt',
+        type:'range',
+        name:'Battery',
+        unit:'%',
+        isControl:false,
+        range:[0,100],
+        value:0
+    },
+    dimmer:{
+        id:'dimmer',
+        name:'Dimmer',
+        type:'range',
+        isControl:false,
+        range:[0,200],
+        value:0 
+    }
 }
 
 

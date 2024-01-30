@@ -33,7 +33,7 @@ export default class DeviceService extends tEvent implements CommonDriverService
        return this.dbDevice.search(...queries)
     }
 
-    async adDevice(idvs: DeviceBasic | DeviceBasic[]):Promise<string[]> {
+    async register(idvs: DeviceBasic | DeviceBasic[]):Promise<string[]> {
         console.log(idvs);
         const _idvs:DeviceBasic[]=toArray(idvs);
         return this.dbDevice.gets(_idvs.map(i=>i.id))
@@ -70,7 +70,9 @@ export default class DeviceService extends tEvent implements CommonDriverService
     }
 
     /** update device from device */
-    onUpdate(idvs: DeviceBasic[]) {
+    onUpdate(idvs: DeviceBasic[],label:string="") {
+        label=makeLabel(label,"onUpdate");
+        log("%d %s",label,JSON.stringify(idvs))
         const ids:string[]=idvs.map(idv=>idv.id)
         this.dbDevice.gets(ids)
         .then(devices=>{
@@ -83,20 +85,21 @@ export default class DeviceService extends tEvent implements CommonDriverService
                 if(this._updateDevice(device,idv)) isCommit=true;
             })
             // add new device
-            if(nDevices.length) this._addNewDevice(nDevices)
+            if(nDevices.length) this._addNewDevice(nDevices,label)
             // commit
             if(isCommit) this.dbDevice.commit();
         })
     }
 
     /** add new device */
-    private _addNewDevice(idvs:DeviceBasic|DeviceBasic[]){
+    private _addNewDevice(idvs:DeviceBasic|DeviceBasic[],label:string=''){
+        label=[label,"_upDevice"].join("/");
         toArray(idvs).forEach(idv=>{
             const pos=this.nDevices.findIndex(d=>d.id===idv.id);
             if(pos==-1) this.nDevices.push(idv);
             else Object.assign(this.nDevices[pos],idv);
         })
-        log("update new device ",this.nDevices);
+        log("%dupdate new device %s",label,JSON.stringify(this.nDevices));
     }
 
     /**
@@ -106,7 +109,9 @@ export default class DeviceService extends tEvent implements CommonDriverService
      * @param opts 
      * @returns true=need to update, false not update
      */
-    private _updateDevice(oDevice:Device,nDevice:DeviceBasic,opts:Partial<UpdateDeviceInput>={}):boolean{
+    private _updateDevice(oDevice:Device,nDevice:DeviceBasic,opts:Partial<UpdateDeviceInput>={},label:string=""):boolean{
+        label=makeLabel(label,"_upDevice");
+        log("%d init %s",label,JSON.stringify({oDevice,nDevice}))
         const _opts=createUpdateDeviceInput(opts);
         let isUpdate:boolean=false;
         //update value
@@ -148,8 +153,11 @@ export default class DeviceService extends tEvent implements CommonDriverService
             }
         })
         //update
-        if(isUpdate) this.dbDevice.add(oDevice,_opts.isCommit);
-        return isUpdate?true:false;
+        if(isUpdate) {
+            log("%d update %s",label,JSON.stringify(oDevice))
+            this.dbDevice.add(oDevice,_opts.isCommit);
+        }
+        return isUpdate;
     }
 
     private _init(){
@@ -171,7 +179,9 @@ export default class DeviceService extends tEvent implements CommonDriverService
         })
     }
 
-    onUpdateBySearch(idv: Partial<Device|DeviceBasic>, search:Partial<Device>) {
+    onUpdateBySearch(idv: Partial<Device|DeviceBasic>, search:Partial<DeviceBasic>,label:string='') {
+        label=makeLabel(label,"upBySearch");
+        log("%d %s",label,JSON.stringify({idv,search}))
         const queries=Object.keys(search).map(key=>{
             const value=(search as any)[key]
             const query:LocalDatabaseQuery={key,type:'==',value}
@@ -182,7 +192,7 @@ export default class DeviceService extends tEvent implements CommonDriverService
             let isCommit:boolean=false;//commit database
             devices.forEach(device=>{
                 const ndevice:DeviceBasic={...device,...idv};
-                if(this._updateDevice(device,ndevice)) isCommit=true;
+                if(this._updateDevice(device,ndevice),label) isCommit=true;
             });
             if(isCommit) this.dbDevice.commit();
         })
@@ -192,16 +202,16 @@ export default class DeviceService extends tEvent implements CommonDriverService
             const check=Object.keys(search).every(key=>(search as any)[key]===(ndv as any)[key]);
             if(!check) return;
             //update
-            Object.assign(ndv,idv);
+            const after=Object.assign({},ndv,idv)
+            log("%d update un-register devices %s",label,JSON.stringify({before:ndv,after}))
+           ndv=after;
         })
     }
 
-    remote(idvs: DeviceBasic|DeviceBasic[],network:CommonNetwork) {
-        // const remote=this.drivers.find(dv=>dv.type===device.type);
-        // if(!remote) return log("### ERROR:Not remote service");
-        // log("### WARING: not handle")
+    remote(idvs: DeviceBasic|DeviceBasic[],network:CommonNetwork,label:string='') {
+        label=makeLabel(label,"remote");
         const _idvs=toArray(idvs);
-        log("remote ",{idvs:_idvs.map(i=>i.id)})
+        log("%d remote %s",label,JSON.stringify(idvs))
         const ids=_idvs.map(d=>d.id);
         this.dbDevice.gets(ids)
         .then(devices=>{
@@ -210,15 +220,13 @@ export default class DeviceService extends tEvent implements CommonDriverService
                 if(!device) return log("### WARNING: not inside database ",idv);
                 const remote=this.drivers.find(dv=>dv.type===device.type);
                 if(!remote) return log("### WARING: No method for remote ",{drivers:this.drivers,idv});
-                remote.control.power({...idv,type:device.type},network);
+                // remote.control.power({...idv,type:device.type},network);
+                remote.control.power({...device,idv},network);
             })
         })
     }
     getServices(): CommonDriverList[] {
         throw new Error("Method not implemented.");
-    }
-    register(idvs: DeviceOpt[]) {
-        
     }
 
     test(msg:string){
@@ -252,6 +260,10 @@ export function createDeviceFromBasic(idv:DeviceBasic):Device{
         icon: ""
     }
     return device
+}
+
+function makeLabel(...labels:string[]):string{
+    return labels.filter(l=>!!l).join("/")
 }
 
 export interface DataChange{

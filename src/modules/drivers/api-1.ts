@@ -20,7 +20,7 @@ const services:DriverHookDb={
         ref:'api/v1/register',
         handler(client, packet, infor, driverService, network) {
             const {devices}=JSON.parse(packet.payload)
-            driverService.adDevice(devices).then(list=>log("#update devices ",list))
+            driverService.register(devices).then(list=>log("#update devices ",list))
         }
     },
     getDevice:{
