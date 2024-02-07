@@ -9,6 +9,13 @@ const _SYSTEM_KEY="$"
 const _LABEL="SocketService"
 const log=createLog(_LABEL,{enablePos:true});
 const debug=createDebug(_LABEL,1);
+const _PRIVATE_KEY="private"; //
+const _LOGINBYTOKEN_REPLY="login-res"; //
+const APIs={
+    loginByToken:'login-by-token',
+    replyPrivate:'private',
+    loginReply:'login-res'
+}
 
 export default class SocketService extends tEvent implements CommonNetwork{
     wss!:WebSocketServer;
@@ -19,9 +26,10 @@ export default class SocketService extends tEvent implements CommonNetwork{
         this.wss.on("connection",(ws:SocketExt,req)=>{
             ws.id=uuid();
             ws.subs=[];
+            this._subscribe(ws,`${APIs.replyPrivate}/${ws.id}/#`)
             const uid:string=toArray(req.headers.uid).join("") ||"";
             const pass:string=toArray(req.headers.pass).join("")||"";
-            // login
+            // login1
             if(req.headers.uid && this.authenticate && typeof this.authenticate=='function'){
                 this.authenticate(ws,uid,pass,(err,success)=>{
                     if(err ||!success) {
@@ -61,8 +69,10 @@ export default class SocketService extends tEvent implements CommonNetwork{
         log("%d login success",client.id,{uid,pass});
         log("%d bypass login","WARING: ")
         callback(null,true);
+        // this.publish(`${_PRIVATE_KEY}/${client.id}/${APIs.loginReply}`,{})
     }
     authorizePublish: CommonAuthorizePublish=(client,packet,callback)=>{
+        log("%d check publish %s =>%s, %d",client.id,packet.topic,"success","WARINING: bypass");
         callback(null);
     }
     authSubscribe: CommonAuthorizeSubscribe=(client,sub,callback)=>{
@@ -81,15 +91,15 @@ export default class SocketService extends tEvent implements CommonNetwork{
     authByToken(client:CommonClient,token:string,cb:(err:any,success?:boolean)=>void){
         log("%d login by token success ",client.id,{token});
         log("%d bypass by default","### WARNING:");
-        const send=(client as any).send;
-        if(send && typeof send==='function'){
-            const payload:string=JSON.stringify({code:0,data:[]})
-            const packet=createPacket({topic:'login-res',payload})
-            send(packet)
-        }
+        this.publish(`${_PRIVATE_KEY}/${client.id}/${_LOGINBYTOKEN_REPLY}`,{token})
         cb(null,true);
     }
 
+    /**
+     * subscribe topic for client from server,bypass sercurity
+     * @param client 
+     * @param subs 
+     */
     _subscribe(client: SocketExt, subs: Subscription | Subscription[]): void {
         const _subs:SubscripStd[]=toArray(subs).map(sub=>correctSubsciption(sub));
         const list:string[]=[];
@@ -126,7 +136,9 @@ function parserJSON(ws:SocketExt,msg:string,next:Function){
         return next(ws,obj);
     }
     catch(err){
-        log("parserJSON: ### ERROR ###\n\t\t",err,"\n",msg);
+        const _msg:string=err instanceof Error?err.message:"other"
+        log("### ERROR: %s\n",_msg);
+        log(" ++++ debug ++++\n",{msg,err})
         return ws.send(JSON.stringify({error:1,msg:"you message is wrong format"}));
     }
 }
@@ -171,11 +183,16 @@ function login(service:SocketService){
         const topic=packet.topic||""
         if(topic!==_LOGIN_KEY) return next(ws,packet)
         const {uid,pass}=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
-        service.authenticate(ws,uid,pass,(err,success)=>{
+        service.authenticate(ws,uid,pass,(err,success,user)=>{
             if(err ||!success) {
                 log("%d login falred {uid:%s,pass:%s}",ws.id,uid,pass);
                 return ws.close();
             }
+            //send token @@@
+            const payload=JSON.stringify({error:0,msg:'login success',user})
+            const packet=createPacket({payload,topic:`${_PRIVATE_KEY}/${ws.id}/${APIs.loginReply}`})
+            log("### TEST ### \npacket:",packet)
+            ws.send(JSON.stringify(packet))
         })
     }
 }

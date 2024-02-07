@@ -33,7 +33,7 @@ export type CommonAuthorizeSubscribe =(client:CommonClient,subs:Subscription,cal
 
 export type CommonHandleAuthPub=(err:any)=>void
 export type CommonHandleAuthSub=(err:any|null,sub:SubscripStd|undefined)=>void;
-export type CommonHandleAuth=(error:any,sucess:boolean)=>void;
+export type CommonHandleAuth=(error:any,sucess:boolean,user?:any)=>void;
 export interface PublishOption{
     timeout_sec:number;
 }

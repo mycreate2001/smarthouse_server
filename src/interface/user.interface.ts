@@ -27,7 +27,7 @@ export interface UserGroup{
 
 
 export interface UserServiceData{
-    login(uid:string,pass:string):Promise<UserDataExt>
+    login(uid:string,pass:string):Promise<UserDataExt> ;//login failred =>error
     register(user:Partial<UserData>&{id:string,pass:string}):Promise<UserDataExt>;
     registerGroup(group:Partial<UserGroup>&{id:string}):Promise<UserGroup>
     loginByToken(token:string):Promise<UserDataExt>;
