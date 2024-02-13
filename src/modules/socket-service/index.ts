@@ -5,7 +5,7 @@ import SocketService from "./socket.service";
 import { CommonNetworkPacket } from "../../interface/network.interface";
 import { ModulePackage } from "module-loader/interface";
 
-const _NETWORK_ID="webswocket"
+const _NETWORK_ID="websocket"
 
 export default function startup(infor:ModulePackage,websocket:WebSocketServer):CommonNetworkPacket{
     //1. input & verify

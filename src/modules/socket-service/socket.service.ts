@@ -1,14 +1,15 @@
 import { WebSocket, WebSocketServer } from "ws";
-import { CommonAuthenticate, CommonAuthorizePublish, CommonAuthorizeSubscribe, CommonClient, CommonHandleAuthSub, CommonNetwork, CommonNetworkConnect, CommonOnMessage, Packet, SubscripStd, Subscription, createPacket } from "../../interface/network.interface";
+import { CommonAuthenticate, CommonAuthorizePublish, CommonAuthorizeSubscribe, CommonClient, CommonErrorHandle, CommonHandleAuthSub, CommonNetwork, CommonNetworkConnect, CommonOnMessage, Packet, SubscripStd, Subscription, createPacket } from "../../interface/network.interface";
 
-import { createDebug, createLog } from "advance-log";
+import { createLog } from "advance-log";
 import { tEvent, toArray, uuid,runCallback } from "ultility-tools";
 import { Qos } from "../../interface/websocket.interface";
+import { UserData, UserDataExt } from "../../interface/user.interface";
 const _SYSTEM_KEY="$"
 
 const _LABEL="SocketService"
 const log=createLog(_LABEL,{enablePos:true});
-const debug=createDebug(_LABEL,1);
+// const debug=createDebug(_LABEL,1);
 const _PRIVATE_KEY="private"; //
 const _LOGINBYTOKEN_REPLY="login-res"; //
 const APIs={
@@ -19,6 +20,7 @@ const APIs={
 
 export default class SocketService extends tEvent implements CommonNetwork{
     wss!:WebSocketServer;
+    messageId:number=0;
     db:any={}
     constructor(socket:WebSocketServer){
         super(true);
@@ -26,7 +28,8 @@ export default class SocketService extends tEvent implements CommonNetwork{
         this.wss.on("connection",(ws:SocketExt,req)=>{
             ws.id=uuid();
             ws.subs=[];
-            this._subscribe(ws,`${APIs.replyPrivate}/${ws.id}/#`)
+            ws.publish=(packet:Packet)=>ws.send(JSON.stringify(packet))
+            // this._subscribe(ws,`${APIs.replyPrivate}/${ws.id}/#`)
             const uid:string=toArray(req.headers.uid).join("") ||"";
             const pass:string=toArray(req.headers.pass).join("")||"";
             // login1
@@ -34,7 +37,9 @@ export default class SocketService extends tEvent implements CommonNetwork{
                 this.authenticate(ws,uid,pass,(err,success)=>{
                     if(err ||!success) {
                         log("%d login falred {uid:%s,pass:%s}",ws.id,uid,pass);
-                        ws.close();
+                        const packet=createPacket({topic:`${_PRIVATE_KEY}/${ws.id}/${_LOGINBYTOKEN_REPLY}`,payload:JSON.stringify({error:0,msg:"login failure",data:null})})
+                        ws.send(JSON.stringify(packet))
+                        // ws.close(1007,JSON.stringify(packet));
                     }
                 })
             }
@@ -46,6 +51,7 @@ export default class SocketService extends tEvent implements CommonNetwork{
 
             //run onConnect
             ws.on("close",(code,reason)=>{
+                log("disconnect ",{code,reason:reason.toString()})
                 // execute onConnect
                 if(this.onConnect && typeof this.onConnect==='function') this.onConnect(ws,false);
                 this.emit("connection",ws,false);
@@ -53,7 +59,10 @@ export default class SocketService extends tEvent implements CommonNetwork{
                 this.delete(ws.subs);
                 
             });
+
             //run onConnect
+            // const packet=createPacket({topic:`private/${ws.id}/connect`,payload:ws.id})
+            // ws.send(JSON.stringify(packet));        //send client.id
             if(this.onConnect && typeof this.onConnect==='function') this.onConnect(ws,true);
             this.emit("connection",ws,true);
         })
@@ -84,15 +93,14 @@ export default class SocketService extends tEvent implements CommonNetwork{
     publish(topic: string, payload:string|object,opts?:Partial<PublishOption>): void {
         if(!topic || typeof topic!=='string') return;
         const _payload:string=typeof payload==='string'?payload:JSON.stringify(payload)
-        const packet:Packet=createPacket({...opts,payload:_payload,topic})
+        const packet:Packet=createPacket({...opts,payload:_payload,topic,messageId:this.messageId++})
         this.emit(topic,null,packet)
     }
 
-    authByToken(client:CommonClient,token:string,cb:(err:any,success?:boolean)=>void){
-        log("%d login by token success ",client.id,{token});
-        log("%d bypass by default","### WARNING:");
+    authByToken(client:CommonClient,token:string,cb:(err:any,user?:UserData)=>void){
+        log("%d login by token success, WARNING: default bypass",client.id,{token});
         this.publish(`${_PRIVATE_KEY}/${client.id}/${_LOGINBYTOKEN_REPLY}`,{token})
-        cb(null,true);
+        cb(null);
     }
 
     /**
@@ -138,7 +146,6 @@ function parserJSON(ws:SocketExt,msg:string,next:Function){
     catch(err){
         const _msg:string=err instanceof Error?err.message:"other"
         log("### ERROR: %s\n",_msg);
-        log(" ++++ debug ++++\n",{msg,err})
         return ws.send(JSON.stringify({error:1,msg:"you message is wrong format"}));
     }
 }
@@ -170,9 +177,20 @@ const _SUBSCRIBE_KEY="subscribe"
 function subscribe(service:SocketService){
     return (ws:SocketExt,packet:Packet,next:Function)=>{
         const topic=packet.topic||""
+        //not subscribe >> next
         if(topic!==_SUBSCRIBE_KEY) return next(ws,packet)
-        const subs:Subscription|Subscription[]=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
-        service._subscribe(ws,subs)
+        // subscribe
+        const payload=packet.payload;
+        const obj=typeof payload==='string'?JSON.parse(payload):payload;
+        const subs:Subscription[]=toArray(obj.subscribes)
+        if(service.authSubscribe && typeof service.authSubscribe==='function') {
+            const list:SubscripStd[]=[]
+            subs.forEach(sub=>service.authSubscribe(ws,sub,(err,_sub)=>{
+                if(err||!_sub||!_sub.topic) return;
+                list.push(_sub);
+            }))
+            service._subscribe(ws,list);
+        }
     }
 }
 
@@ -183,16 +201,11 @@ function login(service:SocketService){
         const topic=packet.topic||""
         if(topic!==_LOGIN_KEY) return next(ws,packet)
         const {uid,pass}=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
-        service.authenticate(ws,uid,pass,(err,success,user)=>{
+        service.authenticate(ws,uid,pass,(err,success)=>{
             if(err ||!success) {
                 log("%d login falred {uid:%s,pass:%s}",ws.id,uid,pass);
                 return ws.close();
             }
-            //send token @@@
-            const payload=JSON.stringify({error:0,msg:'login success',user})
-            const packet=createPacket({payload,topic:`${_PRIVATE_KEY}/${ws.id}/${APIs.loginReply}`})
-            log("### TEST ### \npacket:",packet)
-            ws.send(JSON.stringify(packet))
         })
     }
 }
@@ -204,11 +217,16 @@ function loginByToken(service:SocketService){
         const topic=packet.topic||""
         if(topic!==_LOGIN_BYTOKEN_KEY) return next(ws,packet)
         const {token}=typeof packet.payload==='string'?JSON.parse(packet.payload):packet.payload
-        service.authByToken(ws,token,(err,success)=>{
-            if(err||!success){
+        service.authByToken(ws,token,(err,user)=>{
+            if(err||!user){
                 log("%d login falred {token:%s}",ws.id,token);
                 ws.close();
+                return;
             }
+
+            //send user infor
+
+
         })
     }
 }
@@ -224,8 +242,12 @@ export interface PublishOption{
     qos:Qos;
     retain:boolean;
 }
-export interface SocketExt extends WebSocket,CommonClient{
+export interface SocketExt extends WebSocket, CommonClient{
     id:string;
-    subs:any[]
+    subs:any[];
+    eid?:string;
+    user?: UserDataExt | undefined;
+    publish:(packet: Packet, callback?: CommonErrorHandle )=>void;
+    
 }
 

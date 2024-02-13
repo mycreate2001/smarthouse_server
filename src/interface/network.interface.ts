@@ -22,6 +22,7 @@ export interface CommonClient{
     id:string;
     eid?:string;
     user?:UserDataExt
+    // publish:(packet:Packet,callback?:CommonErrorHandle)=>void;//(packet:Packet,callback?:CommonErrorHandle)=>void
 }
 
 /** Handle each function */
@@ -32,8 +33,9 @@ export type CommonAuthorizePublish=(client:CommonClient,packet:Packet,callback:C
 export type CommonAuthorizeSubscribe =(client:CommonClient,subs:Subscription,callback:CommonHandleAuthSub)=>void;
 
 export type CommonHandleAuthPub=(err:any)=>void
+export type CommonErrorHandle=(err?:Error)=>void
 export type CommonHandleAuthSub=(err:any|null,sub:SubscripStd|undefined)=>void;
-export type CommonHandleAuth=(error:any,sucess:boolean,user?:any)=>void;
+export type CommonHandleAuth=(error:any,sucess:boolean)=>void;
 export interface PublishOption{
     timeout_sec:number;
 }
@@ -43,6 +45,8 @@ export interface Packet{
     qos:Qos;                // type of sending
     retain:boolean;         // enable remain message for new connect or not True= Remember this message
     cmd:string;
+    dup:boolean;
+    messageId:number;
 }
 
 export const PacketDefault:Packet={
@@ -50,7 +54,9 @@ export const PacketDefault:Packet={
     payload:'',
     qos:0,
     retain:false,
-    cmd:'publish'
+    cmd:'publish',
+    dup:false,
+    messageId:0
 }
 
 export function createPacket(opts:Partial<Packet>={}):Packet{

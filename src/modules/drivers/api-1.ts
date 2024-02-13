@@ -1,6 +1,8 @@
 import { createLog } from "advance-log";
 import { CommonDriverService, DeviceBasic, DeviceValueDataCommon } from "../../interface/device.interface";
 import { DriverControl, DriverHook, DriverHookDb, DriverPacket } from "../../interface/device-service.interface";
+import { createPacket } from "../../interface/network.interface";
+import { toArray } from "ultility-tools";
 const log=createLog("API V1",{enablePos:true})
 const _TYPE='api-v1'
 const _NETWORK_ID='mqtt,websocket'.split(",");
@@ -26,19 +28,31 @@ const services:DriverHookDb={
     getDevice:{
         type:'get-device',
         name:'get devices',
-        ref:'api/v1/infor',
+        ref:'api/v1/:id/infor',
         handler(client, packet, infor, driverService, network) {
-            const replyTopic=infor.ref+"/res"
+            const replyTopic=infor.ref.replace(":id",client.id)+"/res"
             const payload=packet.payload;
-            if(payload==='devices'){
-                driverService.getDevices()
-                .then(devices=>network.publish(replyTopic,{devices,msg:"ok",err:0}))
+            const reqs=payload.split(" ");
+            const pTasks=reqs.map( async req=>{
+                if(req==='ndevices') return {data:driverService.nDevices,req}
+                if(req==='devices') return {data:await driverService.getDevices(),req};
+                //other case
                 return;
-            }
-            if(payload==='ndevices'){
-                network.publish(replyTopic,{ndevices:driverService.nDevices});
-                log("new device ",driverService.nDevices);
-            }
+            }).filter(x=>!!x);
+
+            Promise.all(pTasks).then(objs=>{
+                // log("### TEST-001 ### ",{obj:JSON.stringify(objs)})
+                const results:any={}
+                toArray(objs).forEach(obj=>{
+                    if(!obj) return
+                    results[obj.req]=obj.data
+                })
+                network.publish(replyTopic,JSON.stringify({...results,error:0}))
+            })
+            .catch(err=>{
+                const msg:string=err instanceof Error?err.message:"other"
+                network.publish(replyTopic,JSON.stringify({error:1,msg}))
+            })
         }
     },
     remote: {

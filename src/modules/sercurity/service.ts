@@ -1,12 +1,15 @@
 import { createLog } from "advance-log";
 import { DriverHook, DriverPacket } from "../../interface/device-service.interface";
-import { CommonNetworkPacket, correctSubsciption } from "../../interface/network.interface";
+import { CommonNetworkPacket, correctSubsciption, createPacket } from "../../interface/network.interface";
 import { UserServiceData } from "../../interface/user.interface";
 import { getList, wildcard } from "ultility-tools";
 
 const _LABEL="sercurity"
 const _DEFAULT_ALLOWPUBLISH_TOPIC:boolean=true;
 const _DEFAULT_ALLOWSUBSCRIBE_TOPIC:boolean=true;
+const _TOKEN_STARTWITH='$TOKEN'
+const _PRIVATE_KEY='private'
+const _LOGIN_REPLY="login-res"
 
 const log=createLog(_LABEL,{enablePos:true})
 export interface SercurityServiceOption{
@@ -21,14 +24,30 @@ export default function SercurityService(userService:UserServiceData,networks:Co
         /** authentication */
         const networkService=network.service;
         networkService.authenticate=async (client,uid,pass,cb)=>{
+            const replyTopic:string=`${_PRIVATE_KEY}/${client.id}/${_LOGIN_REPLY}`
             try{
                 if(!uid ||typeof uid!=='string') throw new Error("invalid uid");
-                const {token,...user}=await userService.login(uid,pass);
-                cb(null,true,token);
-                networkService.publish(`private/${client.id}/login-res`,{token,...user})
+                //case 1  verify by token
+                if(uid.startsWith(_TOKEN_STARTWITH)){
+                    // const token=pass;
+                    const user=await userService.loginByToken(pass);
+                    client.user=user;
+                    networkService.publish(replyTopic,JSON.stringify({user}))
+                    log("%d loginByToken => %s token:%s",client.id,"success",pass)
+                    cb(null,true);
+                    return;
+
+                }
+                const user=await userService.login(uid,pass);
+                client.user=user;
+                log("%d login => %s ",client.id,"success",{uid,pass})
+                networkService.publish(replyTopic,JSON.stringify({error:0,data:user,msg:'login success'}))
+                cb(null,true);
+
             }
             catch(err){
                 const msg=err instanceof Error?err.message:"other"
+                await networkService.publish(replyTopic,JSON.stringify({error:1,msg,data:null}))
                 log("%d login ERROR:%s",client.id,msg,{uid,pass})
                 cb(err,false)
             }
@@ -106,7 +125,7 @@ export default function SercurityService(userService:UserServiceData,networks:Co
             catch(err){
                 // error
                 const msg:string=err instanceof Error?err.message:"other"
-                log("%d check subscribe %s => %s,reason %s",client.id,_sub,"Failured",msg);
+                log("%d check subscribe %s => %s,reason %s",client.id,_sub.topic,"Failured",msg);
                 cb(err,undefined)
             }
         }
