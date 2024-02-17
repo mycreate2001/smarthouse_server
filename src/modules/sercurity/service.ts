@@ -24,41 +24,43 @@ export default function SercurityService(userService:UserServiceData,networks:Co
         /** authentication */
         const networkService=network.service;
         networkService.authenticate=async (client,uid,pass,cb)=>{
-            const replyTopic:string=`${_PRIVATE_KEY}/${client.id}/${_LOGIN_REPLY}`
             try{
                 if(!uid ||typeof uid!=='string') throw new Error("invalid uid");
                 //case 1  verify by token
-                if(uid.startsWith(_TOKEN_STARTWITH)){
+                if(uid===_TOKEN_STARTWITH){
                     // const token=pass;
                     const user=await userService.loginByToken(pass);
                     client.user=user;
-                    networkService.publish(replyTopic,JSON.stringify({user}))
                     log("%d loginByToken => %s token:%s",client.id,"success",pass)
-                    cb(null,true);
+                    cb(null,true,user);
                     return;
 
                 }
                 const user=await userService.login(uid,pass);
                 client.user=user;
-                log("%d login => %s ",client.id,"success",{uid,pass})
-                networkService.publish(replyTopic,JSON.stringify({error:0,data:user,msg:'login success'}))
-                cb(null,true);
+                log("%d login => %s ",client.id,"SUCCESS",{uid,pass})
+                cb(null,true,user);
 
             }
             catch(err){
-                const msg=err instanceof Error?err.message:"other"
-                await networkService.publish(replyTopic,JSON.stringify({error:1,msg,data:null}))
-                log("%d login ERROR:%s",client.id,msg,{uid,pass})
+                const _err=err instanceof Error?err:new Error("other")
+                if(uid===_TOKEN_STARTWITH)
+                    log("%d loginByToken => %s,reason:%s",client.id,"### FAILURED ###",_err.message,{token:pass})
+                else  log("%d login => %s,reason:%s",client.id,"### FAILURED ###",_err.message,{uid,pass})
                 cb(err,false)
             }
             
         }
 
         /** publish */
-        networkService.authorizePublish=(client,packet,cb)=>{
+        networkService.authorizePublish=async (client,packet,cb)=>{
             // check login
             const user=client.user;
             if(!user) throw new Error("not yet login");
+            // check token expired @@@ */
+           
+
+            // check token expired end
             const topic:string=packet.topic
             try{
                 const _drivers=drivers.filter(d=>d.networkIds.includes(network.id));
@@ -70,7 +72,10 @@ export default function SercurityService(userService:UserServiceData,networks:Co
                 
                 // no service
                 if(!services.length) {
-                    if(allowPublish) return cb(null)
+                    if(allowPublish) {
+                        log("%d publish %s =>%s, %d",client.id,topic,"SUCCESS","### WARINING: allow other topics")
+                        return cb(null)
+                    }
                     else throw new Error("not allow other link")
                 }
 
@@ -89,7 +94,7 @@ export default function SercurityService(userService:UserServiceData,networks:Co
             catch(err){
                 // error
                 const msg:string=err instanceof Error?err.message:"other"
-                log("%d check publish %s=>%s,reason %s",client.id,topic,"Failured",msg);
+                log("%d publish %s=>%s,reason %s",client.id,topic,"### Failured ###",msg);
                 cb(err)
             }
 
@@ -101,6 +106,9 @@ export default function SercurityService(userService:UserServiceData,networks:Co
             try{
                 const user=client.user;
                 if(!user) throw new Error("Not login yet");
+                //@@@ checktoken expired 
+
+                ///
                 const _drivers=drivers.filter(d=>d.networkIds.includes(network.id));
                 const services:DriverHook[]=_drivers.reduce<DriverHook[]>((acc,cur)=>{
                     let _services:DriverHook[]=Object.keys(cur.services).map(id=>Object.assign({},{id,...cur.services[id]}))
@@ -110,7 +118,10 @@ export default function SercurityService(userService:UserServiceData,networks:Co
 
                 // check other topics
                 if(!services.length){
-                    if(allowSubscribe) return cb(null,_sub);
+                    if(allowSubscribe) {
+                        log("%d subscribe '%s'=> success, %d",client.id,_sub.topic,"### WARING: allow other topics");
+                        return cb(null,_sub);
+                    }
                     throw new Error("Not allow other topic")
                 }
 
@@ -119,17 +130,17 @@ export default function SercurityService(userService:UserServiceData,networks:Co
                 if(!list.includes(_sub.topic)) throw new Error("accept deined");
 
                 // final
+                log("%d subscribe '%s'=> success",client.id,_sub.topic)
                 cb(null,_sub);
 
             }
             catch(err){
                 // error
-                const msg:string=err instanceof Error?err.message:"other"
-                log("%d check subscribe %s => %s,reason %s",client.id,_sub.topic,"Failured",msg);
-                cb(err,undefined)
+                const _err=err instanceof Error?err:new Error("other")
+                log("%d subscribe %s => %s, reason %s",client.id,_sub.topic,"### FAILURED! ###",_err.message);
+                cb(_err,undefined)
             }
         }
 
-        // const _drivers:DriverPacket[]=drivers.filter(d=>d.networkIds.includes(network.id));
     })
 }

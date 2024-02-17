@@ -1,4 +1,4 @@
-import { UserDataExt } from "./user.interface";
+import { UserData, UserDataExt } from "./user.interface";
 
 export const PUBLISH_TIMEOUT_SEC_DEFAULT=10;    // time for sending success to client
 export interface CommonNetwork{
@@ -35,7 +35,7 @@ export type CommonAuthorizeSubscribe =(client:CommonClient,subs:Subscription,cal
 export type CommonHandleAuthPub=(err:any)=>void
 export type CommonErrorHandle=(err?:Error)=>void
 export type CommonHandleAuthSub=(err:any|null,sub:SubscripStd|undefined)=>void;
-export type CommonHandleAuth=(error:any,sucess:boolean)=>void;
+export type CommonHandleAuth=(error:any,sucess:boolean,user?:UserData)=>void;
 export interface PublishOption{
     timeout_sec:number;
 }

@@ -55,7 +55,7 @@ export default class MqttService implements CommonNetwork{
             if(!checkFns(this.authorizePublish)) return cb(null);
             const _client=client?client:{id:'server',publish:()=>null};//@@@ check
             const payload=packet.payload.toString()
-            this.authorizePublish(_client,{...packet,payload},cb);
+            this.authorizePublish(_client,createPacket({...packet,payload}),cb);
         }
 
         /** subscribe */
